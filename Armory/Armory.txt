@@ -1,0 +1,15 @@
+## Title: Armory |c277ecdExport|r
+## Author: |c277ecdAaxc|r
+## Version: 3.0.4
+## Description: Data gather addon for www.eso-armory.com online character views. Version |c277ecd3.0.3|r
+## APIVersion: 101031
+## SavedVariables: ArmoryExport
+## DependsOn: LibAddonMenu-2.0
+
+Armory.lua
+Units/TrialScores.lua
+Units/Achievements.lua
+Units/Rewards.lua
+Units/Recipes.lua
+Units/Criteria.lua
+Units/Reconstruction.lua

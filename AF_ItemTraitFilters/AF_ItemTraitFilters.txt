@@ -1,0 +1,7 @@
+## Title: Advanced Filters - Item Trait Filters
+## Author: Randactyl
+## Version: 1.1.1.1
+## APIVersion: 100019
+## DependsOn: AdvancedFilters
+
+TraitFilters.lua

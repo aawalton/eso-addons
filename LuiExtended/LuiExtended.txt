@@ -1,0 +1,136 @@
+## Title: |cE12000L|cFFFFB0ui E|rxtended|
+## Author: ArtOfShred, psypanda, SpellBuilder
+## Version: 6.2.9
+## APIVersion: 100035
+## AddOnVersion: 629
+## Description: Provides UnitFrames, InfoPanel, Combat Text & Info, Buffs & Debuff Tracking, Chat Announcements and Slash Commands.
+## DependsOn: LibAddonMenu-2.0>=31 LibMediaProvider-1.0
+## OptionalDependsOn: LibChatMessage pChat
+## IsLibrary: false
+## SavedVariables: LUIESV
+
+# This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates.
+# The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries.
+# All rights reserved
+#
+# You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
+
+# The MIT License (MIT)
+#
+# Copyright (c) 2017-2019 - LuiExtended - ArtOfShred <esoui.com>
+# Copyright (c) 2015-2016 - LuiExtended - SpellBuilder and Upularity <esoui.com>
+# Copyright (c) 2016-2018 - Miat's CC Tracker - dorrino <esoui.com>
+# Copyright (c) 2014 - CombatCloud - Samantha James
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+LuiExtended.lua
+Functions.lua
+Hooks-SkillsAdvisor.lua
+Hooks.lua
+Initialize.lua
+UI.lua
+Changelog.lua
+Bindings.xml
+
+frontend/Changelog.xml
+frontend/CombatText.xml
+frontend/CrowdControlTracker.xml
+# frontend/StatPanel.xml
+
+i18n/en.lua
+i18n/$(language).lua
+i18n/settings/Settings_en.lua
+i18n/settings/Settings_$(language).lua
+i18n/skills/Skills_en.lua
+i18n/skills/Skills_$(language).lua
+
+Unlock.lua
+
+data/Globals.lua
+data/AbilityTables.lua
+data/Tooltips.lua
+data/UnitNamesTable.lua
+data/ZoneNamesTable.lua
+data/Effects.lua
+data/CastBarTable.lua
+data/CombatTextConstants.lua
+data/AlertTable.lua
+data/CrowdControl.lua
+data/DebugTable.lua
+data/Quests.lua
+data/PetNames.lua
+data/AbilityBlacklistPresets.lua
+data/CombatTextBlacklistPresets.lua
+
+modules/ChatAnnouncements/ChatAnnouncements.lua
+
+modules/CombatText/CombatText.lua
+modules/CombatText/Animation.lua
+modules/CombatText/Pool.lua
+modules/CombatText/PoolManager.lua
+modules/CombatText/EventListeners/Base.lua
+modules/CombatText/EventListeners/Combat.lua
+modules/CombatText/EventListeners/Death.lua
+modules/CombatText/EventListeners/PointsAlliance.lua
+modules/CombatText/EventListeners/PointsExperience.lua
+modules/CombatText/EventListeners/PointsChampion.lua
+modules/CombatText/EventListeners/ResourcesPotion.lua
+modules/CombatText/EventListeners/ResourcesPower.lua
+modules/CombatText/EventListeners/ResourcesUltimate.lua
+modules/CombatText/EventViewers/Base.lua
+modules/CombatText/EventViewers/CombatCloud.lua
+modules/CombatText/EventViewers/CombatHybrid.lua
+modules/CombatText/EventViewers/CombatEllipse.lua
+modules/CombatText/EventViewers/CombatScroll.lua
+modules/CombatText/EventViewers/CrowdControl.lua
+modules/CombatText/EventViewers/Death.lua
+modules/CombatText/EventViewers/Points.lua
+modules/CombatText/EventViewers/Resources.lua
+
+modules/CombatInfo/CombatInfo.lua
+modules/CombatInfo/AbilityAlerts.lua
+modules/CombatInfo/CrowdControlTracker.lua
+# modules/CombatInfo/StatPanel.lua
+
+modules/InfoPanel/InfoPanel.lua
+
+modules/SpellCastBuffs/SpellCastBuffs.lua
+modules/SpellCastBuffs/Collectibles.lua
+modules/SpellCastBuffs/Cyrodiil.lua
+modules/SpellCastBuffs/Stealth.lua
+modules/SpellCastBuffs/Debug.lua
+modules/SpellCastBuffs/Werewolf.lua
+
+modules/SlashCommands/SlashCommands.lua
+modules/SlashCommands/General.lua
+modules/SlashCommands/Group.lua
+modules/SlashCommands/Guild.lua
+modules/SlashCommands/Social.lua
+
+modules/UnitFrames/UnitFrames.lua
+
+settings/Settings.lua
+settings/ChatAnnouncements.lua
+settings/CombatInfo.lua
+settings/CombatText.lua
+settings/InfoPanel.lua
+settings/SlashCommands.lua
+settings/SpellCastBuffs.lua
+settings/UnitFrames.lua
