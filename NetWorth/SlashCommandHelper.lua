@@ -13,7 +13,7 @@ function SlashCommandHelper:Initialize()
         return self:SlashCommandCallback()
     end
 
-    self.command = LibSlashCommander:Register({"/networth", "/nw"}, SlashCommandCallback, "Calculate net worth of all assets")
+    self.command = LibSlashCommander:Register({"/networth", "/nw", "/nm"}, SlashCommandCallback, "Calculate net worth of all assets")
 end
 
 function SlashCommandHelper:SlashCommandCallback()
