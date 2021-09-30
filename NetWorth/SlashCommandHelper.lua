@@ -22,7 +22,7 @@ function SlashCommandHelper:SlashCommandCallback()
     for itemIdOrLink, DBItem in pairs(IIfA.database) do
         -- find the item link
         local itemLink
-        if NetWorth:IsItemLink(itemIdOrLink) then
+        if NetWorth.IsItemLink(itemIdOrLink) then
             itemLink = itemIdOrLink
         else
             itemLink = NetWorth.GetItemLinkFromItemId(itemIdOrLink)
@@ -57,10 +57,10 @@ function SlashCommandHelper:SlashCommandCallback()
     networth = networth + totalCurrency
 
     d(string.format("Total net worth: %s", CommaValue(networth)))
-
 end
 
-function NetWorth:IsItemLink(link)
+
+function NetWorth.IsItemLink(link)
 	local _, _, type = ZO_LinkHandler_ParseLink(link)
 	return type == "item"
 end
