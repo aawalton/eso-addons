@@ -396,3 +396,14 @@ ESODBExportConst.SlaughterfishAttackStatusStrings = {
 	"attaque de poissons carnassiers",
 	"атака рыбы-убийцы",
 }
+
+ESODBExportConst.TrialTypes = {
+	RAID_CATEGORY_TRIAL,
+	RAID_CATEGORY_CHALLENGE
+}
+
+ESODBExportConst.BattlegroundTypes = {
+	BATTLEGROUND_LEADERBOARD_TYPE_DEATHMATCH,
+	BATTLEGROUND_LEADERBOARD_TYPE_FLAG_GAMES,
+	BATTLEGROUND_LEADERBOARD_TYPE_LAND_GRAB
+}

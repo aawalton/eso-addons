@@ -1,9 +1,9 @@
 ## DisableSavedVariablesAutoSaving: 1
-## Title: |c2080D0ESO-Database.com|r Export |c00C000v4.4.2|r
+## Title: |c2080D0ESO-Database.com|r Export |c00C000v4.4.4|r
 ## Description: The ESO-Database.com export AddOn to collect your characters information and statistics.
 ## Author: |cEFEBBEKeldor|r
-## Version: 4.4.2
-## IntVersion: 4402
+## Version: 4.4.4
+## IntVersion: 4404
 ## APIVersion: 101031
 ## SavedVariables: ESODBDataExportV4
 

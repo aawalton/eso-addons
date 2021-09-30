@@ -9,8 +9,8 @@
 ESODatabaseExport = {}
 ESODatabaseExport.Name = "ESODatabaseExport"
 ESODatabaseExport.DisplayName = "ESO-Database.com Export"
-ESODatabaseExport.AddonVersion = "4.4.2"
-ESODatabaseExport.AddonVersionInt = 4402
+ESODatabaseExport.AddonVersion = "4.4.4"
+ESODatabaseExport.AddonVersionInt = 4404
 ESODatabaseExport.SavedVariablesName = "ESODBDataExportV4"
 ESODatabaseExport.NumKeepStats = 12
 ESODatabaseExport.VariableVersion = 22
@@ -1021,17 +1021,138 @@ function ESODatabaseExport.ExportTitles()
 	end
 end
 
-function ESODatabaseExport.ExportWeeklyLeaderboards()
+function ESODatabaseExport.QueryLeaderboardData()
 
-	svAccount.Leaderboards.Weekly = {}
+	-- Must be called before accessing leaderboard data
+	-- When the data is ready, EVENT_RAID_LEADERBOARD_DATA_CHANGED is fired
+	QueryRaidLeaderboardData()
+end
 
-	local numEntries = GetNumTrialOfTheWeekLeaderboardEntries()
-	if numEntries > 0 then
+function ESODatabaseExport.QueryBattlegroundData()
 
+	-- Must be called before accessing leaderboard data
+	-- When the data is ready, EVENT_BATTLEGROUND_LEADERBOARD_DATA_CHANGED is fired
+	QueryBattlegroundLeaderboardData()
+end
+
+function ESODatabaseExport.ExportTrialLeadeboards()
+
+	local _, megaserver = ESODBExportUtils:GetCharacterInfo()
+
+	svAccount.TrialLeaderboards = {}
+	svAccount.TrialLeaderboards.Megaserver = megaserver
+	svAccount.TrialLeaderboards.AddonVersion = ESODatabaseExport.AddonVersionInt
+	svAccount.TrialLeaderboards.Timestamp = GetTimeStamp()
+	svAccount.TrialLeaderboards.Trials = {}
+	svAccount.TrialLeaderboards.Weekly = {}
+
+	ESODatabaseExport.ExportTrialScores()
+	ESODatabaseExport.ExportWeeklyTrialScores()
+end
+
+function ESODatabaseExport.ExportBattlegroundLeadeboards()
+
+	local _, megaserver = ESODBExportUtils:GetCharacterInfo()
+
+	svAccount.BattlegroundLeaderboards = {}
+	svAccount.BattlegroundLeaderboards.Megaserver = megaserver
+	svAccount.BattlegroundLeaderboards.AddonVersion = ESODatabaseExport.AddonVersionInt
+	svAccount.BattlegroundLeaderboards.Timestamp = GetTimeStamp()
+	svAccount.BattlegroundLeaderboards.Battlegrounds = {}
+
+	ESODatabaseExport.ExportBattlegroundScores()
+end
+
+function ESODatabaseExport.ExportTrialScores()
+
+	for _, raidCategory in pairs(ESODBExportConst.TrialTypes) do
+
+		local numRaids, hasWeekly = GetNumRaidLeaderboards(raidCategory)
+
+		if hasWeekly == true then
+
+			local _, raidId = GetRaidOfTheWeekLeaderboardInfo(raidCategory)
+
+			ESODBExportUtils:SetTableIndexByFieldValue(svAccount.TrialLeaderboards.Weekly, "RaidUniqueId", raidCategory .. "-" .. raidId, {
+				RaidUniqueId = raidCategory .. "-" .. raidId,
+				RaidId = raidId,
+				RaidCategory = raidCategory,
+				Scores = {}
+			})
+		end
+
+		if numRaids > 0 then
+
+			local position = 0
+			local lastRank = 0
+
+			for raidIndex = 1, numRaids do
+
+				local _, raidId = GetRaidLeaderboardInfo(raidCategory, raidIndex)
+				local numEntries = GetNumTrialLeaderboardEntries(raidIndex)
+
+				position = 0
+				lastRank = 0
+
+				if numEntries > 0 then
+
+					local raidTableIndex = ESODBExportUtils:SetTableIndexByFieldValue(svAccount.TrialLeaderboards.Trials, "RaidUniqueId", raidCategory .. "-" .. raidId, {
+						RaidUniqueId = raidCategory .. "-" .. raidId,
+						RaidId = raidId,
+						RaidCategory = raidCategory,
+						Scores = {}
+					})
+
+					local j = 0
+					for i = 1, numEntries, 1 do
+
+						local ranking, charName, score, rowClassId, allianceId, displayName = GetTrialLeaderboardEntryInfo(raidIndex, i)
+						if ranking > 0 then
+
+							if ranking ~= position then
+								lastRank = lastRank + 1
+								position = ranking
+							end
+
+							svAccount.TrialLeaderboards.Trials[raidTableIndex].Scores[j] = {
+								Rank = lastRank,
+								CharName = charName,
+								Score = score,
+								ClassId = rowClassId,
+								AllianceId = allianceId,
+								UserId = displayName
+							}
+
+							j = j + 1
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function ESODatabaseExport.ExportWeeklyTrialScores()
+
+	local _, trialRaidId = GetRaidOfTheWeekLeaderboardInfo(RAID_CATEGORY_TRIAL)
+	local numTrialEntries = GetNumTrialOfTheWeekLeaderboardEntries()
+
+	if numTrialEntries > 0 then
+
+		local raidTableIndex = ESODBExportUtils:SetTableIndexByFieldValue(svAccount.TrialLeaderboards.Weekly, "RaidUniqueId", RAID_CATEGORY_TRIAL .. "-" .. trialRaidId, {
+			RaidUniqueId = RAID_CATEGORY_TRIAL .. "-" .. trialRaidId,
+			RaidId = trialRaidId,
+			RaidCategory = RAID_CATEGORY_TRIAL,
+			Scores = {}
+		})
+
+		svAccount.TrialLeaderboards.Weekly[raidTableIndex].Scores = {}
+
+		local j = 0
 		local position = 0
 		local lastRank = 0
 
-		for i = 1, numEntries, 1 do
+		for i = 1, numTrialEntries, 1 do
 
 			local ranking, charName, score, rowClassId, allianceId, displayName = GetTrialOfTheWeekLeaderboardEntryInfo(i)
 
@@ -1040,7 +1161,7 @@ function ESODatabaseExport.ExportWeeklyLeaderboards()
 				lastRank = lastRank + 1
 			end
 
-			svAccount.Leaderboards.Weekly[i] = {
+			svAccount.TrialLeaderboards.Weekly[raidTableIndex].Scores[j] = {
 				Rank = lastRank,
 				CharName = charName,
 				Score = score,
@@ -1048,149 +1169,104 @@ function ESODatabaseExport.ExportWeeklyLeaderboards()
 				AllianceId = allianceId,
 				UserId = displayName
 			}
+
+			j = j + 1
 		end
 	end
-end
 
-function ESODatabaseExport.ExportTrialLeaderboards()
-
-	svAccount.Leaderboards.Trials = {}
-
-	local numRaids = GetNumRaidLeaderboards(RAID_CATEGORY_TRIAL)
-
-	if numRaids > 0 then
-
-		local position = 0
-		local lastRank = 0
-
-		for raidIndex = 1, numRaids do
-
-			position = 0
-			lastRank = 0
-
-			local _, raidId = GetRaidLeaderboardInfo(RAID_CATEGORY_TRIAL, raidIndex)
-			local numEntries = GetNumTrialLeaderboardEntries(raidIndex)
-
-			if numEntries > 0 then
-
-				local raidTableIndex = ESODBExportUtils:SetTableIndexByFieldValue(svAccount.Leaderboards.Trials, "RaidId", raidId, {
-					RaidId = raidId,
-					Scores = {}
-				})
-
-				local j = 0
-				for i = 1, numEntries, 1 do
-
-					local ranking, charName, score, rowClassId, allianceId, displayName = GetTrialLeaderboardEntryInfo(raidIndex, i)
-					if ranking > 0 then
-
-						if ranking ~= position then
-							lastRank = lastRank + 1
-							position = ranking
-						end
-
-						svAccount.Leaderboards.Trials[raidTableIndex].Scores[j] = {
-							Rank = lastRank,
-							CharName = charName,
-							Score = score,
-							ClassId = rowClassId,
-							AllianceId = allianceId,
-							UserId = displayName
-						}
-
-						j = j + 1
-					end
-				end
-			end
-		end
-	end
-end
-
-function ESODatabaseExport.ExportMaelstromArenaLeaderboards()
-
-	svAccount.Leaderboards.MSA = {}
-	svAccount.Leaderboards.MSAWeekly = {}
-
+	local _, classRaidId = GetRaidOfTheWeekLeaderboardInfo(RAID_CATEGORY_CHALLENGE)
 	local numClasses = GetNumClasses()
 
 	if numClasses > 0 then
 
-		for class = 1, numClasses do
+		local raidTableIndex = ESODBExportUtils:SetTableIndexByFieldValue(svAccount.TrialLeaderboards.Weekly, "RaidUniqueId", RAID_CATEGORY_CHALLENGE .. "-" .. classRaidId, {
+			RaidUniqueId = RAID_CATEGORY_CHALLENGE .. "-" .. classRaidId,
+			RaidId = classRaidId,
+			RaidCategory = RAID_CATEGORY_CHALLENGE,
+			Scores = {}
+		})
 
-			local classId = GetClassInfo(class)
-			local numLeaderboardEntries = GetNumChallengeLeaderboardEntries(1, classId)
-			local numWeeklyLeaderboardEntries = GetNumChallengeOfTheWeekLeaderboardEntries(classId)
+		svAccount.TrialLeaderboards.Weekly[raidTableIndex].Scores = {}
 
-			if numLeaderboardEntries > 0 then
-				local j = 0
-				for i = 1, numLeaderboardEntries, 1 do
+		local j = 0
 
-					local ranking, charName, score, rowClassId, allianceId, displayName = GetChallengeLeaderboardEntryInfo(1, classId, i)
-					if ranking > 0 then
-						svAccount.Leaderboards.MSA[j] = {
-							Rank = ranking,
-							CharName = charName,
-							Score = score,
-							ClassId = rowClassId,
-							AllianceId = allianceId,
-							UserId = displayName
-						}
-						j = j + 1
-					end
-				end
-			end
+		for classIndex = 1, numClasses do
 
-			if numWeeklyLeaderboardEntries > 0 then
-				j = 0
-				for i = 1, numLeaderboardEntries, 1 do
+			local classId = GetClassInfo(classIndex)
+			local numClassEntries = GetNumChallengeOfTheWeekLeaderboardEntries(classId)
+
+			if numClassEntries > 0 then
+
+				local position = 0
+				local lastRank = 0
+
+				for i = 1, numClassEntries, 1 do
 
 					local ranking, charName, score, rowClassId, allianceId, displayName = GetChallengeOfTheWeekLeaderboardEntryInfo(classId, i)
-					if ranking > 0 then
-						svAccount.Leaderboards.MSAWeekly[j] = {
-							Rank = ranking,
-							CharName = charName,
-							Score = score,
-							ClassId = rowClassId,
-							AllianceId = allianceId,
-							UserId = displayName
-						}
-						j = j + 1
+
+					if ranking ~= position then
+						position = ranking
+						lastRank = lastRank + 1
 					end
+
+					svAccount.TrialLeaderboards.Weekly[raidTableIndex].Scores[j] = {
+						Rank = lastRank,
+						CharName = charName,
+						Score = score,
+						ClassId = rowClassId,
+						AllianceId = allianceId,
+						UserId = displayName
+					}
+
+					j = j + 1
 				end
 			end
 		end
 	end
 end
 
-function ESODatabaseExport.ExportWeeklyTrial()
+function ESODatabaseExport.ExportBattlegroundScores()
 
-	local raidName, raidId = GetRaidOfTheWeekLeaderboardInfo(RAID_CATEGORY_TRIAL)
+	local position = 0
+	local lastRank = 0
 
-	svAccount.Leaderboards.WeeklyTrial = {}
-	svAccount.Leaderboards.WeeklyTrial.Id = raidId
-	svAccount.Leaderboards.WeeklyTrial.Name = raidName
-end
+	for _, battlegroundType in pairs(ESODBExportConst.BattlegroundTypes) do
 
-function ESODatabaseExport.QueryLeaderboardData()
+		local numEntries = GetNumBattlegroundLeaderboardEntries(battlegroundType)
 
-	-- Must be called before accessing leaderboard data
-	-- When the data is ready, EVENT_RAID_LEADERBOARD_DATA_CHANGED is fired
-	QueryRaidLeaderboardData()
-end
+		position = 0
+		lastRank = 0
 
-function ESODatabaseExport.ExportLeadeboards()
+		if numEntries > 0 then
 
-	local _, megaserver = ESODBExportUtils:GetCharacterInfo()
+			local battlegroundTableIndex = ESODBExportUtils:SetTableIndexByFieldValue(svAccount.BattlegroundLeaderboards.Battlegrounds, "BattlegroundId", battlegroundType, {
+				BattlegroundId = battlegroundType,
+				Scores = {}
+			})
 
-	svAccount.Leaderboards = {}
-	svAccount.Leaderboards.Megaserver = megaserver
-	svAccount.Leaderboards.AddonVersion = ESODatabaseExport.AddonVersionInt
-	svAccount.Leaderboards.Timestamp = GetTimeStamp()
+			local j = 0
+			for i = 1, numEntries, 1 do
 
-	ESODatabaseExport.ExportWeeklyLeaderboards()
-	ESODatabaseExport.ExportTrialLeaderboards()
-	ESODatabaseExport.ExportMaelstromArenaLeaderboards()
-	ESODatabaseExport.ExportWeeklyTrial()
+				local ranking, displayName, charName, score = GetBattlegroundLeaderboardEntryInfo(battlegroundType, i)
+				if ranking > 0 then
+
+					if ranking ~= position then
+						lastRank = lastRank + 1
+						position = ranking
+					end
+
+					svAccount.BattlegroundLeaderboards.Battlegrounds[battlegroundTableIndex].Scores[j] = {
+						Rank = lastRank,
+						CharName = charName,
+						Score = score,
+						UserId = displayName
+					}
+
+					j = j + 1
+				end
+			end
+		end
+	end
 end
 
 
@@ -2298,7 +2374,8 @@ function ESODatabaseExport.OnAddOnLoaded(_, addonName)
 	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_SKILL_RESPEC_RESULT, ESODatabaseExport.EventSkillRespecResult)
 	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_ZONE_CHANGED, ESODatabaseExport.EventZoneChanged)
 	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_HOUSING_PRIMARY_RESIDENCE_SET, ESODatabaseExport.EventHousingPrimaryResidenceSet)
-	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_RAID_LEADERBOARD_DATA_CHANGED, ESODatabaseExport.ExportLeadeboards)
+	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_RAID_LEADERBOARD_DATA_CHANGED, ESODatabaseExport.ExportTrialLeadeboards)
+	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_BATTLEGROUND_LEADERBOARD_DATA_CHANGED, ESODatabaseExport.ExportBattlegroundLeadeboards)
 
 	-- Justice events
 	EVENT_MANAGER:RegisterForEvent(ESODatabaseExport.Name, EVENT_JUSTICE_PICKPOCKET_FAILED, ESODatabaseExport.EventJusticePickpocketFailed)
@@ -2372,7 +2449,7 @@ function ESODatabaseExport.OnAddOnLoaded(_, addonName)
 	----
 	EVENT_MANAGER:RegisterForUpdate(ESODatabaseExport.Name .. "ExportInterval", ESODatabaseExport.ScanInterval, ESODatabaseExport.Export)
 	EVENT_MANAGER:RegisterForUpdate(ESODatabaseExport.Name .. "ExportGuildsInterval", ESODatabaseExport.ScanGuildInterval, ESODatabaseExport.ExportGuilds)
-	EVENT_MANAGER:RegisterForUpdate(ESODatabaseExport.Name .. "LeaderboardsInterval", ESODatabaseExport.LeaderboardScanInterval, ESODatabaseExport.QueryLeaderboardData)
+	EVENT_MANAGER:RegisterForUpdate(ESODatabaseExport.Name .. "LeaderboardsInterval", ESODatabaseExport.LeaderboardScanInterval, function() ESODatabaseExport.QueryLeaderboardData() ESODatabaseExport.QueryBattlegroundData() end)
 	EVENT_MANAGER:RegisterForUpdate(ESODatabaseExport.Name .. "TimedActivitiesInterval", ESODatabaseExport.TimedActivitiesScanInterval, ESODatabaseExport.ExportTimedActivities)
 end
 
