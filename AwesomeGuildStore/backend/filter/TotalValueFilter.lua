@@ -84,9 +84,11 @@ function TotalValueFilter.GetTotalCount(itemLink)
     local DBItem = IIfA.database[TotalValueFilter.GetItemID(itemLink)]
 
     local itemCount = 0
-    for locname, data in pairs(DBItem.locations) do
-        for bagSlot, qty in pairs(data.bagSlot) do
-            itemCount = itemCount + (qty or 0)
+    if (DBItem) then
+        for locname, data in pairs(DBItem.locations) do
+            for bagSlot, qty in pairs(data.bagSlot) do
+                itemCount = itemCount + (qty or 0)
+            end
         end
     end
     return itemCount
