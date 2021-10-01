@@ -27229,7 +27229,7 @@ local function AddRadiusActionEffectForFurniture( id, name, inclusive, onActionS
 end
 
 do
-	local LERP_INTERVAL = 800
+	local LERP_INTERVAL = 1000
 
 	do
 		local function Action( self, active, effects )

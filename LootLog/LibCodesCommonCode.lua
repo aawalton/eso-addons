@@ -1,5 +1,5 @@
 local NAME = "LibCodesCommonCode"
-local VERSION = 4
+local VERSION = 5
 
 if (type(_G[NAME]) == "table" and type(_G[NAME].version) == "number" and _G[NAME].version >= VERSION) then return end
 
@@ -8,7 +8,7 @@ _G[NAME] = Lib
 
 
 --------------------------------------------------------------------------------
--- Color/Integer Conversions
+-- Color Conversions
 --------------------------------------------------------------------------------
 
 do
@@ -46,6 +46,24 @@ do
 
 	function Lib.Int32ToInt24( rgba )
 		return BitRShift(rgba, 8)
+	end
+
+	local function h2c( p, q, t )
+		t = t - zo_floor(t)
+		if (t < 1/6) then return p + (q - p) * 6 * t end
+		if (t < 1/2) then return q end
+		if (t < 2/3) then return p + (q - p) * (2/3 - t) * 6 end
+		return p
+	end
+
+	function Lib.HSLToRGB( h, s, l )
+		if (s == 0) then
+			return l, l, l
+		else
+			local q = (l < 0.5) and (l * (1 + s)) or (l + s - l * s)
+			local p = 2 * l - q
+			return h2c(p, q, h + 1/3), h2c(p, q, h), h2c(p, q, h - 1/3)
+		end
 	end
 end
 

@@ -4997,15 +4997,16 @@ function EHT.Biz.AdjustSelectedFurniture( delta, precision )
 		end
 	end
 
-	local coordPrecision = EHT.SavedVars.SelectionPrecisionMoveCustom
-	local anglePrecision = math.rad( EHT.SavedVars.SelectionPrecisionRotateCustom )
-
-	if not EHT.SavedVars.SelectionPrecisionUseCustom then
-		coordPrecision, anglePrecision = EHT.Biz.GetPrecisionIncrements( precision )
+	local anglePrecision, coordPrecision
+	if true == EHT.SavedVars.SelectionPrecisionUseCustom then
+		anglePrecision = math.rad(EHT.SavedVars.SelectionPrecisionRotateCustom)
+		coordPrecision = EHT.SavedVars.SelectionPrecisionMoveCustom
+	else
+		coordPrecision, anglePrecision = EHT.Biz.GetPrecisionIncrements(precision)
 	end
 
 	if nil == coordPrecision or 0 >= coordPrecision then coordPrecision = 1 end
-	if nil == anglePrecision or 0 >= anglePrecision then anglePrecision = math.rad( 1 ) end
+	if nil == anglePrecision or 0 >= anglePrecision then anglePrecision = math.rad(1) end
 
 	if delta.Forward or delta.Left then
 		local heading = EHT.Biz.GetEditorHeading()
@@ -5085,7 +5086,11 @@ function EHT.Biz.AdjustSelectedFurniture( delta, precision )
 		end
 
 		x, y, z, pitch, yaw, roll = item.X, item.Y, item.Z, item.Pitch, item.Yaw, item.Roll
-		--x, y, z, pitch, yaw, roll = EHT.Housing.GetFurniturePositionAndOrientation( item.Id )
+
+		if not x or not y or not z or not pitch or not yaw or not roll then
+			local _x, _y, _z, _pitch, _yaw, _roll = EHT.Housing.GetFurniturePositionAndOrientation( item.Id )
+			x, y, z, pitch, yaw, roll = x or _x or 0, y or _y or 0, z or _z or 0, pitch or _pitch or 0, yaw or _yaw or 0, roll or _roll or 0
+		end
 
 		if nil ~= delta.X then x = x + ( delta.X * coordPrecision ) end
 		if nil ~= delta.Y then y = y + ( delta.Y * coordPrecision ) end

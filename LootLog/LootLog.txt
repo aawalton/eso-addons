@@ -7,8 +7,8 @@
 ## Title: Loot Log
 ## Description: Searchable log of the items that you and your group members have looted
 ## Author: @code65536
-## Version: 4.1.0
-## APIVersion: 100035 101031
+## Version: 4.1.1
+## APIVersion: 101031 101032
 ## SavedVariables: LootLogSavedVariables LootLogHistory
 ## DependsOn: LibExtendedJournal>=6
 ## OptionalDependsOn: LibCharacterKnowledge>=6 LibMultiAccountSets>=9 LibAddonMenu-2.0
@@ -27,6 +27,9 @@ LootLogTrade.lua
 Bindings.xml
 
 ; Changelog:
+;
+; Version 4.1.1 (2021/09/28)
+; * Blue-quality companion items will no longer be considered notable
 ;
 ; Version 4.1.0 (2021/08/07)
 ; * The item request link for uncollected items linked by other players will now

@@ -4,7 +4,7 @@ ItemBrowser = {
 	name = "ItemBrowser",
 
 	title = GetString(SI_ITEMBROWSER_TITLE),
-	version = "4.1.6",
+	version = "4.2.1",
 	url = "https://www.esoui.com/downloads/info1480.html",
 
 	-- Default settings
@@ -61,6 +61,32 @@ end
 
 function ItemBrowser.FormatTransmuteCost( cost )
 	return string.format("%s%s", (cost and cost <= 75) and cost or "—", zo_iconFormatInheritColor("/esoui/art/currency/gamepad/gp_seedcrystal_mipmap.dds", 16, 16))
+end
+
+do
+	local AntiquitySetItems
+
+	local function GetAntiquitySetItems( )
+		if (not AntiquitySetItems) then
+			AntiquitySetItems = { }
+			local antiquityId = GetNextAntiquityId()
+			while (antiquityId) do
+				local setId = GetAntiquitySetId(antiquityId)
+				if (setId and setId ~= 0) then
+					local itemId = GetItemRewardItemId(GetAntiquitySetRewardId(setId))
+					if (itemId and itemId ~= 0) then
+						AntiquitySetItems[itemId] = setId
+					end
+				end
+				antiquityId = GetNextAntiquityId(antiquityId)
+			end
+		end
+		return AntiquitySetItems
+	end
+
+	function ItemBrowser.GetItemAntiquitySetId( itemLink )
+		return GetAntiquitySetItems()[GetItemLinkItemId(itemLink)] or 0
+	end
 end
 
 function ItemBrowser.MigrateSettings( )

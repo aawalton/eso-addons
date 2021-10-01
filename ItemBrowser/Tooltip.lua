@@ -50,6 +50,13 @@ local function GetItemSlotName( itemLink, isWeapon )
 	end
 end
 
+local function MixColors( color1, color2 )
+	local h1, s1, l1 = ConvertRGBToHSL(LCCC.Int24ToRGB(color1))
+	local h2, s2, l2 = ConvertRGBToHSL(LCCC.Int24ToRGB(color2))
+	if (zo_abs(h1 - h2) > 0.5) then h1 = h1 + 1 end
+	return LCCC.RGBToInt24(LCCC.HSLToRGB((h1 + h2) / 2, (s1 + s2) / 2, (l1 + l2) / 2))
+end
+
 local function AddTooltipExtensionToUndauntedCoffer( tooltip, itemLink )
 	local colors = ItemBrowser.vars.tooltipColors.pieces
 
@@ -167,6 +174,41 @@ function ItemBrowser.AddTooltipExtension( tooltip, itemLink, account, flags, ite
 		end
 	end
 
+	-- Component: antiquity fragments for mythics
+	if ((account == nil or account == GetDisplayName()) and valid) then
+		local antiquitySetId = ItemBrowser.GetItemAntiquitySetId(itemLink)
+		if (antiquitySetId ~= 0) then
+			-- Initialize colors
+			local colorDug = ItemBrowser.vars.tooltipColors.pieces.unlocked
+			local colorNoLead = ItemBrowser.vars.tooltipColors.pieces.locked
+			local colorHaveLead = MixColors(colorDug, colorNoLead)
+
+			local results = { }
+			local noLeads = 0
+
+			for i = 1, GetNumAntiquitySetAntiquities(antiquitySetId) do
+				local antiquityId = GetAntiquitySetAntiquityId(antiquitySetId, i)
+				local color
+
+				if (DoesAntiquityNeedCombination(antiquityId)) then
+					color = colorDug
+				elseif (DoesAntiquityHaveLead(antiquityId)) then
+					color = colorHaveLead
+				else
+					color = colorNoLead
+					noLeads = noLeads + 1
+				end
+
+				table.insert(results, string.format("|c%06X%s|r", color, zo_strformat("<<C:1>>", GetAntiquityName(antiquityId))))
+			end
+
+			-- Show the section only if the player has progress to show or the item is uncollected
+			if (noLeads < #results or not IsItemSetCollectionPieceUnlocked(GetItemLinkItemId(itemLink))) then
+				LEJ.TooltipExtensionAddSection(GetString(SI_ANTIQUITY_FRAGMENTS), table.concat(results, ", "))
+			end
+		end
+	end
+
 	-- Component: account knowledge
 	if (LMAS and BitAnd(flags, FLAG_SHOW_ACCOUNTS) == FLAG_SHOW_ACCOUNTS and valid) then
 		local accounts = LMAS.GetAccountList(true)
@@ -249,6 +291,7 @@ function ItemBrowser.HookExternalTooltips( )
 	TooltipHook(ItemTooltip, "SetStoreItem", GetStoreItemLink)
 	TooltipHook(ItemTooltip, "SetAttachedMailItem", GetAttachedItemLink)
 	TooltipHook(ItemTooltip, "SetLootItem", GetLootItemLink, nil, { "lootId" })
+	TooltipHook(ItemTooltip, "SetReward", GetItemRewardItemLink)
 	TooltipHook(ItemTooltip, "SetQuestReward", GetQuestRewardItemLink)
 	TooltipHook(ItemTooltip, "SetTradingHouseItem", GetTradingHouseSearchResultItemLink)
 	TooltipHook(ItemTooltip, "SetTradingHouseListing", GetTradingHouseListingItemLink)

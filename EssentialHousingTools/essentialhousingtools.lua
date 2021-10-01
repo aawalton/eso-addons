@@ -277,7 +277,7 @@ function EHT.Setup.CleanVars()
 
 	if 0 == vars.SelectionPrecision then
 		vars.SelectionPrecision = 3
-		vars.SelectionPrecisionUseCustom = true
+		vars.SelectionPrecisionUseCustom = false
 	end
 
 	if vars.SelectionIndicatorAlpha < EHT.CONST.MIN_SELECTION_INDICATOR_ALPHA then vars.SelectionIndicatorAlpha = EHT.CONST.MIN_SELECTION_INDICATOR_ALPHA end

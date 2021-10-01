@@ -7357,7 +7357,7 @@ function EHT.UI.SetupToolDialogEditTab( ui, parent, prefix, settings, source )
 	ui.EditSettingsGroup:SetMouseEnabled(false)
 
 	ui.Precision = WINDOW_MANAGER:CreateControl( prefix .. "Precision", ui.EditSettingsGroup, CT_SLIDER )
-	ui.Precision:SetAnchor( TOP, ui.EditSettingsGroup, TOP, 0, 28 )
+	ui.Precision:SetAnchor( TOP, ui.EditSettingsGroup, TOP, 0, 38 )
 	ui.Precision:SetHeight( 15 )
 	ui.Precision:SetWidth( 130 )
 	ui.Precision:SetMouseEnabled( true )
@@ -7409,24 +7409,39 @@ function EHT.UI.SetupToolDialogEditTab( ui, parent, prefix, settings, source )
 	end
 
 	ui.CustomPrecisionToggle = WINDOW_MANAGER:CreateControlFromVirtual( prefix .. "CustomPrecisionToggle", ui.EditSettingsGroup, "ZO_CheckButton" )
-	ui.CustomPrecisionToggle:SetAnchor( TOP, ui.Precision, BOTTOM, -63, 12 )
+	ui.CustomPrecisionToggle:SetAnchor( TOP, ui.Precision, BOTTOM, -63, 24 )
 	ZO_CheckButton_SetLabelText( ui.CustomPrecisionToggle, "Use Custom Precision" )
 	ui.CustomPrecisionToggle.label:ClearAnchors()
 	ui.CustomPrecisionToggle.label:SetAnchor( LEFT, ui.CustomPrecisionToggle, RIGHT, 5, 1 )
 	ui.CustomPrecisionToggle.label:SetWidth( 120 )
 	ui.CustomPrecisionToggle.label:SetHorizontalAlignment( TEXT_ALIGN_RIGHT )
 	ZO_CheckButton_SetCheckState( ui.CustomPrecisionToggle, EHT.SavedVars.SelectionPrecisionUseCustom )
-	ZO_CheckButton_SetToggleFunction( ui.CustomPrecisionToggle, function()
-		EHT.SavedVars.SelectionPrecisionUseCustom = ZO_CheckButton_IsChecked( ui.CustomPrecisionToggle )
-		ui.Precision:SetEnabled( not EHT.SavedVars.SelectionPrecisionUseCustom )
-		EHT.UI.SetPrecisionInfoTooltip( true )
-	end )
+
+	local function OnUseCustomPrecisionToggled()
+		local control = EHT.UI.ToolDialog
+		local enabled = ZO_CheckButton_IsChecked(control.CustomPrecisionToggle)
+		local c = enabled and 0.5 or 1
+
+		EHT.SavedVars.SelectionPrecisionUseCustom = enabled
+		control.Precision:SetEnabled(not enabled)
+		control.PrecisionLabel:SetColor(c, c, c, 1)
+		control.PrecisionMaxLabel:SetColor(c, c, c, 1)
+		control.PrecisionMinLabel:SetColor(c, c, c, 1)
+		
+		if not control.CustomPrecisionToggle:IsHidden() then
+			EHT.UI.SetPrecisionInfoTooltip(true)
+		end
+	end
+
+	ZO_CheckButton_SetToggleFunction(ui.CustomPrecisionToggle, OnUseCustomPrecisionToggled)
 	ui.CustomPrecisionToggle:GetChild( 1 ):SetFont( "ZoFontGameSmall" )
 
 	EHT.UI.SetInfoTooltip(
 		ui.CustomPrecisionToggle,
 		"|cffffffEnable |c88ffffCustom Move and Rotate Precision|cffffff\n\nTo change these custom values go to\n|c88ffffSettings > Addons > Essential Housing Tools",
 		TOP, 0, 10, BOTTOM, ui.Window )
+
+	OnUseCustomPrecisionToggled()
 
 	do
 		local b = WINDOW_MANAGER:CreateControl( nil, ui.EditSettingsGroup, CT_TEXTURE )

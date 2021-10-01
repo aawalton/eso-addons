@@ -7,8 +7,8 @@
 ## Title: Item Set Browser
 ## Description: List and browse the game's item sets with tracking of Item Set Collection progress
 ## Author: @code65536
-## Version: 4.1.6
-## APIVersion: 100035 101031
+## Version: 4.2.1
+## APIVersion: 101031 101032
 ## SavedVariables: ItemBrowserSavedVariables
 ## DependsOn: LibExtendedJournal>=6
 ## OptionalDependsOn: LibMultiAccountSets>=9 LibAddonMenu-2.0
@@ -27,6 +27,15 @@ Tooltip.lua
 Bindings.xml
 
 ; Changelog:
+;
+; Version 4.2.1 (2021/09/29)
+; * Fixed an issue with the display of antiquity fragment names in non-English
+;   game clients
+;
+; Version 4.2.0 (2021/09/28)
+; * Item tooltips for in-progress Mythic items will now include information
+;   about the item's antiquity fragments
+; * Added support for Update 32 (The Deadlands)
 ;
 ; Version 4.1.6 (2021/07/14)
 ; * Added support for Update 31 (Waking Flame)

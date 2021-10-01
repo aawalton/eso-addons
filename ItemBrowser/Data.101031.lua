@@ -391,6 +391,15 @@ ItemBrowser.data = {
 		{ 174412, 0x00, { 1263 } }, -- Perfected Bahsei's Mania
 		{ 174594, 0x00, { 1263 } }, -- Perfected Sul-Xan's Torment
 		{ 174983, 0x00, { 1263 } }, -- Perfected Saxhleel Champion
+		{ 177427, 0x00, { 1268 } }, -- Crimson Oath's Rive
+		{ 177593, 0x00, { 1268 } }, -- Scorion's Feast
+		{ 177765, 0x00, { 1268 } }, -- Rush of Agony
+		{ 177930, 0x00, { 1267 } }, -- Silver Rose Vigil
+		{ 178096, 0x00, { 1267 } }, -- Thunder Caller
+		{ 178268, 0x00, { 1267 } }, -- Grisly Gourmet
+		{ 180463, 0x20, { -4 } }, -- Dark Convergence
+		{ 180635, 0x20, { -4 } }, -- Plaguebreak
+		{ 180800, 0x20, { -4 } }, -- Hrothgar's Chill
 
 		-- Monster Sets --------------------------------------------------------
 		{ 59391, 0x18, { 934, { -101 } } }, -- Spawn of Mephala
@@ -440,6 +449,8 @@ ItemBrowser.data = {
 		{ 175197, 0x18, { 584 } }, -- Zoal the Ever-Wakeful
 		{ 175253, 0x18, { 584 } }, -- Immolator Charr
 		{ 175309, 0x18, { 584 } }, -- Glorgoloch the Destroyer
+		{ 178582, 0x18, { 1267, { -103 } } }, -- Prior Thierric
+		{ 178644, 0x18, { 1268, { -103 } } }, -- Magma Incarnate
 
 		-- 3p Jewelry Sets -----------------------------------------------------
 		{ 69166, 0x22, { 584, -1 } }, -- Endurance
@@ -642,6 +653,8 @@ ItemBrowser.data = {
 		[1201] = 3, -- Castle Thorn
 		[1228] = 3, -- Black Drake Villa
 		[1229] = 3, -- The Cauldron
+		[1267] = 3, -- Red Petal Bastion
+		[1268] = 3, -- The Dread Cellar
 
 		-- Trials --------------------------------------------------------------
 		[ 636] = 4, -- Hel Ra Citadel

@@ -53,10 +53,10 @@ ItemBrowser.data = {
 		{ 121984, 0x51, { 849 }, 8 }, -- Daedric Trickery
 		{ 122334, 0x51, { 849 }, 6 }, -- Shacklebreaker
 		{ 130460, 0x51, { 980 }, 2 }, -- Innate Axiom
-		{ 130803, 0x51, { 980, { 981 } }, 4 }, -- Fortified Brass
+		{ 130803, 0x51, { 981, { 980 } }, 4 }, -- Fortified Brass
 		{ 131168, 0x51, { 980 }, 6 }, -- Mechanical Acuity
 		{ 135800, 0x51, { 1011 }, 3 }, -- Adept Rider
-		{ 136157, 0x51, { 1011, { 1027 } }, 6 }, -- Sload's Semblance
+		{ 136157, 0x51, { 1027, { 1011 } }, 6 }, -- Sload's Semblance
 		{ 136515, 0x51, { 1011 }, 9 }, -- Nocturnal's Favor
 		{ 142894, 0x51, { 726 }, 7 }, -- Grave-Stake Collector
 		{ 143271, 0x51, { 726 }, 2 }, -- Naga Shaman
@@ -79,6 +79,9 @@ ItemBrowser.data = {
 		{ 172558, 0x51, { 1261 }, 3 }, -- Hist Whisperer
 		{ 172932, 0x51, { 1261 }, 7 }, -- Heartland Conqueror
 		{ 173306, 0x51, { 1261 }, 5 }, -- Diamond's Victory
+		{ 178916, 0x51, { 1286 }, 3 }, -- Wretched Vitality
+		{ 179298, 0x51, { 1286 }, 7 }, -- Deadlands Demolisher
+		{ 179657, 0x51, { 1283, { 1286 } }, 5 }, -- Iron Flask
 
 		-- Non-Crafted ---------------------------------------------------------
 		{ 68476, 0x20, { 643 } }, -- Black Rose
@@ -400,6 +403,9 @@ ItemBrowser.data = {
 		{ 180463, 0x20, { -4 } }, -- Dark Convergence
 		{ 180635, 0x20, { -4 } }, -- Plaguebreak
 		{ 180800, 0x20, { -4 } }, -- Hrothgar's Chill
+		{ 179960, 0x00, { 1286 } }, -- Eye of the Grasp
+		{ 180132, 0x00, { 1286 } }, -- Hexos' Ward
+		{ 180297, 0x00, { 1286 } }, -- Kynmarcher's Cruelty
 
 		-- Monster Sets --------------------------------------------------------
 		{ 59391, 0x18, { 934, { -101 } } }, -- Spawn of Mephala
@@ -537,11 +543,14 @@ ItemBrowser.data = {
 		{ 165899, 0x100, { -5 } }, -- Bloodlord's Embrace
 		{ 171436, 0x102, { -5 } }, -- Ring of the Pale Order
 		{ 171437, 0x102, { -5 } }, -- Pearls of Ehlnofey
-		{ 175524, 0x100, { -5  } }, -- Harpooner's Wading Kilt
-		{ 175525, 0x100, { -5  } }, -- Gaze of Sithis
-		--{ 175526, 0x102, { -5  } }, -- Harvester's Hope-Ring
-		{ 175527, 0x102, { -5  } }, -- Death Dealer's Fete
-		{ 175528, 0x102, { -5  } }, -- Shapeshifter's Chain
+		{ 175524, 0x100, { -5 } }, -- Harpooner's Wading Kilt
+		{ 175525, 0x100, { -5 } }, -- Gaze of Sithis
+		--{ 175526, 0x102, { -5 } }, -- Harvester's Hope-Ring
+		{ 175527, 0x102, { -5 } }, -- Death Dealer's Fete
+		{ 175528, 0x102, { -5 } }, -- Shapeshifter's Chain
+		{ 181695, 0x102, { -5 } }, -- Spaulder of Ruin
+		{ 182208, 0x102, { -5 } }, -- Markyn Ring of Majesty
+		{ 182209, 0x102, { -5 } }, -- Belharza's Band
 	},
 
 	specialNames = {
@@ -593,7 +602,9 @@ ItemBrowser.data = {
 		[ 823] = 1, -- The Gold Coast
 		[ 849] = 1, -- Vvardenfell
 		[ 980] = 1, -- The Clockwork City
+		[ 981] = 1, -- The Brass Fortress
 		[1011] = 1, -- Summerset
+		[1027] = 1, -- Artaeum
 		[ 726] = 1, -- Murkmire
 		[1086] = 1, -- Northern Elsweyr
 		[1133] = 1, -- Southern Elsweyr
@@ -602,6 +613,8 @@ ItemBrowser.data = {
 		[1207] = 1, -- The Reach
 		[1208] = 1, -- Blackreach: Arkthzand Cavern
 		[1261] = 1, -- Blackwood
+		[1283] = 1, -- The Shambles
+		[1286] = 1, -- The Deadlands
 
 		-- PvP -----------------------------------------------------------------
 		[ 181] = 2, -- Cyrodiil

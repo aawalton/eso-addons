@@ -4,7 +4,7 @@ LootLog = {
 	name = "LootLog",
 
 	title = GetString(SI_LOOTLOG_TITLE),
-	version = "4.1.0",
+	version = "4.1.1",
 	url = "https://www.esoui.com/downloads/info1455.html",
 
 	-- Default settings
@@ -263,7 +263,7 @@ function LootLog.IsItemNotable( itemLink, itemId )
 	local itemType = GetItemLinkItemType(itemLink)
 
 	if (GetItemLinkActorCategory(itemLink) == GAMEPLAY_ACTOR_CATEGORY_COMPANION) then
-		return GetItemLinkFunctionalQuality(itemLink) >= ITEM_FUNCTIONAL_QUALITY_ARCANE
+		return GetItemLinkFunctionalQuality(itemLink) >= ITEM_FUNCTIONAL_QUALITY_ARTIFACT
 	elseif (itemType == ITEMTYPE_WEAPON or itemType == ITEMTYPE_ARMOR) then
 		if (GetItemLinkSetInfo(itemLink)) then
 			return true

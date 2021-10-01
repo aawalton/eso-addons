@@ -8,9 +8,9 @@
 ## Description: Common framework for addons that provide a UI similar to the in-game journal
 ## Author: @code65536
 ## IsLibrary: true
-## Version: 1.1.5
+## Version: 1.1.6
 ## AddOnVersion: 6
-## APIVersion: 100035 101031
+## APIVersion: 101031 101032
 
 l10n/default.lua
 l10n/$(language).lua
@@ -22,6 +22,9 @@ SortFilterList.lua
 Bindings.xml
 
 ; Changelog:
+;
+; Version 1.1.6 (2021/09/28)
+; * API version bump for Update 32 (The Deadlands)
 ;
 ; Version 1.1.5 (2021/07/14)
 ; * API version bump for Update 31 (Waking Flame)

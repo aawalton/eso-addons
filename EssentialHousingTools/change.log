@@ -1,3 +1,9 @@
+Version 1763
+2021-09-30
+
+Minor bug fixes.
+Fixed an issue that caused the "Use Custom Precision" checkbox to work opposite to how it had always worked previously.
+
 Version 1762
 2021-09-14
 
