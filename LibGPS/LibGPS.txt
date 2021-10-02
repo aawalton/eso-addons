@@ -1,11 +1,11 @@
-## Title: LibGPS
+﻿## Title: LibGPS
 ## Author: sirinsidiator & votan
 ## Contributors: Shinni
-## Version: 3.0.3
-## AddOnVersion: 65
-## APIVersion: 100033
+## Version: 3.1.0
+## AddOnVersion: 66
+## APIVersion: 101031 101032
 ## IsLibrary: true
-## DependsOn: LibMapPing>=900 LibDebugLogger LibChatMessage
+## DependsOn: LibMapPing>=900 LibDebugLogger>=196 LibChatMessage>=100
 ## SavedVariables: LibGPS_Data
 ##
 ## This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates.
@@ -16,6 +16,7 @@
 
 StartUp.lua
 Measurement.lua
+WorldSize.lua
 MapStack.lua
 MapAdapter.lua
 TamrielOMeter.lua
