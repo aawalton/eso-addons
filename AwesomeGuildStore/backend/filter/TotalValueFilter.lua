@@ -64,12 +64,27 @@ function TotalValueFilter:Initialize()
     })
 end
 
+local rawItemTypes = {
+    [ITEMTYPE_BLACKSMITHING_RAW_MATERIAL] = true,
+    [ITEMTYPE_CLOTHIER_RAW_MATERIAL] = true,
+    [ITEMTYPE_WOODWORKING_RAW_MATERIAL] = true,
+    [ITEMTYPE_JEWELRYCRAFTING_RAW_MATERIAL] = true,
+    [ITEMTYPE_JEWELRYCRAFTING_RAW_BOOSTER] = true,
+    [ITEMTYPE_RAW_MATERIAL] = true,
+    [ITEMTYPE_JEWELRY_RAW_TRAIT] = true,
+}
+
 function TotalValueFilter:FilterLocalResult(itemData)
     local totalValue = TotalValueFilter.GetTotalValue(itemData)
     if(self.localMin and totalValue < self.localMin) then
         return false
     elseif(self.localMax and totalValue > self.localMax) then
         return false
+    end
+
+    if (self.localMin or self.localMax) then
+        local itemType = GetItemLinkItemType(itemData.itemLink)    
+        if (rawItemTypes[itemType]) then return false end
     end
     return true
 end
