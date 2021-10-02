@@ -18,7 +18,10 @@ end
 
 function SlashCommandHelper:SlashCommandCallback()
     -- iterate over items in IIfA
-    local networth = 0
+    local totalValue = 0
+    local totalCount = 0
+    local uniqueItems = 0
+
     for itemIdOrLink, DBItem in pairs(IIfA.database) do
         -- find the item link
         local itemLink
@@ -45,7 +48,9 @@ function SlashCommandHelper:SlashCommandCallback()
 
             -- accumulate value
             local value = itemCount * price
-            networth = networth + value
+            totalValue = totalValue + value
+            totalCount = totalCount + itemCount
+            if itemCount > 0 then uniqueItems = uniqueItems + 1 end
             -- if value > 10000000 then
             --     d(itemLink)
             --     d(string.format("%s x %s = %s", CommaValue(itemCount), CommaValue(price), CommaValue(value), itemLink))
@@ -54,9 +59,13 @@ function SlashCommandHelper:SlashCommandCallback()
     end
 
     local totalCurrency = NetWorth.GetTotalCurrency()
-    networth = networth + totalCurrency
+    local networth = totalValue + totalCurrency
 
-    d(string.format("Total net worth: %s", CommaValue(networth)))
+    d(string.format("net worth: %s", CommaValue(networth)))
+    -- d(string.format("currency: %s", CommaValue(totalCurrency)))
+    -- d(string.format("item value: %s", CommaValue(totalValue)))
+    -- d(string.format("item count: %s", CommaValue(totalCount)))
+    -- d(string.format("unique items: %s", CommaValue(uniqueItems)))
 end
 
 
@@ -86,6 +95,7 @@ function NetWorth.GetTotalCurrency()
     local totalTV = 0
     local totalAP = 0
     local totalWV = 0
+
     local assets = IIfA.data.assets
 
     for i=1, GetNumCharacters() do
