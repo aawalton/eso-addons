@@ -88,6 +88,7 @@ backend/filter/LevelFilter.lua
 backend/filter/UnitPriceFilter.lua
 backend/filter/UnitValueFilter.lua
 backend/filter/TotalValueFilter.lua
+backend/filter/TotalCountFilter.lua
 backend/filter/QualityFilter.lua
 backend/filter/TextFilter.lua
 backend/filter/ItemStyleFilter.lua

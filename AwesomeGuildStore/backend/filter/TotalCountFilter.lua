@@ -1,31 +1,25 @@
 local AGS = AwesomeGuildStore
 
 local FilterBase = AGS.class.FilterBase
-local CountRangeFilterBase = AGS.class.CountRangeFilterBase
+local ValueRangeFilterBase = AGS.class.ValueRangeFilterBase
 
 local FILTER_ID = AGS.data.FILTER_ID
 local SUB_CATEGORY_ID = AGS.data.SUB_CATEGORY_ID
 
 local gettext = AGS.internal.gettext
-local GetItemLinkWritVoucherCount = AGS.internal.GetItemLinkWritVoucherCount
-
-local GetItemLinkItemType = GetItemLinkItemType
-
-local ITEMTYPE_MASTER_WRIT = ITEMTYPE_MASTER_WRIT
-
 
 local MIN_COUNT = 0
 local MAX_COUNT = 2100000000
 
-local TotalCountFilter = CountRangeFilterBase:Subclass()
+local TotalCountFilter = ValueRangeFilterBase:Subclass()
 AGS.class.TotalCountFilter = TotalCountFilter
 
 function TotalCountFilter:New(...)
-    return CountRangeFilterBase.New(self, ...)
+    return ValueRangeFilterBase.New(self, ...)
 end
 
 function TotalCountFilter:Initialize()
-    CountRangeFilterBase.Initialize(self, FILTER_ID.TOTAL_COUNT_FILTER, FilterBase.GROUP_LOCAL, {
+    ValueRangeFilterBase.Initialize(self, FILTER_ID.TOTAL_COUNT_FILTER, FilterBase.GROUP_LOCAL, {
         -- TRANSLATORS: label of the total count filter
         label = gettext("Total Count Already Owned"),
         currency = CURT_MONEY,
@@ -75,12 +69,7 @@ function TotalCountFilter:FilterLocalResult(itemData)
     return true
 end
 
-function TotalCountFilter.GetTotalCount(itemLink)
-    return TotalCountFilter.GetTotalCount(itemLink) * TotalCountFilter.GetPrice(itemLink)
-end
-
 function TotalCountFilter.GetTotalCount(itemLink) 
-    local totalCount = 0
     local DBItem = IIfA.database[TotalCountFilter.GetItemID(itemLink)]
 
     local itemCount = 0
@@ -92,10 +81,6 @@ function TotalCountFilter.GetTotalCount(itemLink)
         end
     end
     return itemCount
-end
-
-function TotalCountFilter.GetPrice(itemLink)
-    return (LibPrice.ItemLinkToPriceGold(itemLink) or 0) / 1.20
 end
 
 function TotalCountFilter.GetItemID(itemLink)

@@ -97,7 +97,7 @@ function SearchTabWrapper:InitializeFilters(tradingHouseWrapper)
     AGS:RegisterFilter(AGS.class.TotalValueFilter:New())
     AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.TOTAL_VALUE_FILTER))
 
-    AGS:RegisterFilter(AGS.class.TotalValueFilter:New())
+    AGS:RegisterFilter(AGS.class.TotalCountFilter:New())
     AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.TOTAL_COUNT_FILTER))
 
     AGS:RegisterFilter(AGS.class.QualityFilter:New())
