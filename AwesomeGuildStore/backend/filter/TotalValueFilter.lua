@@ -65,8 +65,7 @@ function TotalValueFilter:Initialize()
 end
 
 function TotalValueFilter:FilterLocalResult(itemData)
-    local itemLink = itemData.itemLink
-    local totalValue = TotalValueFilter.GetTotalValue(itemLink)
+    local totalValue = TotalValueFilter.GetTotalValue(itemData)
     if(self.localMin and totalValue < self.localMin) then
         return false
     elseif(self.localMax and totalValue > self.localMax) then
@@ -75,8 +74,9 @@ function TotalValueFilter:FilterLocalResult(itemData)
     return true
 end
 
-function TotalValueFilter.GetTotalValue(itemLink)
-    return TotalValueFilter.GetTotalCount(itemLink) * TotalValueFilter.GetPrice(itemLink)
+function TotalValueFilter.GetTotalValue(itemData)
+    local stackPrice = itemData.purchasePrice / itemData.stackCount
+    return TotalValueFilter.GetTotalCount(itemData.itemLink) * stackPrice
 end
 
 function TotalValueFilter.GetTotalCount(itemLink) 
