@@ -1,6 +1,6 @@
 -- CustomCompassPins by Shinni
 local ADDON_NAME = "CustomCompassPins"
-local version = 1.31
+local version = 1.32
 
 local onlyUpdate = false
 if COMPASS_PINS and COMPASS_PINS.version then
@@ -167,12 +167,12 @@ end
 --
 function CompassPinManager:New(...)
 	local result = ZO_ControlPool.New(self, "ZO_MapPin", PARENT, "Pin")
-	result:Initialize(...)
+	result:Initialize2(...)
 
 	return result
 end
 
-function CompassPinManager:Initialize(...)
+function CompassPinManager:Initialize2(...)
 	self.pinData = {}
 	self.defaultAngle = 1
 end
