@@ -1,7 +1,8 @@
 -- CustomCompassPins by Shinni
-local version = 1.281
-local onlyUpdate = false
+local ADDON_NAME = "CustomCompassPins"
+local version = 1.32
 
+local onlyUpdate = false
 if COMPASS_PINS and COMPASS_PINS.version then
 	if COMPASS_PINS.version >= version then
 		return
@@ -166,12 +167,12 @@ end
 --
 function CompassPinManager:New(...)
 	local result = ZO_ControlPool.New(self, "ZO_MapPin", PARENT, "Pin")
-	result:Initialize(...)
+	result:Initialize2(...)
 
 	return result
 end
 
-function CompassPinManager:Initialize(...)
+function CompassPinManager:Initialize2(...)
 	self.pinData = {}
 	self.defaultAngle = 1
 end
@@ -189,6 +190,8 @@ function CompassPinManager:GetNewPin(data)
 	pin.yLoc = data.yLoc
 	pin.pinType = data.pinType
 	pin.pinTag = data.pinTag
+	pin.pinName = data.pinName
+	pin.data = data
 
 	local layout = COMPASS_PINS.pinLayouts[data.pinType]
 	local texture = pin:GetNamedChild("Background")
@@ -198,13 +201,19 @@ function CompassPinManager:GetNewPin(data)
 end
 -- creates a pin of the given pinType at the given location
 -- (radius is not implemented yet)
-function CompassPinManager:CreatePin(pinType, pinTag, xLoc, yLoc)
-	local data = {}
+function CompassPinManager:CreatePin(pinType, pinTag, xLoc, yLoc, pinName, ...)
+	local data = {...} -- in case the user wants to add more information
 
 	data.xLoc = xLoc or 0
 	data.yLoc = yLoc or 0
 	data.pinType = pinType or "NoType"
 	data.pinTag = pinTag or {}
+	data.pinName = pinName
+
+	self:RemovePin(data.pinTag) -- added in 1.29
+	-- some addons add new compass pins outside of this libraries callback
+	-- function. in such a case the old pins haven't been removed yet and get stuck
+	-- see destinations comment section 03/19/16 (uladz) and newer
 
 	self.pinData[pinTag] = data
 end
@@ -250,6 +259,7 @@ function CompassPinManager:Update(x, y, heading)
 	local layout
 	local normalizedDistance
 	local distance
+	local absNormalizedAngle
 	for _, pinData in pairs(self.pinData) do
 
 		layout = Compass_Pins.pinLayouts[pinData.pinType]
@@ -276,7 +286,8 @@ function CompassPinManager:Update(x, y, heading)
 
 				normalizedAngle = 2 * angle / (layout.FOV or Compass_Pins.defaultFOV)
 
-				if zo_abs(normalizedAngle) > (layout.maxAngle or self.defaultAngle) then
+				absNormalizedAngle = zo_abs(normalizedAngle)
+				if absNormalizedAngle > (layout.maxAngle or self.defaultAngle) then
 					pin:SetHidden(true)
 				else
 					pin:ClearAnchors()
@@ -286,11 +297,14 @@ function CompassPinManager:Update(x, y, heading)
 					if layout.sizeCallback then
 						layout.sizeCallback(pin, angle, normalizedAngle, normalizedDistance)
 					else
-						if zo_abs(normalizedAngle) > 0.25 then
-							pin:SetDimensions(36 - 16 * zo_abs(normalizedAngle), 36 - 16 * zo_abs(normalizedAngle))
+						if absNormalizedAngle > 0.25 then
+							pin:SetDimensions(36 - 16 * absNormalizedAngle, 36 - 16 * absNormalizedAngle)
 						else
 							pin:SetDimensions(32, 32)
 						end
+						-- CALLBACK_MANAGER:FireCallbacks("CustomCompassPins_SizeCallback", pin, angle, normalizedAngle, normalizedDistance)
+						-- callback manager has quite some overhead. 
+						-- use layout.additionalLayout instead
 					end
 
 					pin:SetAlpha(1 - normalizedDistance)
@@ -300,8 +314,7 @@ function CompassPinManager:Update(x, y, heading)
 					end
 				end
 			else
-				d("CustomCompassPin Error:")
-				d("no pin with key " .. pinData.pinKey .. "found!")
+				CHAT_ROUTER:AddDebugMessage(string.format("CustomCompassPin Error: no pin with key %s found!", pinData.pinKey))
 			end
 		else
 			if pinData.pinKey then

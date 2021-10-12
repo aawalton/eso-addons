@@ -1480,6 +1480,20 @@ Destinations.ChampionTableStore = {
     { 0.3106598854, 0.6040608882, 2996, 4},--Vor'chul the Beastbreaker
     { 0.3106598854, 0.6040608882, 2996, 3},--The Rootwhisperer
   },
+  ["u32deadlandszone_base_0"] = { --Deadlands
+    { 0.8933273553, 0.2688917815, 3138, 2},
+    { 0.1448765397, 0.5360811352, 3138, 1},
+  },
+  ["u32_folly_delve_base_0"] = { --Deadlands
+    { 0.5496475696, 0.4482638537, 3138, 2},
+  },
+  ["u32_dreaded_refuge_ext_base_0"] = {
+    { 0.2167935371, 0.1269224733, 3138, 1},
+    { 0.3966909945, 0.1203977018, 3138, 1},
+  },
+  ["u32_dreaded_refuge_int_base2_0"] = {
+    { 0.4977623522, 0.4356679320, 3138, 1},
+  },
 }
 -- X: 0.5710620880127 Y: 0.63778245449066
 -- alias for Gloomreach
@@ -1498,3 +1512,6 @@ Destinations.ChampionTableStore["arpenial3_base_0"]  = Destinations.ChampionTabl
 
 -- vunalk
 Destinations.ChampionTableStore["vunalk1_base_0"]  = Destinations.ChampionTableStore["vunalk2_base_0"]
+
+--u32_dreaded_refuge_int_base_0
+Destinations.ChampionTableStore["u32_dreaded_refuge_int_base_0"]  = Destinations.ChampionTableStore["u32_dreaded_refuge_int_base2_0"]

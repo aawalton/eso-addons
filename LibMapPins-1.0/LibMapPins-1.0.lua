@@ -26,34 +26,13 @@
 -- OTHER DEALINGS IN THE SOFTWARE.
 --
 -------------------------------------------------------------------------------
-local MAJOR = "LibMapPins-1.0"
-
-local function GetAddOnVersion()
-    local addOnManager = GetAddOnManager()
-    for i = 1, addOnManager:GetNumAddOns() do
-        local name = addOnManager:GetAddOnInfo(i)
-        if name == MAJOR then
-            return addOnManager:GetAddOnVersion(i)
-        end
-    end
-    return 0
-end
-local MINOR = GetAddOnVersion()
-
-local lib, oldminor
-if LibStub then
-    lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
-else
-    lib = {}
-end
-if not lib then return end
+lib = lib or {}
 
 -------------------------------------------------------------------------------
-lib.name = MAJOR
-lib.version = MINOR
-lib.updateFrom = lib.updateFrom or oldminor
-lib.filters = lib.filters or {}
-lib.pinManager = lib.pinManager or ZO_WorldMap_GetPinManager()
+lib.name = "LibMapPins-1.0"
+lib.version = 10033
+lib.filters = {}
+lib.pinManager = ZO_WorldMap_GetPinManager()
 
 local function GetPinTypeId(pinType)
     local pinTypeId
@@ -198,13 +177,6 @@ function lib:AddPinType(pinTypeString, pinTypeAddCallback, pinTypeOnResizeCallba
     self.pinManager:RefreshCustomPins(pinTypeId)
 
     return pinTypeId
-end
-
-SLASH_COMMANDS["/pinlist"] = function()
-    local customPins = lib.pinManager.customPins
-    for pinId, pinLayout in pairs(customPins) do
-        df("pinId: %d - pinName: %s", pinId, pinLayout.pinTypeString)
-    end
 end
 
 -------------------------------------------------------------------------------
@@ -754,9 +726,7 @@ function lib.OnMapChanged()
     end
 end
 
-if not oldminor then
-    CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", lib.OnMapChanged)
-end
+CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", lib.OnMapChanged)
 
 -------------------------------------------------------------------------------
 -- Hooks ----------------------------------------------------------------------

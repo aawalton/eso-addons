@@ -3146,6 +3146,10 @@ Destinations.ACHDataStore = {
   ["vunalk2_base_0"] = {
     { 0.7836887240, 0.2897340059, 20, 999999, 1, "X" }, -- Sharlikran
   },
+  -- Deadlands
+  ["u32deadlandszone_base_0"] = {
+    { 0.8387016057, 0.2812155783, 40, 3144, 1, "X" }, -- Sharlikran
+  },
 }
 
 -- vunalk

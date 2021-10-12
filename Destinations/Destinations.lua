@@ -109,7 +109,7 @@ end
 -------------------------------------------------
 
 local ADDON_AUTHOR                              = "Sharlikran |c990000Snowman|r|cFFFFFFDK|r & MasterLenman & Ayantir"
-local ADDON_VERSION                             = "28.9"
+local ADDON_VERSION                             = "29.0"
 local ADDON_WEBSITE                             = "http://www.esoui.com/downloads/info667-Destinations.html"
 
 local LMP                                       = LibMapPins
@@ -1502,6 +1502,9 @@ local ZoneIDsToFileNames                        = {
   [1207] = "reach_base_0",
   [1208] = "u28_blackreach_base_0",
   [1261] = "blackwood_base_0",
+  [1282] = "u32_fargrave_base_0",
+  [1283] = "u32_theshambles_base_0",
+  [1286] = "u32deadlandszone_base_0",
 }
 
 local achTypes                                  = {

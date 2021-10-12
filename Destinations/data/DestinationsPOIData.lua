@@ -174,6 +174,11 @@ local CRAFTINGSET_PENTRIC_RUN                   = 63
 local CRAFTINGSET_WITHERED_ROOT                 = 64
 local CRAFTINGSET_SARIELLENS_SWORD              = 65
 
+-- Fargrave/Deadlands
+local CRAFTINGSET_IRON_FLASK              = 66
+local CRAFTINGSET_DEADLANDS_DEMOLISHER              = 67
+local CRAFTINGSET_WRETCHED_VITALITY              = 68
+
 -- itemId, numberOfTraitsRequired
 Destinations.SetsStore                          = {
 
@@ -284,6 +289,11 @@ Destinations.SetsStore                          = {
   [CRAFTINGSET_PENTRIC_RUN] = { 173203, 5 }, -- 63
   [CRAFTINGSET_WITHERED_ROOT] = { 172455, 3 }, -- 64
   [CRAFTINGSET_SARIELLENS_SWORD] = { 172829, 7 }, -- 65
+
+  -- Fargrave/Deadlands
+  [CRAFTINGSET_IRON_FLASK] = { 179554, 5 }, -- 65
+  [CRAFTINGSET_DEADLANDS_DEMOLISHER] = { 179180, 7 }, -- 65
+  [CRAFTINGSET_WRETCHED_VITALITY] = { 178806, 3 }, -- 65
 }
 
 Destinations.KeepsStore                         = {
@@ -2539,5 +2549,58 @@ Destinations.POIsStore                          = {
     [76] = { n = "Vunalk Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
     [77] = { n = "Sweetwater Cascades", t = DESTINATIONS_PIN_TYPE_HOUSING },
     ["zoneName"] = "Blackwood",
+  },
+  [1282] =
+  {
+    [1] = { n = "", t = DESTINATIONS_PIN_TYPE_UNKNOWN },
+    [2] = { n = "Fargrave Outskirts Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [3] = { n = "Ossa Accentium", t = DESTINATIONS_PIN_TYPE_HOUSING },
+    [4] = { n = "", t = DESTINATIONS_PIN_TYPE_UNKNOWN },
+    [5] = { n = "Fargrave Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    ["zoneName"] = "Fargrave",
+  },
+  [1283] =
+  {
+    [1] = { n = "Forgotten Feretory", t = DESTINATIONS_PIN_TYPE_CRAFTING, s = CRAFTINGSET_IRON_FLASK },
+    [2] = { n = "Skein Row", t = DESTINATIONS_PIN_TYPE_AOI },
+    [3] = { n = "The Bathhouse", t = DESTINATIONS_PIN_TYPE_RUIN },
+    [4] = { n = "The Shambles Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [5] = { n = "Fargrave", t = DESTINATIONS_PIN_TYPE_CITY },
+    ["zoneName"] = "The Shambles",
+  },
+  [1286] =
+  {
+    [1] = { n = "Raging Coast Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [2] = { n = "The Blood Pit Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [3] = { n = "Ardent Hope Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [4] = { n = "Wretched Spire Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [5] = { n = "False Martyrs' Folly Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [6] = { n = "Annihilarch's Summit Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [7] = { n = "The Blood Pit", t = DESTINATIONS_PIN_TYPE_SEWER },
+    [8] = { n = "Burning Gyre Keep", t = DESTINATIONS_PIN_TYPE_TOWER },
+    [9] = { n = "Ardent Hope", t = DESTINATIONS_PIN_TYPE_GATE },
+    [10] = { n = "", t = DESTINATIONS_PIN_TYPE_UNKNOWN },
+    [11] = { n = "The Brandfire Reformatory", t = DESTINATIONS_PIN_TYPE_DELVE },
+    [12] = { n = "Destruction's Solace", t = DESTINATIONS_PIN_TYPE_CRYPT },
+    [13] = { n = "The Abomination Cradle", t = DESTINATIONS_PIN_TYPE_GROUPBOSS },
+    [14] = { n = "Annihilarch's Summit", t = DESTINATIONS_PIN_TYPE_CAVE },
+    [15] = { n = "False Martyrs' Folly", t = DESTINATIONS_PIN_TYPE_DELVE },
+    [16] = { n = "Wretched Spire", t = DESTINATIONS_PIN_TYPE_TOWN },
+    [17] = { n = "Portal to Fargrave", t = DESTINATIONS_PIN_TYPE_PORTAL },
+    [18] = { n = "Portal to Fargrave", t = DESTINATIONS_PIN_TYPE_PORTAL },
+    [19] = { n = "Stormwright's Cleft", t = DESTINATIONS_PIN_TYPE_CRAFTING, s = CRAFTINGSET_WRETCHED_VITALITY },
+    [20] = { n = "The Razorworks", t = DESTINATIONS_PIN_TYPE_CRAFTING, s = CRAFTINGSET_DEADLANDS_DEMOLISHER },
+    [21] = { n = "Agony's Ascent", t = DESTINATIONS_PIN_TYPE_HOUSING },
+    [22] = { n = "The Tempest Engine", t = DESTINATIONS_PIN_TYPE_AOI },
+    [23] = { n = "Traitor's Ascent", t = DESTINATIONS_PIN_TYPE_AOI },
+    [24] = { n = "Charnel Pulpit", t = DESTINATIONS_PIN_TYPE_AOI },
+    [25] = { n = "Chantry of the Moon Reiver", t = DESTINATIONS_PIN_TYPE_AOI },
+    [26] = { n = "Ravaged Crossing", t = DESTINATIONS_PIN_TYPE_AOI },
+    [27] = { n = "Zynoahz's Gaol", t = DESTINATIONS_PIN_TYPE_DAEDRICRUIN },
+    [28] = { n = "Jynd's Foundry", t = DESTINATIONS_PIN_TYPE_DAEDRICRUIN },
+    [29] = { n = "Wounded Crossing Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [30] = { n = "The Scourshales Wayshrine", t = DESTINATIONS_PIN_TYPE_WAYSHRINE },
+    [31] = { n = "Den of the Unmaker", t = DESTINATIONS_PIN_TYPE_GROUPBOSS },
+    ["zoneName"] = "The Deadlands",
   },
 }

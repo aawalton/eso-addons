@@ -5,7 +5,7 @@ local DEBUG_MODE 			= true
 QUESTTRACKER_DEBUG_TABLE 	= {}
 
 local ADDON_NAME	= "Ravalox'QuestTracker"
-local VERSION_CODE	= "3.8.2.7"
+local VERSION_CODE	= "3.8.2.8"
 
 local CONSTRAINT_WIDTH = 100
 local CONSTRAINT_HEIGHT = 60
