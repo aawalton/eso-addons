@@ -1,4 +1,4 @@
-local ADDON_VERSION = 1762
+local ADDON_VERSION = 1764
 local ADDON_NAME = "HousingHub"
 local ADDON_TITLE = "Housing Hub"
 local ADDON_ROOT_PATH = "user:/AddOns/EssentialHousingTools/HousingHub/"
@@ -1190,7 +1190,7 @@ function EHH:DeferredInitializeSettingsPanel()
 				type = "button",
 				name = "Go Live...",
 				tooltip = "Publish your channel details allowing all Community members to see your channel listed " ..
-						  "in the \"Live Streams\" tab of the Housing Hub and list your channel as 'live' for the 4 hours.\n\n" ..
+						  "in the \"Live Streams\" tab of the Housing Hub and list your channel as 'live' for several hours.\n\n" ..
 						  "Do not forget to use the \"Go Live...\" button in the \"Live Streams\" tab of the " ..
 						  "Housing Hub before you begin streaming each day in order to let Community members know " ..
 						  "that you are live.\n\n" ..
@@ -1199,8 +1199,8 @@ function EHH:DeferredInitializeSettingsPanel()
 				width = "half",
 				requiresReload = true,
 				func = function()
-					if self:StreamChannelGoLive() then
-						ReloadUI()
+					if not self:ConfirmStreamChannelGoLive() then
+						self:ShowAlertDialog("Please enter all required Twitch Channel information.")
 					end
 				end,
 			},

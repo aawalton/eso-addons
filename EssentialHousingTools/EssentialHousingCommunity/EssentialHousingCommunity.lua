@@ -372,17 +372,8 @@ function C.GetRecordTypeName( recordType )
 	return C.RECORD_TYPES[ recordType ]
 end
 
--- No longer supported due to file contention issues as of Update 29.
 function C.RequestPrioritySave()
---[[
-	if GetAddOnManager then
-		local manager = GetAddOnManager()
-
-		if manager and manager.RequestAddOnSavedVariablesPrioritySave then
-			manager:RequestAddOnSavedVariablesPrioritySave( EHT.Community.ADDON_NAME )
-		end
-	end
-]]
+	-- No longer supported due to file contention issues as of Update 29.
 end
 
 function C.GetHashValue( s, range )

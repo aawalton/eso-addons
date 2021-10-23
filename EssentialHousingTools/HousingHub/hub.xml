@@ -2011,7 +2011,7 @@
 						buttons[1] = self:GetNamedChild("Button1")
 						buttons[1]:SetAnchor(LEFT)
 
-						for index = 2, 4 do
+						for index = 2, 5 do
 							buttons[index] = self:GetNamedChild("Button" .. tostring(index))
 							buttons[index]:SetAnchor(LEFT, buttons[index - 1], RIGHT, 50)
 						end
@@ -2022,6 +2022,7 @@
 						<Label name="$(parent)Button2" inherits="HousingHubDialogButton" />
 						<Label name="$(parent)Button3" inherits="HousingHubDialogButton" />
 						<Label name="$(parent)Button4" inherits="HousingHubDialogButton" />
+						<Label name="$(parent)Button5" inherits="HousingHubDialogButton" />
 					</Controls>
 				</Control>
 			</Controls>
@@ -2104,7 +2105,7 @@
 							EHH_WidgetButton_OnMouseUp(self:GetParent(), button)
 						end
 					</OnMouseUp>
-					
+
 					<OnMouseEnter>
 						self.Over:SetHidden(false)
 						self.FocusAnimation:PlayForward()
@@ -2192,11 +2193,9 @@
 
 		<TopLevelControl name="HousingHubStreamMessage" alpha="0.8" clampedToScreen="true" hidden="true" layer="OVERLAY" mouseEnabled="true" movable="false" tier="HIGH">
 			<Anchor point="TOPLEFT" />
-			<!-- <Dimensions x="373" y="85" /> -->
 			<Dimensions x="400" y="120" />
 			
 			<OnInitialized>
--- /script HousingHubStreamMessage:Play( "Test Streamer Name\nis live on Twitch","")
 				if EssentialHousingHub then
 					self.Message = self:GetNamedChild("Message")
 					self.Header = self:GetNamedChild("Header")

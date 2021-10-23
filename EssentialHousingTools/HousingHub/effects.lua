@@ -31007,16 +31007,16 @@ end
 EHH.EffectType:SetDefaultDateAdded(1551473040)
 
 do
-	local jumpEffect
+	--local jumpEffect
 
 	local function JumpConfirmed(houseId, owner, houseName)
 		if EHH:IsJumpingToHouse() then
 			return
 		end
 
-		if jumpEffect then
-			jumpEffect:Delete()
-		end
+		--if jumpEffect then
+			--jumpEffect:Delete()
+		--end
 
 		if not houseId then
 			HousingEditorJumpToSafeLocation()
@@ -31053,17 +31053,17 @@ do
 			end
 		end
 
-		if EHH:IsJumpingToHouse() then
-			local jumpEffectRecord
-			jumpEffectRecord, jumpEffect = EHH.EffectUI.AddEffect("Reserved: Jumping")
-		end
+		--if EHH:IsJumpingToHouse() then
+			--local jumpEffectRecord
+			--jumpEffectRecord, jumpEffect = EHH.EffectUI.AddEffect("Reserved: Jumping")
+		--end
 	end
 	
 	function EHH.Effect.EndPortalJumpEffect()
-		if jumpEffect then
-			jumpEffect:Delete()
-			jumpEffect = nil
-		end
+		--if jumpEffect then
+			--jumpEffect:Delete()
+			--jumpEffect = nil
+		--end
 	end
 
 	function EHH.Effect.CancelPortalJump()

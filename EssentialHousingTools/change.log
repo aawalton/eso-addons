@@ -1,3 +1,9 @@
+Version 1764
+2021-10-14
+
+Housing Streams can now specify approximately how long each Live Stream will run when going live.
+Fixed an issue that caused Portals to sometimes stop working if the jump was interrupted.
+
 Version 1763
 2021-09-30
 

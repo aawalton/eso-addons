@@ -938,10 +938,11 @@ function EHH:UpdateStreamChannelData()
 	return false
 end
 
-function EHH:UpdateStreamChannelLastLiveTS(ts)
+function EHH:UpdateStreamChannelLastLiveTS(ts, durationHours)
 	if self:IsStreamChannelDataValid() then
 		local data = self:GetStreamChannelData()
 		data.LastLiveTS = ts
+		data.LastEndTS = ts + (durationHours or 2) * 3600
 		return self:SetCommunityStreamChannelRecord(data)
 	end
 	return false
@@ -955,8 +956,8 @@ function EHH:ClearStreamChannelData()
 	end
 end
 
-function EHH:StreamChannelGoLive()
-	if self:UpdateStreamChannelLastLiveTS(GetTimeStamp()) then
+function EHH:StreamChannelGoLive(durationHours)
+	if self:UpdateStreamChannelLastLiveTS(GetTimeStamp(), durationHours) then
 		local INSTANT = true
 		self:IncUMTD("n_scl", 1, INSTANT)
 		return true
@@ -982,8 +983,11 @@ function EHH:AreStreamChannelsLive()
 		for key, channelData in pairs(metaDataList) do
 			local lastLiveTS = tonumber(channelData.LastLiveTS)
 			if lastLiveTS then
-				local ageSeconds = now - lastLiveTS
-				if ageSeconds <= MAX_BROADCAST_SECONDS then
+				local lastEndTS = tonumber(channelData.LastEndTS)
+				if not lastEndTS or lastEndTS < lastLiveTS then
+					lastEndTS = lastLiveTS + MAX_BROADCAST_SECONDS
+				end
+				if now <= lastEndTS then
 					return true
 				end
 			end

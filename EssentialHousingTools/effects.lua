@@ -31364,7 +31364,7 @@ do
 			return
 		end
 
-		_, jump.Effect = EHT.EffectUI.AddEffect( "Reserved: Jumping" )
+		--_, jump.Effect = EHT.EffectUI.AddEffect( "Reserved: Jumping" )
 		EHT.UsingPortal = true
 
 		EVENT_MANAGER:RegisterForUpdate( "EHT.Effect.MonitorPortalJump", 250, EHT.Effect.MonitorPortalJump )
@@ -31406,9 +31406,9 @@ do
 		EHT.UI.HideHint()
 
 		if jump and jump.Index == index then
-			if jump.Effect then
-				jump.Effect:Delete()
-			end
+			--if jump.Effect then
+				--jump.Effect:Delete()
+			--end
 
 			EVENT_MANAGER:UnregisterForUpdate( "EHT.Effect.MonitorPortalJump" )
 

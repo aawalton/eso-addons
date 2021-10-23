@@ -3488,24 +3488,7 @@ function EHH:SetupConfirmDialog()
 
 	return ESO_Dialogs[self.Defs.Dialogs.Confirm]
 end
---[[
-function EHH:ShowAlertDialog(body, confirmCallback, forceUIMode)
-	local dialog = self:SetupAlertDialog()
-	dialog.title.text = self.Title
-	dialog.mainText.text = body
-	dialog.buttons[1].callback = function()
-		if nil ~= confirmCallback then
-			confirmCallback()
-		end
-		if nil == forceUIMode or forceUIMode then
-			self:EnterUIMode()
-		end
-	end
 
-	self:SuppressDialogUI()
-	ZO_Dialogs_ShowDialog(self.Defs.Dialogs.Alert)
-end
-]]
 function EHH:ShowAlertDialog(body, confirmCallback, forceUIMode)
 	local function onClick()
 		if nil ~= confirmCallback then
@@ -3535,32 +3518,7 @@ function EHH:ShowErrorDialog(...)
 	self:PlaySoundFailure()
 	self:ShowAlertDialog(...)
 end
---[[
-function EHH:ShowConfirmationDialog(body, confirmCallback, cancelCallback, forceUIMode)
-	local dialog = self:SetupConfirmDialog()
-	dialog.title.text = self.Title
-	dialog.mainText.text = body
-	dialog.buttons[1].callback = function()
-		if nil ~= confirmCallback then
-			confirmCallback()
-		end
-		if nil == forceUIMode or forceUIMode then
-			self:EnterUIMode()
-		end
-	end
-	dialog.buttons[2].callback = function()
-		if nil ~= cancelCallback then
-			cancelCallback()
-		end
-		if nil == forceUIMode or forceUIMode then
-			self:EnterUIMode()
-		end
-	end
 
-	self:SuppressDialogUI()
-	ZO_Dialogs_ShowDialog(self.Defs.Dialogs.Confirm)
-end
-]]
 function EHH:ShowConfirmationDialog(body, confirmCallback, cancelCallback, forceUIMode)
 	local function onConfirm()
 		if nil ~= confirmCallback then
@@ -4598,6 +4556,62 @@ function EHH:SetPreferredHubListControls(controls)
 	self:RefreshHubListControlsPreferenceButtons()
 end
 
+function EHH:ConfirmStreamChannelGoLive()
+	if not self:IsStreamChannelDataValid() then
+		self:ShowStreamChannelSettings()
+		return false
+	end
+
+	local data =
+	{
+		body = "Your Twitch channel will appear in the Live Streams tab for all Community members - " ..
+			"plus Community members will see a brief notification of your Live Stream " ..
+			"that links to your Twitch channel when they log in or change characters.\n\n" ..
+			"|acApproximately how long do you plan to stream for right now?",
+		buttons =
+		{
+			{
+				text = "1 - 2 Hours",
+				handler = function()
+					if self:StreamChannelGoLive(2) then
+						ReloadUI()
+					end
+				end,
+			},
+			{
+				text = "3 - 4 Hours",
+				handler = function()
+					if self:StreamChannelGoLive(4) then
+						ReloadUI()
+					end
+				end,
+			},
+			{
+				text = "5 - 6 Hours",
+				handler = function()
+					if self:StreamChannelGoLive(6) then
+						ReloadUI()
+					end
+				end,
+			},
+			{
+				text = "7 - 8 Hours",
+				handler = function()
+					if self:StreamChannelGoLive(8) then
+						ReloadUI()
+					end
+				end,
+			},
+			{
+				text = "Cancel",
+				handler = function() end,
+			},
+		},
+	}
+	self:ShowCustomDialog(data)
+	return true
+end
+
 do
 	function EHH:SetupHousingHub()
 		local ui = self:GetDialog("HousingHub")
@@ -5486,12 +5500,10 @@ do
 					c:SetText("Go Live...")
 					c:SetMouseEnabled(true)
 					self:SetInfoTooltip(c, "Let the Community know when your Twitch Stream is about to go live!\n\n" ..
-						"For the next |cffff442 Hours|r all Community members that log in will see a brief notification of your Live Stream that links to your Twitch channel.",
+						"All Community members will see a brief notification of your Live Stream that links to your Twitch channel when they log in or change characters.",
 						BOTTOM, 0, 0, TOP)
 					c:SetHandler("OnMouseDown", function()
-						if self:StreamChannelGoLive() then
-							ReloadUI()
-						end
+						self:ConfirmStreamChannelGoLive()
 					end)
 				end
 
@@ -5530,8 +5542,6 @@ do
 
 					c = WINDOW_MANAGER:CreateControl(nil, ui.WindowFrame, CT_TEXTURE)
 					ui.CategoryFilterContainer = c
-					--c:SetAnchor(TOPLEFT, nil, TOPLEFT, -24, 6)
-					--c:SetAnchor(BOTTOMLEFT, nil, TOPLEFT, -24, 32)
 					c:SetAnchor(TOPLEFT, nil, nil, -24, 48)
 					c:SetColor(0.1, 0.125, 0.2, 1)
 					c:SetDimensionConstraints(0, 26, 800, 26)
@@ -6827,6 +6837,7 @@ do
 		rec.Schedule = data.Schedule
 		rec.Description = data.Description
 		rec.LastLiveTS = data.LastLiveTS
+		rec.LastEndTS = data.LastEndTS
 		rec.LastLiveAgeHours = data.LastLiveAgeHours
 
 		if data.GuildId then
@@ -10312,8 +10323,11 @@ function EHH:QueueLiveStreamerMessages()
 		for index, channelData in ipairs(metaDataList) do
 			local lastLiveTS = tonumber(channelData.LastLiveTS)
 			if lastLiveTS then
-				local entryAgeHours = (now - lastLiveTS) / 60 / 60
-				if entryAgeHours <= self.Defs.Limits.MaxBroadcastHours then
+				local lastEndTS = tonumber(channelData.LastEndTS)
+				if not lastEndTS or lastEndTS < lastLiveTS then
+					lastEndTS = lastLiveTS + self.Defs.Limits.MaxBroadcastHours * 3600
+				end
+				if now <= lastEndTS then
 					if not self:HasShownLiveStreamMessage(channelData) then
 						local messageAndChannelData =
 						{

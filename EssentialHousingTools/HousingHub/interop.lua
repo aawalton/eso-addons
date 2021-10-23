@@ -799,12 +799,14 @@ do
 				local description = tostring(data.Description or "")
 				local schedule = tostring(data.Schedule or "")
 				local lastLiveTS = tonumber(data.LastLiveTS or "")
+				local lastEndTS = tonumber(data.LastEndTS or "")
 				local channelData =
 				{
 					Player = player,
 					ChannelName = channelName,
 					Description = description,
 					LastLiveTS = lastLiveTS,
+					LastEndTS = lastEndTS,
 					Schedule = schedule,
 					URL = url,
 				}

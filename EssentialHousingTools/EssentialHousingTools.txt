@@ -2,8 +2,8 @@
 ## Description: [REQUIRES EssentialHousingCommunity, HousingHub, LibAddonMenu] 3D Grid * Snap-to-Grid * Copy & Paste * Automatic Backups * Group Edit/Align/Center/Level * Visual FX * Automation & Animation * Build Templates
 ## APIVersion: 100035 101031
 ## Author: @Cardinal05, @Architectura
-## Version: 1762
-## AddOnVersion: 1762
+## Version: 1764
+## AddOnVersion: 1764
 ## SavedVariables: EssentialHousingToolsSavedVars
 ## DependsOn: EssentialHousingCommunity HousingHub LibAddonMenu-2.0
 ## OptionalDependsOn: LibGPS LibMapPing
