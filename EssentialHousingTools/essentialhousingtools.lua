@@ -175,9 +175,11 @@ function EHT.Setup.CleanVars()
 
 	if "table" ~= type(vars.Houses) then vars.Houses = { } end
 
-	for index, house in pairs( EHT.Data.GetFavoriteHouses() ) do
-		house.HouseId = tonumber( house.HouseId )
-		house.Owner = EHT.Util.Trim( string.lower( house.Owner ) )
+	for index, house in pairs(EHT.Data.GetFavoriteHouses()) do
+		if "table" == type(house) then
+			house.HouseId = tonumber(house.HouseId)
+			house.Owner = EHT.Util.Trim(string.lower(house.Owner))
+		end
 	end
 
 	if "number" ~= type(vars.MaxHouseHistory) or EHT.CONST.MIN_HOUSE_HISTORY > vars.MaxHouseHistory then vars.MaxHouseHistory = EHT.CONST.MIN_HOUSE_HISTORY end

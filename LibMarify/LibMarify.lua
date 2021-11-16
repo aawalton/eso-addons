@@ -3,7 +3,7 @@ LibMarify = {
     displayName = "|c3CB371" .. "Lib Marify" .. "|r",
     shortName = "LM",
     name = "LibMarify",
-    version = "1.2.11",
+    version = "1.2.14",
 
     indent         = 0, 
     hookColor      = "FFAC00",

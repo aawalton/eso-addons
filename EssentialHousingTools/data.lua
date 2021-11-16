@@ -1109,7 +1109,7 @@ function EHT.Data.GetCurrentHouse( suppressMessage )
 	elseif scene.FrameIndex > #scene.Frames then
 		frame = scene.Frames[ 1 ]
 		scene.FrameIndex = 1
-	else
+	else	
 		frame = scene.Frames[ scene.FrameIndex ]
 	end
 
@@ -2119,18 +2119,17 @@ function EHT.Data.UpdateEffectRecord( rec, effect, isCreate )
 	local pitch, yaw, roll = effect:GetOrientation()
 	local cR, cG, cB = effect:GetColor()
 	local color = EHT.Util.CompressColor( cR, cG, cB )
-	local alpha = effect:GetAlpha()
-	local contrast = effect:GetContrast()
+	local alpha = effect:GetAlpha() or 1
+	local contrast = effect:GetContrast() or 1
 	local sizeX, sizeY, sizeZ = effect:GetSize()
 	local groups = effect:GetEffectGroupBitmask()
+	local metaParams = effect.EffectType:GetMetaParams()
 
 	rec.X, rec.Y, rec.Z = x, y, z
 	rec.Pitch, rec.Yaw, rec.Roll = pitch, yaw, roll
-	rec.Color, rec.Alpha, rec.Contrast = color, alpha or 1, contrast or 1
+	rec.Color, rec.Alpha, rec.Contrast = color, alpha, contrast
 	rec.SizeX, rec.SizeY, rec.SizeZ = sizeX, sizeY, sizeZ
 	rec.Groups = groups
-
-	local metaParams = effect.EffectType:GetMetaParams()
 
 	if metaParams and 0 < #metaParams then
 		local data = rec.MetaData
@@ -2147,6 +2146,8 @@ function EHT.Data.UpdateEffectRecord( rec, effect, isCreate )
 	if not isCreate then
 		EHT.Data.UpdateGroupEffectRecord( rec )
 	end
+
+	EHT.Data.SetHouseFXDirty()
 
 	return rec
 end
@@ -2274,6 +2275,7 @@ function EHT.Data.DeleteEffectRecord( rec, suppressUndo )
 	for index = 1, #effects do
 		if rec == effects[index] then
 			table.remove( effects, index )
+			EHT.Data.SetHouseFXDirty()
 			return true
 		end
 	end
@@ -2303,6 +2305,7 @@ function EHT.Data.DeleteAllEffectRecords()
 	if 0 < #batch then
 		EHT.CT.AddHistory( history )
 		EHT.UI.RefreshHistory()
+		EHT.Data.SetHouseFXDirty()
 	end
 
 	return true
@@ -2691,6 +2694,83 @@ function EHT.Data.GetHouseKiosk( filter )
 	end
 
 	return kiosk
+end
+
+do
+	local function GetHouseFXDirtyValue(houseId)
+		if not houseId then
+			if not EHT.Housing.IsOwner() then
+				return
+			end
+			houseId = EHT.Housing.GetHouseId()
+		end
+		return EHT.DirtyHouseFX[houseId], houseId
+	end
+
+	local function SetHouseFXDirtyValue(newValue, houseId)
+		local currentValue, currentHouseId = GetHouseFXDirtyValue(houseId)
+		if not houseId then
+			if not EHT.Housing.IsOwner() then
+				return
+			end
+			houseId = currentHouseId
+		end
+		if 0 == houseId then
+			return
+		end
+
+		local hasCurrentValue = currentValue ~= nil
+		local hasNewValue = newValue ~= nil
+		if hasCurrentValue ~= hasNewValue then
+			EHT.DirtyHouseFX[houseId] = newValue
+			if houseId == EHT.Housing.GetHouseId() then
+				EHT.Data.OnHouseFXDirtyStateChanged()
+			end
+		end
+	end
+
+	function EHT.Data.OnHouseFXDirtyStateChanged()
+		EHT.UI.RefreshPublishFXButton()
+	end
+	
+	function EHT.Data.AreHouseFXDirty(houseId)
+		local dirtyValue = GetHouseFXDirtyValue(houseId)
+		return dirtyValue ~= nil, dirtyValue
+	end
+
+	function EHT.Data.ClearHouseFXDirty(houseId)
+		SetHouseFXDirtyValue(nil, houseId)
+	end
+
+	function EHT.Data.SetHouseFXDirty(houseId)
+		SetHouseFXDirtyValue(GetTimeStamp(), houseId)
+	end
+end
+
+function EHT.Data.OnZoneChanged(houseId, houseOwner, previousHouseId, previousHouseOwner)
+	if 0 == houseId or not EHT.Housing.IsOwner() then
+		-- This is not a house or a house that we own.
+		return
+	end
+	
+	local houseEffects = EHT.Data.GetHouseEffects(houseId)
+	if not houseEffects or not next(houseEffects) then
+		-- There are no local FX.
+		return
+	end
+
+	local dirty = false
+	local world = EssentialHousingHub:GetWorldCode()
+	local publishedEffects = EssentialHousingHub:GetCommunityHouseFXRecord(houseOwner, world, houseId)
+	if not publishedEffects or not next(publishedEffects) then
+		-- There are local FX but no published FX.
+		dirty = true
+	end
+
+	if dirty then
+		-- Let the player know that their FX are dirty immediately.
+		EHT.Data.SetHouseFXDirty(houseId)
+	end
 end
 
 EHT.Modules = ( EHT.Modules or { } ) EHT.Modules.Data = true

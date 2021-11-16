@@ -9,7 +9,7 @@ if not EHT.Setup then EHT.Setup = { } end
 if not EHT.UI then EHT.UI = { } end
 if not EHT.Util then EHT.Util = { } end
 
-EHT.ADDON_VERSION = "1764"
+EHT.ADDON_VERSION = "1766"
 EHT.ADDON_AUTHOR = "@Cardinal05, @Architectura"
 EHT.ADDON_NAME = "EssentialHousingTools"
 EHT.ADDON_TITLE = "Essential Housing Tools"
@@ -2262,6 +2262,8 @@ EHT.SuppressAssistantSummoningDisabledWarning = false
 
 EHT.TriggerPhrases = nil
 EHT.TriggerQueue = { }
+
+EHT.DirtyHouseFX = { }
 
 EHT.DefaultSettings = { }
 

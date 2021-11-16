@@ -125,6 +125,10 @@ function EHH:SetCommunityFXRecord(houseId, effects)
 	}
 	local result = EHT.Community.SetRecord(key, data)
 
+	if result and EHT.Data and EHT.Data.ClearHouseFXDirty then
+		EHT.Data.ClearHouseFXDirty(houseId)
+	end
+
 	-- Eliminate this home's duplicate record from an existing legacy bulk record.
 	local legacyRecord = self:GetCommunityLegacyFXRecord(player)
 	if "table" == type(legacyRecord) and (nil ~= tonumber(legacyRecord.HouseId) or "table" == type(legacyRecord.Houses)) then

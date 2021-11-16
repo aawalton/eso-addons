@@ -9,8 +9,8 @@
 ESODBGameDataExport = {}
 ESODBGameDataExport.Name = "ESODatabaseGameDataExport"
 ESODBGameDataExport.DisplayName = "ESO-Database.com Game Data Export"
-ESODBGameDataExport.AddonVersion = "1.0.6"
-ESODBGameDataExport.AddonVersionInt = 1006
+ESODBGameDataExport.AddonVersion = "1.0.7"
+ESODBGameDataExport.AddonVersionInt = 1007
 ESODBGameDataExport.SavedVariablesName = "ESODBGameDataExportSV"
 ESODBGameDataExport.NumKeepChests = 1500
 ESODBGameDataExport.NumKeepPsijikPortals = 1500

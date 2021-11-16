@@ -108,12 +108,19 @@ function CS.STYLE()
 	[111] = {2,2926,167944}, -- Nighthollow
 	[112] = {2,2938,167961}, -- Arkthzand Armory
 	[113] = {2,2998,167978}, -- Wayward Guardian
+	[114] = {2,2959,170132}, -- House Hexos
+	--[115] = {2,?,?}, -- Deadlands Gladiator
 	[116] = {2,2984,171552}, -- True-Sworn
 	[117] = {2,2991,171581}, -- Waking Flame
+	--[118] = {2,?,?}, -- Dremora Kynreeve
+	[119] = {2,2999,171859}, -- Ancient Daedric
 	[120] = {2,3000,171879}, -- Black Fin Legion
 	[121] = {2,3001,171896}, -- Ivory Brigade
 	[122] = {2,3002,171913}, -- Sul-Xan
-	
+	[123] = {2,3094,176058}, -- Crimson Oath
+	[124] = {2,3097,178505}, -- Silver Rose
+	--[125] = {2,?,?}, -- Annihilarch's Chosen
+	--[126] = {2,?,?}, -- Fargrave Guardian
   }
   --|H1:item:96954:5:1:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h
   
@@ -214,12 +221,17 @@ function CS.STYLE()
 	[111] = {167943, 167944, 167958, 0}, -- Nighthollow
 	[112] = {167960, 167961, 167975, 0}, -- Arkthzand Armory
 	[113] = {167977, 167978, 167992, 0}, -- Wayward Guardian
+	[114] = {170131, 170132, 170146, 0}, -- House Hexos
+	--[115] = {X-1, X, X+14, 0}, -- Deadlands Gladiator
 	[116] = {171551, 171552, 171566, 0}, -- True-Sworn
 	[117] = {171580, 171581, 171595, 0}, -- Waking Flame
+	--[118] = {X-1, X, X+14, 0}, -- Dremora Kynreeve
+	[119] = {171858, 171859, 171873, 0}, -- Ancient Daedric
 	[120] = {171878, 171879, 171893, 0}, -- Black Fin Legion
 	[121] = {171895, 171896, 171910, 0}, -- Ivory Brigade
 	[122] = {171912, 171913, 171927, 0}, -- Sul-Xan
-
+	[123] = {176057, 176058, 176072, 0}, -- Crimson Oath
+	[124] = {178504, 178505, 178519, 0}, -- Silver Rose
 	}
   
 	--build visual motif number list

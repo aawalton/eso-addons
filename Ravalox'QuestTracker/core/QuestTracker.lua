@@ -5,7 +5,7 @@ local DEBUG_MODE 			= true
 QUESTTRACKER_DEBUG_TABLE 	= {}
 
 local ADDON_NAME	= "Ravalox'QuestTracker"
-local VERSION_CODE	= "3.8.2.8"
+local VERSION_CODE	= "3.8.2.9"
 
 local CONSTRAINT_WIDTH = 100
 local CONSTRAINT_HEIGHT = 60
@@ -299,10 +299,15 @@ local function OnInterfaceSettingChanged(eventCode, system, settingId)
 	
 	if QUESTTRACKER_HIDEDEFAULTQUESTTRACKERWINDOW then
 		QUESTTRACKER_HIDEDEFAULTQUESTTRACKERWINDOW:UpdateValue(false, newValue)
+-- V3.8.2.9 Calamath NOTE:
+-- Addressed an issue where if the player changed the default quest tracker display settings in the system menu before opening the settings panel for this add-on, 
+-- the settings would not be reflected in the add-on's save data.
+	else
+		QUESTTRACKER.svCurrent.hideDefaultQuestTracker = newValue
+	end
 -- V3.8.2.3 Calamath NOTE : Use FOCUSED_QUEST_TRACKER instead to avoid nil reference errors. And the UpdateVisibility method has no arguments.
 --       ZO_FocusedQuestTracker:UpdateVisibility (false, newValue)
-		FOCUSED_QUEST_TRACKER:UpdateVisibility()
-	end
+	FOCUSED_QUEST_TRACKER:UpdateVisibility()
 end
 
 -- hide QT window when in combat

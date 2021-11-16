@@ -815,6 +815,37 @@ function EHH:HasUnviewedGuests(guests)
 	return 0 ~= newGuestCount and newGuestCount ~= currentGuestCount
 end
 
+function EHH:OnGuestJournalSigned()
+	local houseId = self:GetHouseId()
+	if 0 ~= houseId then
+		local owner = self:GetOwner()
+		local data =
+		{
+			houseId = houseId,
+			owner = owner,
+			timestamp = GetTimeStamp(),
+		}
+		self:SetPersistentState("RecentJournalSignature", data)
+	end
+end
+
+function EHH:HasLocalPlayerRecentlySignedGuestJournal()
+	local houseId = self:GetHouseId()
+	if 0 ~= houseId then
+		local owner = self:GetOwner()
+		local data = self:GetPersistentState("RecentJournalSignature")
+		if "table" == type(data) then
+			if houseId == data.houseId and owner == data.owner then
+				local ts = tonumber(data.timestamp)
+				if ts and (GetTimeStamp() - ts) < 3600 then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 ---[ Effects ]---
 
 function EHH:GetHouseEffects(houseId, owner)

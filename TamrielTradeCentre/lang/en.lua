@@ -251,6 +251,16 @@ ZO_CreateStringId("TTC_NPC_SIHRIMAYA", "sihrimaya")
 
 ZO_CreateStringId("TTC_NPC_DIONHASSILDOR", "dion hassildor")
 
+ZO_CreateStringId("TTC_NPC_BODSAMANAS", "bodsa manas")
+ZO_CreateStringId("TTC_NPC_FURNVEKH", "furnvekh")
+ZO_CreateStringId("TTC_NPC_LIVIATAPPO", "livia tappo")
+ZO_CreateStringId("TTC_NPC_VEN", "ven")
+ZO_CreateStringId("TTC_NPC_VESAKTA", "vesakta")
+ZO_CreateStringId("TTC_NPC_ZENELAZ", "zenelaz")
+
+ZO_CreateStringId("TTC_NPC_TUXUTL", "tuxutl")
+
+
 --Master Writ
 ZO_CreateStringId("TTC_MASTER_WRIT_ALCHEMYREGEX", "Craft an? (.-) with")
 ZO_CreateStringId("TTC_MASTER_WRIT_ENCHANTINGREGEX", "Craft an? (.*)")

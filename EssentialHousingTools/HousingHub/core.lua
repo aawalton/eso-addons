@@ -1,4 +1,4 @@
-local ADDON_VERSION = 1764
+local ADDON_VERSION = 1766
 local ADDON_NAME = "HousingHub"
 local ADDON_TITLE = "Housing Hub"
 local ADDON_ROOT_PATH = "user:/AddOns/EssentialHousingTools/HousingHub/"

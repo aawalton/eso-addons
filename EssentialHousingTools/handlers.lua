@@ -121,6 +121,7 @@ function EHT.Handlers.PlayerActivated(event, initial)
 		EHT.EffectFurnitureStateManager:Reset()
 		EHT.UnregisterTemporaryUpdateEvents()
 		EHT.Effect:ResetDeferralQueues()
+		EHT.Data.OnZoneChanged(houseId, houseOwner, previousHouseId, previousHouseOwner)
 	end
 
 	EHT.UI.UpdateUIMode( nil, nil ~= previousHouseId and zoneChanged )

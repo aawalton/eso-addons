@@ -1,8 +1,8 @@
 ## Title: LibDebugLogger
 ## Author: sirinsidiator
-## Version: 2.2.0
-## APIVersion: 100035
-## AddOnVersion: 217
+## Version: 2.3.0
+## APIVersion: 101031 101032
+## AddOnVersion: 220
 ## IsLibrary: true
 ## SavedVariables: LibDebugLoggerSettings LibDebugLoggerLog
 ##

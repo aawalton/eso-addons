@@ -491,6 +491,9 @@ function EHT.Util.CompressColor( r, g, b )
 end
 
 function EHT.Util.DecompressColor( i )
+	if not i then
+		return 1, 1, 1
+	end
 	i = i / 1000000
 	local b = 1 + math.floor( i * 100 )
 	local g = 1 + math.floor( ( ( i * 100 ) % 1 ) * 100 )

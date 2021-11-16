@@ -2,9 +2,9 @@
 ## Title: |c3CB371LibMarify|r
 ## Author: @Marify
 ## IsLibrary: true
-## APIVersion: 100035
-## Version: 1.2.12
-## AddOnVersion: 1212
+## APIVersion: 101032
+## Version: 1.2.14
+## AddOnVersion: 1214
 ## IsLibrary: true
 
 

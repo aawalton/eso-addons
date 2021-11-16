@@ -9276,6 +9276,7 @@ function EHH:SignGuestbook()
 
 	if self:SignCommunityGuestbook() then
 		self:DismissGuestbook(true)
+		self:OnGuestJournalSigned()
 
 		if hasSigned then
 			self:ShowAlertDialog(

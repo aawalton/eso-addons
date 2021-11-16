@@ -91,7 +91,7 @@ WritCreater.default =
 	},
 	["mail"] = {
 		delete = false,
-		loot = true,
+		loot = IsESOPlusSubscriber(),
 	}
 }
 

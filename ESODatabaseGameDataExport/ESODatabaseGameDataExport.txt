@@ -1,10 +1,10 @@
 ## DisableSavedVariablesAutoSaving: 1
-## Title: |c2080D0ESO-Database.com|r Game Data Export |c00C000v1.0.6|r
+## Title: |c2080D0ESO-Database.com|r Game Data Export |c00C000v1.0.7|r
 ## Description: The ESO-Database.com game data export AddOn to collect game related data like chest positions.
 ## Author: |cEFEBBEKeldor|r
-## Version: 1.0.6
-## IntVersion: 1006
-## APIVersion: 101031
+## Version: 1.0.7
+## IntVersion: 1007
+## APIVersion: 101032
 ## SavedVariables: ESODBGameDataExportSV
 
 Core/ESODatabaseGameDataExportConst.lua

@@ -42,29 +42,31 @@ lib.headerFont = "ZoFontWinH3"
 
 local function SetupHeader(pool, control)
 	local label = control:GetNamedChild("Text")
+	local divider = control:GetNamedChild("Divider")
 	local orgGetTextDimensions = label.GetTextDimensions
 	function label:GetTextDimensions()
 		local w, h = orgGetTextDimensions(self)
-		return w, h + 6
-	end
-	local function Noop(self)
+		local hdivider = divider and (select(2, divider:GetDimensions()) + 9) or 0
+		return w, h + hdivider
 	end
 
 	label:ClearAnchors()
 	label:SetAnchor(TOPLEFT, control, TOPLEFT, 0, 3)
 	label:SetAnchor(TOPRIGHT, control, TOPRIGHT, 0, 3)
-	-- First and last time the anchors are set
-	label.ClearAnchors = Noop
-	label.SetAnchor = Noop
-	label:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
+	label:SetMaxLineCount(1)
 
-	--label.SetHorizontalAlignment = Noop
 	label:SetHidden(false)
 	control.nameLabel = label
 
 	control.isHeader = true
 	control.item = control
 	control:SetMouseEnabled(false)
+
+	if divider then
+		divider:ClearAnchors()
+		divider:SetAnchor(TOPLEFT, label, BOTTOMLEFT, 0, 3)
+		divider:SetAnchor(RIGHT, control, RIGHT, 0, 0, ANCHOR_CONSTRAINS_X)
+	end
 end
 
 local function GetValueOrCallback(arg, ...)
@@ -653,11 +655,7 @@ local function HookContextMenu()
 		Reset()
 		inventorySlot, slotActions = ...
 		if slotActions.m_contextMenuMode then
-			local ctrl, alt, shift, command =
-				lib.enabledSpecialKeys[KEY_CTRL] and IsControlKeyDown(),
-				lib.enabledSpecialKeys[KEY_ALT] and IsAltKeyDown(),
-				lib.enabledSpecialKeys[KEY_SHIFT] and IsShiftKeyDown(),
-				lib.enabledSpecialKeys[KEY_COMMAND] and IsCommandKeyDown()
+			local ctrl, alt, shift, command = lib.enabledSpecialKeys[KEY_CTRL] and IsControlKeyDown(), lib.enabledSpecialKeys[KEY_ALT] and IsAltKeyDown(), lib.enabledSpecialKeys[KEY_SHIFT] and IsShiftKeyDown(), lib.enabledSpecialKeys[KEY_COMMAND] and IsCommandKeyDown()
 			if ctrl or alt or shift or command then
 				registry = nil
 				lib.contextMenuRegistry:FireCallbacks("Special", inventorySlot, slotActions, ctrl, alt, shift, command)

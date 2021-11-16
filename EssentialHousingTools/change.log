@@ -1,7 +1,19 @@
+Version 1766
+2021-10-30
+
+Fixed an issue that could have caused a Lua error to appear when attempting to publish homes.
+Fixed several FX-related Lua errors.
+
+Version 1765
+2021-10-23
+
+The Identify keybind will no longer appear while previewing a home as the feature cannot work in a home preview.
+Added a Publish FX option to the EHT button that appears after adding or editing FX in your home to serve as a reminder that FX changes must be published in order to be seen by other players.
+
 Version 1764
 2021-10-14
 
-Housing Streams can now specify approximately how long each Live Stream will run when going live.
+Housing Streamers can now specify approximately how long each Live Stream will run when going live.
 Fixed an issue that caused Portals to sometimes stop working if the jump was interrupted.
 
 Version 1763

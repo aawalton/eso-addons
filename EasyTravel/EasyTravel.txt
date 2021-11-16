@@ -1,8 +1,8 @@
 ## Title: EasyTravel
 ## Author: sirinsidiator
-## Version: 1.8.2
-## APIVersion: 100035
-## AddOnVersion: 12
+## Version: 1.8.3
+## APIVersion: 101031 101032
+## AddOnVersion: 16
 ## DependsOn: LibSlashCommander LibCustomMenu LibChatMessage
 ##
 ## This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. 

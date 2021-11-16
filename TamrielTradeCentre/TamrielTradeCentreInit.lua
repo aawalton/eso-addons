@@ -533,6 +533,17 @@ local KioskIDNPCsTable = {
 	[99] = {
 		GetString(TTC_NPC_DIONHASSILDOR),
 	},
+	[100] = {
+		GetString(TTC_NPC_BODSAMANAS),
+		GetString(TTC_NPC_FURNVEKH),
+		GetString(TTC_NPC_LIVIATAPPO),
+		GetString(TTC_NPC_VEN),
+		GetString(TTC_NPC_VESAKTA),
+		GetString(TTC_NPC_ZENELAZ),
+	},
+	[101] = {
+		GetString(TTC_NPC_TUXUTL),
+	},
 }
 
 function TamrielTradeCentre:NPCNameToKioskID(npcNameString, isExact)

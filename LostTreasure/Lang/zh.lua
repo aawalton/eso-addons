@@ -1,4 +1,4 @@
--- Lost Treasure : Chinese Localization by Calamath
+-- Chinese Localization by Calamath
 
 local function SafeStrings(strings)
 	for stringId, stringValue in pairs(strings) do

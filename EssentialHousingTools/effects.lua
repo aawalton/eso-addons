@@ -423,6 +423,7 @@ local TEXTURES = {
 	ICON_FAVORITE = "icon_favorite",
 	ICON_FEEDBACK = "icon_feedback",
 	ICON_FOOTER = "icon_footer",
+	ICON_FX_UNPUBLISHED = "icon_fx_unpublished",
 	ICON_GOLD = "esoui/art/currency/currency_gold.dds",
 	ICON_GUESTBOOK = "icon_guestbook",
 	ICON_HELP = "icon_help",
@@ -442,6 +443,7 @@ local TEXTURES = {
 	ICON_PIN = "icon_pin",
 	ICON_QUILL = "icon_quill",
 	ICON_RADIAL_MENU = "icon_radial_menu",
+	ICON_RADIAL_MENU_BG = "icon_radial_menu_bg",
 	ICON_ROTATION_ARROW = "icon_rotation_arrow",
 	ICON_SACK = "icon_sack",
 	ICON_TRADEABLE = "icon_tradeable",
@@ -7320,14 +7322,14 @@ function EHT.EffectUI.RefreshAll()
 
 	local effects = EHT.Data.GetEffectRecords()
 	if not effects or 0 == #effects then
-		EVENT_MANAGER:RegisterForUpdate( "EHTEffectsOnRefreshComplete", 500, OnRefreshComplete )
+		EVENT_MANAGER:RegisterForUpdate( "EHTEffectsOnRefreshComplete", 100, OnRefreshComplete )
 	else
 		local effectIndex = 1
 		local lastWatchDogEffectIndex = 0
 
 		local function OnWatchDog()
-			if effectIndex == lastWatchDogEffectIndex then
-				EVENT_MANAGER:RegisterForUpdate( "EHTEffectsOnRefreshComplete", 500, OnRefreshComplete )
+			if effectIndex >= lastWatchDogEffectIndex then
+				EVENT_MANAGER:RegisterForUpdate( "EHTEffectsOnRefreshComplete", 2500, OnRefreshComplete )
 				return
 			end
 
@@ -7337,7 +7339,7 @@ function EHT.EffectUI.RefreshAll()
 		local function OnLoadEffects()
 			local numEffects = #effects
 			if effectIndex > numEffects then
-				EVENT_MANAGER:RegisterForUpdate( "EHTEffectsOnRefreshComplete", 1000, OnRefreshComplete )
+				EVENT_MANAGER:RegisterForUpdate( "EHTEffectsOnRefreshComplete", 2500, OnRefreshComplete )
 				EVENT_MANAGER:UnregisterForUpdate( "EHTEffectsRefreshAllProcess" )
 				EVENT_MANAGER:UnregisterForUpdate( "EHTEffectsRefreshAllProcessWatchDog" )
 				return
@@ -7346,9 +7348,14 @@ function EHT.EffectUI.RefreshAll()
 			local maxTime = GetGameTimeMilliseconds() + 32
 			while effectIndex <= numEffects and GetGameTimeMilliseconds() < maxTime do
 				local effect = effects[effectIndex]
-				effectIndex = effectIndex + 1
 				if effect then
-					EHT.EffectUI.CreateEffectFromEffectRecord( effect )
+					if not EHT.EffectUI.CreateEffectFromEffectRecord(effect) then
+						table.remove(effects, effectIndex)
+					else
+						effectIndex = effectIndex + 1
+					end
+				else
+					effectIndex = effectIndex + 1
 				end
 			end
 
@@ -7359,7 +7366,7 @@ function EHT.EffectUI.RefreshAll()
 		EHT.Effect:UnregisterOnUpdate()
 
 		EVENT_MANAGER:RegisterForUpdate( "EHTEffectsRefreshAllProcess", 33, OnLoadEffects )
-		EVENT_MANAGER:RegisterForUpdate( "EHTEffectsRefreshAllProcessWatchDog", 2000, OnWatchDog )
+		EVENT_MANAGER:RegisterForUpdate( "EHTEffectsRefreshAllProcessWatchDog", 3000, OnWatchDog )
 	end
 end
 
@@ -7401,8 +7408,22 @@ function EHT.EffectUI.PreviewEffects( effectRecords, effectTS )
 
 	EHT.Effect:DeleteAll()
 
-	for index, rec in ipairs( effectRecords ) do
-		EHT.EffectUI.CreateEffectFromEffectRecord( rec )
+	if effectRecords then
+		local index = 1
+		local numRecords = #effectRecords
+		while index <= numRecords do
+			local rec = effectRecords[index]
+			if rec then
+				if EHT.EffectUI.CreateEffectFromEffectRecord(rec) then
+					index = index + 1
+				else
+					table.remove(effectRecords, index)
+					numRecords = numRecords - 1
+				end
+			else
+				index = index + 1
+			end
+		end
 	end
 
 	EHT.EffectUI.RefreshEditorButtons()
@@ -7607,11 +7628,20 @@ function EHT.EffectUI.AddEffect( effectOrEffectTypeName, overwriteDuplicate, tem
 	return record, effect
 end
 
-function EHT.EffectUI.CreateEffectFromEffectRecord( rec )
-	if nil == rec then return false end
+function EHT.EffectUI.CreateEffectFromEffectRecord(rec)
+	if "table" ~= type(rec) then
+		return false
+	end
 
-	local cR, cG, cB = EHT.Util.DecompressColor( rec.Color )
-	local effect = EHT.Effect:New( tonumber( rec.EffectType ) )
+	if	nil == rec.EffectType or nil == rec.Color or
+		nil == rec.X or nil == rec.Y or nil == rec.Z or
+		nil == rec.Pitch or nil == rec.Yaw or nil == rec.Roll or
+		nil == rec.SizeX or nil == rec.SizeY or nil == rec.SizeZ then
+		return false
+	end
+
+	local cR, cG, cB = EHT.Util.DecompressColor(rec.Color)
+	local effect = EHT.Effect:New(tonumber(rec.EffectType))
 
 	if nil == effect then
 		return false
@@ -7623,11 +7653,11 @@ function EHT.EffectUI.CreateEffectFromEffectRecord( rec )
 	effect.Contrast = rec.Contrast or 1
 	effect.SizeX, effect.SizeY, effect.SizeZ = rec.SizeX, rec.SizeY, rec.SizeZ
 	effect.Groups = rec.Groups
-	effect:SetMetaDataTable( rec.MetaData )
-	effect:SetRecord( rec )
+	effect:SetMetaDataTable(rec.MetaData)
+	effect:SetRecord(rec)
 	effect:Reset()
 
-	EHT.Handlers.OnFurniturePlaced( nil, effect:GetRecordId(), nil, true )
+	EHT.Handlers.OnFurniturePlaced(nil, effect:GetRecordId(), nil, true)
 
 	return true
 end
@@ -32747,6 +32777,10 @@ do
 			end,
 
 			Reset = function( self )
+				if not self.Particles or not self.Particles[1] then
+					return
+				end
+
 				self.FocusDistance = math.max( 1.35 * math.max( self:GetSize() ), 500 )
 				self:Update()
 			end,
@@ -32761,6 +32795,10 @@ do
 			end,
 
 			Reset = function( self )
+				if not self.Particles or not self.Particles[1] then
+					return
+				end
+
 				local p = self.Particles[1]
 				p:Tile( self.TileSizeX, self.TileSizeY )
 			end,
@@ -32840,6 +32878,10 @@ do
 			end,
 
 			Reset = function( self )
+				if not self.Particles or not self.Particles[1] then
+					return
+				end
+
 				self:Update()
 				self.Particles[1]:SetColor( 1, 1, 1, 1 )
 			end
@@ -33013,6 +33055,10 @@ do
 			end,
 
 			Reset = function( self )
+				if not self.Particles or not self.Particles[1] then
+					return
+				end
+
 				self:Update()
 				self.Particles[1]:SetColor( 1, 1, 1 )
 
@@ -33038,6 +33084,10 @@ do
 			end,
 			
 			Reset = function( self )
+				if not self.Particles or not self.Particles[1] then
+					return
+				end
+
 				local targetWidth, targetHeight = self.TargetWidth, self.TargetHeight
 
 				self:Update()
@@ -33230,12 +33280,18 @@ do
 		local owner = EHT.Housing.GetHouseOwner()
 		
 		if houseId and 0 ~= houseId and owner and "" ~= owner and EssentialHousingHub:IsOpenHouse( houseId, owner ) then
+			local isOwner = EHT.Housing.IsOwner()
+			local hideSigned = EHT.GetSetting( "HideSignedGuestJournals" )
 			if	force or (
-					( EHT.Housing.IsOwner() and not EHT.GetSetting( "HideMyGuestJournals" ) ) or
-					( not EHT.Housing.IsOwner() and ( not EHT.GetSetting( "HideSignedGuestJournals" ) or not EssentialHousingHub:HasSignedGuestbook() ) )
+					( isOwner and not EHT.GetSetting( "HideMyGuestJournals" ) ) or
+					( not isOwner and ( not hideSigned or not EssentialHousingHub:HasSignedGuestbook() ) )
 				) then
 				if not force then
 					if lastSummonHouseId == houseId and lastSummonHouseOwner == owner then
+						return
+					end
+
+					if hideSigned and EssentialHousingHub:HasLocalPlayerRecentlySignedGuestJournal() then
 						return
 					end
 				end
@@ -33293,7 +33349,6 @@ do
 			local spawn = FrameTime - self.SpawnMS
 			local interval = GetEasedInterval( self.IntervalMS )
 			local samplingOffset, yawOffset = 0, 0
-
 			local p1, p2 = self.Particles[1], self.Particles[2]
 
 			if spawn < 5000 then

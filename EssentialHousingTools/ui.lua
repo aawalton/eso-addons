@@ -3502,7 +3502,6 @@ function EHT.UI.PublishFX( houseId, confirm )
 			function()
 				EHT.UI.PublishFX( houseId, true )
 			end )
-
 		return
 	end
 
@@ -3544,7 +3543,6 @@ function EHT.UI.UnpublishFX( houseId, confirm )
 			function()
 				EHT.UI.UnpublishFX( houseId, true )
 			end )
-
 		return
 	end
 
@@ -10785,7 +10783,18 @@ do
 
 		local screenLeft = ui.Window:GetCenter() <= GuiRoot:GetCenter()
 		ui.MailOwner:ClearAnchors()
-		ui.MailOwner:SetAnchor( screenLeft and LEFT or RIGHT, ui.EHTButton, screenLeft and RIGHT or LEFT, screenLeft and 46 or -46, 0 )
+		ui.MailOwner:SetAnchor(screenLeft and LEFT or RIGHT, ui.EHTButton, screenLeft and RIGHT or LEFT, screenLeft and 46 or -46, 0)
+	end
+	
+	local function UpdatePublishFXPosition()
+		local ui = EHT.UI.EHTButtonDialog
+		if not ui then return end
+
+		local screenLeft = ui.Window:GetCenter() <= GuiRoot:GetCenter()
+		ui.PublishFX:ClearAnchors()
+		ui.PublishFX:SetAnchor(CENTER, ui.EHTButton, screenLeft and RIGHT or LEFT, screenLeft and 95 or -95, 45)
+		ui.PublishFX.Label:ClearAnchors()
+		ui.PublishFX.Label:SetAnchor(CENTER, ui.EHTButton, screenLeft and RIGHT or LEFT, screenLeft and 95 or -95, 82)
 	end
 
 	local function SetCaption( button, title )
@@ -10814,16 +10823,26 @@ do
 			ui.Options:SetTextureSampleProcessingWeight( TEX_SAMPLE_PROCESSING_ALPHA_AS_RGB, button == ui.Options and 0.5 or 0 )
 		end
 
-		ui.MailOwner:SetTextureSampleProcessingWeight( TEX_SAMPLE_PROCESSING_RGB, button == ui.MailOwner and 1 or 0.5 )
-		ui.MailOwner:SetAlpha( button == ui.MailOwner and 1 or 0.5 )
+		ui.MailOwner:SetTextureSampleProcessingWeight(TEX_SAMPLE_PROCESSING_RGB, button == ui.MailOwner and 1 or .5)
+		ui.MailOwner:SetAlpha(button == ui.MailOwner and 1 or .5)
+		
+		do
+			local isPublishFX = button == ui.PublishFX
+			if isPublishFX then
+				ui.PublishFX.highlightAnimation:PlayForward()
+			else
+				ui.PublishFX.highlightAnimation:PlayBackward()
+			end
+		end
 	end
 
 	function EHT.UI.EHTButtonOnMoved()
 		local ui = EHT.UI.EHTButtonDialog
 		if nil == ui then return end
 
-		zo_callLater( UpdateMailOwnerPosition, 200 )
-		EHT.UI.SaveDialogSettings( "EHTButtonDialog", ui.Window )
+		zo_callLater(UpdateMailOwnerPosition, 200)
+		zo_callLater(UpdatePublishFXPosition, 200)
+		EHT.UI.SaveDialogSettings("EHTButtonDialog", ui.Window)
 	end
 
 	local function AnimateEHTButtonBackdrop()
@@ -10981,6 +11000,10 @@ do
 		end
 	end
 ]]
+	local function GetEHTButtonDialog()
+		return EHT.UI.EHTButtonDialog
+	end
+
 	function EHT.UI.SetupEHTButton()
 		local ui = EHT.UI.EHTButtonDialog
 		if nil == ui then
@@ -11072,11 +11095,11 @@ do
 			ui.BackdropAlpha = 0
 			c = WINDOW_MANAGER:CreateControl( prefix .. "Backdrop", win, CT_TEXTURE )
 			ui.Backdrop = c
-			c:SetColor(UnpackColor(Colors.Label, 0))
-			c:SetTexture( EHT.Textures.CIRCLE_SOFT )
+			c:SetColor(1, 1, 1, 0)
+			c:SetTexture( EHT.Textures.ICON_RADIAL_MENU_BG )
 			c:SetTextureReleaseOption( RELEASE_TEXTURE_AT_ZERO_REFERENCES )
 			c:SetDimensions( 180, 180 )
-			c:SetAnchor( CENTER, win, CENTER, 4, -28 )
+			c:SetAnchor( CENTER, win, CENTER, 0, -24 )
 			c:SetMouseEnabled( true )
 
 			c = WINDOW_MANAGER:CreateControl( prefix .. "EHTButton", win, CT_TEXTURE )
@@ -11178,6 +11201,75 @@ do
 					EHT.ShowAlertDialog( "", "You must be in someone else's home in order to email the owner." )
 				end
 			end )
+
+			c = WINDOW_MANAGER:CreateControl(prefix .. "PublishFXLabel", win, CT_LABEL)
+			ui.PublishFXLabel = c
+			c:SetColor(UnpackColor(Colors.White, 0))
+			c:SetFont("$(BOLD_FONT)|$(KB_16)|soft-shadow-thick")
+			c:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+			c:SetText("Publish\nFX")
+			c:SetMouseEnabled(false)
+
+			c = WINDOW_MANAGER:CreateControl(prefix .. "PublishFX", win, CT_TEXTURE)
+			ui.PublishFX = c
+			ui.PublishFX.Label = ui.PublishFXLabel
+			c:SetTexture(EHT.Textures.ICON_FX_UNPUBLISHED)
+			c:SetTextureReleaseOption(RELEASE_TEXTURE_AT_ZERO_REFERENCES)
+			c:SetDimensions(64, 64)
+			zo_callLater(UpdatePublishFXPosition, 1500)
+			c:SetColor(UnpackColor(Colors.White))
+			c:SetTextureCoords(0, 1, -(1 - .5624), .5624)
+			c:SetMouseEnabled(true)
+
+			local BounceEase = ZO_GenerateCubicBezierEase(.48, .74, .06, 1.54)
+
+			do
+				local timeline = ANIMATION_MANAGER:CreateTimeline()
+				ui.PublishFX.alphaAnimation = timeline
+
+				local animation = timeline:InsertAnimation(ANIMATION_CUSTOM, ui.PublishFX)
+				animation:SetDuration(500)
+
+				local function Update(timeline, progress)
+					local control = timeline:GetAnimatedControl()
+					local easedProgress = BounceEase(progress)
+					control:SetAlpha(zo_lerp(0, .65, easedProgress))
+				end
+				animation:SetUpdateFunction(Update)
+			end
+
+			do
+				local timeline = ANIMATION_MANAGER:CreateTimeline()
+				ui.PublishFX.highlightAnimation = timeline
+
+				local animation = timeline:InsertAnimation(ANIMATION_CUSTOM, ui.PublishFX)
+				animation:SetDuration(350)
+
+				local function Update(timeline, progress)
+					local control = timeline:GetAnimatedControl()
+					local easedProgress = BounceEase(progress)
+					local y1 = zo_lerp(-.4, 0, easedProgress)
+					local y2 = zo_lerp(.6, 1, easedProgress)
+					control:SetTextureCoords(0, 1, y1, y2)
+					control:SetAlpha(.65 + .35 * easedProgress)
+					control.Label:SetAlpha(easedProgress)
+				end
+				animation:SetUpdateFunction(Update)
+			end
+
+			c:SetHandler("OnMouseEnter", function()
+				ui.PublishFX.highlightAnimation:PlayForward()
+			end)
+
+			c:SetHandler("OnMouseExit", function()
+				ui.PublishFX.highlightAnimation:PlayBackward()
+			end)
+
+			c:SetHandler("OnMouseDown", function()
+				if EHT.Housing.IsHouseZone() and EHT.Housing.IsOwner() then
+					EHT.UI.PublishFX()
+				end
+			end)
 
 			c = WINDOW_MANAGER:CreateControl( prefix .. "FX", win, CT_TEXTURE )
 			ui.FX = c
@@ -11446,6 +11538,29 @@ do
 			end
 		end
 	end
+	
+	function EHT.UI.RefreshPublishFXButton()
+		local ui = GetEHTButtonDialog()
+		if ui and ui.Initialized then
+			local publishFX = ui.PublishFX
+			local uiHidden = ui.Hidden or not EHT.Housing.IsHouseZone() or not EHT.Housing.IsOwner()
+			local fxHidden = not EHT.Data.AreHouseFXDirty()
+			local hidden = uiHidden or fxHidden
+			publishFX:SetHidden(hidden)
+
+			local uiHiddenChanged = publishFX.wasUIHidden == uiHidden
+			local fxHiddenChanged = publishFX.wasFXHidden == fxHidden
+			publishFX.wasUIHidden = uiHidden
+			publishFX.wasFXHidden = fxHidden
+			if fxHiddenChanged then
+				if fxHidden then
+					publishFX.alphaAnimation:PlayBackward()
+				else
+					publishFX.alphaAnimation:PlayForward()
+				end
+			end
+		end
+	end
 
 	function EHT.UI.ShowEHTButton( isShown )
 		if nil == isShown then isShown = true end
@@ -11456,20 +11571,13 @@ do
 
 		ui.Hidden = not isShown
 		if ui.Initialized then
-			ui.Window:SetHidden( ui.Hidden )
-			EHTHouseNameWin:SetHidden( ui.Hidden )
+			ui.Window:SetHidden(ui.Hidden)
+			EHTHouseNameWin:SetHidden(ui.Hidden)
 
 			local hideMailOwner = ui.Hidden or not EHT.Housing.IsHouseZone() or EHT.Housing.IsOwner()
-			ui.MailOwner:SetHidden( hideMailOwner )
---[[
-			if ui.Hidden then
-				EVENT_MANAGER:UnregisterForUpdate( "EHT.UI.EHTButtonUpdate" )
-			else
-				EVENT_MANAGER:RegisterForUpdate( "EHT.UI.EHTButtonUpdate", 10, EHT.UI.EHTButtonUpdate )
-			end
-		else
-			EVENT_MANAGER:UnregisterForUpdate( "EHT.UI.EHTButtonUpdate" )
-]]
+			ui.MailOwner:SetHidden(hideMailOwner)
+
+			EHT.UI.RefreshPublishFXButton()
 		end
 
 		if isShown and EHT.UI.IsTutorialHidden() then EHT.UI.ShowNextTutorial() end
@@ -20252,7 +20360,6 @@ function EHT.UI.SetupShareFXContextMenu()
 			if not ui.PublishButton.Enabled then
 				return
 			end
-
 			EHT.UI.PublishFX( ui.Data.HouseId )
 		end )
 		btn = c
@@ -20283,7 +20390,6 @@ function EHT.UI.SetupShareFXContextMenu()
 			if not ui.UnpublishButton.Enabled then
 				return
 			end
-
 			EHT.UI.UnpublishFX( ui.Data.HouseId )
 		end )
 		btn = c
@@ -20539,7 +20645,6 @@ function EHT.UI.SetupMultiPlaceContextMenu()
 			if not ui.PublishButton.Enabled then
 				return
 			end
-
 			EHT.UI.PublishFX( ui.Data.HouseId )
 		end )
 		btn = c
@@ -20570,7 +20675,6 @@ function EHT.UI.SetupMultiPlaceContextMenu()
 			if not ui.UnpublishButton.Enabled then
 				return
 			end
-
 			EHT.UI.UnpublishFX( ui.Data.HouseId )
 		end )
 		btn = c
@@ -20998,14 +21102,10 @@ function EHT.UI.SignGuestbook()
 			break
 		end
 	end
---[[
-	if hasSigned then
-		EHT.UI.ShowAlertDialog( "", "While your enthusiasm is appreciated, the homeowner has politely requested that each guest only sign the journal once." )
-		return false
-	end
-]]
+
 	if EssentialHousingHub:SignCommunityGuestbook() then
 		EHT.UI.DismissGuestbook( true )
+		EssentialHousingHub:OnGuestJournalSigned()
 
 		if hasSigned then
 			EHT.UI.ShowAlertDialog( "",
@@ -23250,16 +23350,23 @@ do
 	end
 
 	function HUDFragment:IsHidden()
-		if not EHT then
+		if not (EHT and EHT.UI and EHT.Housing) then
 			return
+		end
+		if 0 == EHT.Housing.GetHouseId() then
+			return true
+		end
+		local owner = EHT.Housing.GetHouseOwner()
+		if "" == owner then
+			return true
 		end
 		if IsOwnerOfCurrentHouse() then
 			return true
 		end
-		if EHT.Housing and EHT.Housing.IsDisabledMode and not EHT.Housing.IsDisabledMode() then
+		if EHT.Housing.IsDisabledMode and not EHT.Housing.IsDisabledMode() then
 			return true
 		end
-		if EHT.UI and EHT.UI.IsHUDSceneShowing and not EHT.UI.IsHUDSceneShowing() then
+		if EHT.UI.IsHUDSceneShowing and not EHT.UI.IsHUDSceneShowing() then
 			return true
 		end
 		if EHT.GetSetting and true == EHT.GetSetting("HideIdentifyFurnishingKeybind") then

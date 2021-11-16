@@ -8542,8 +8542,6 @@ function EHH.EffectEditor:Initialize()
 				end
 
 				local houseId = ui.TargetHouse.HouseId
-				-- local houseName = ui.TargetHouse:GetText()
-
 				local e = self.Effect
 				e:SetMetaData("HouseId", houseId)
 				e:SetMetaData("Owner", player)
@@ -32841,12 +32839,18 @@ do
 		local owner = EHH:GetOwner()
 
 		if houseId and 0 ~= houseId and owner and "" ~= owner and EHH:IsOpenHouse(houseId, owner) then
+			local isOwner = EHH:IsOwner()
+			local showSigned = EHH:GetSetting("ShowSignedGuestJournals")
 			if	force or (
-					(EHH:IsOwner() and EHH:GetSetting("ShowMyGuestJournals")) or
-					(not EHH:IsOwner() and (EHH:GetSetting("ShowSignedGuestJournals") or not EHH:HasSignedGuestbook()))
+					(isOwner and EHH:GetSetting("ShowMyGuestJournals")) or
+					(not isOwner and (showSigned or not EHH:HasSignedGuestbook()))
 				) then
 				if not force then
 					if lastSummonHouseId == houseId and lastSummonHouseOwner == owner then
+						return
+					end
+
+					if not showSigned and EHH:HasLocalPlayerRecentlySignedGuestJournal() then
 						return
 					end
 				end

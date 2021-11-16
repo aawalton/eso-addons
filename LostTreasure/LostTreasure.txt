@@ -4,26 +4,32 @@
 ; States and/or other countries. All rights reserved.
 ; You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
 
-## Title: |cFFFFBELost Treasure|r
+## Title: Lost Treasure
 ## Description: The one and only true treasure map and survey report locator. All others are just copies.
-## Version: 19
-## AddOnVersion: 19
-## Author: |cFFA500CrazyDutchGuy|r, Scootworks
-## APIVersion: 101031
+## Version: 21
+## AddOnVersion: 21
+## Author: CrazyDutchGuy, Scootworks
+## APIVersion: 101032 101033
 ## SavedVariables: LostTreasure_Account LostTreasure_Character
-## DependsOn: LibAddonMenu-2.0>=31 LibMapPins-1.0>=10029 CustomCompassPins>=31 LibChatMessage>=100 LibDebugLogger>=196 LibSavedVars>=60004 LibNotification>=10
+## DependsOn: LibAddonMenu-2.0>=32 LibMapPins-1.0>=10034 CustomCompassPins>=32 LibDebugLogger>=220 LibSavedVars>=60007 LibNotification>=10 LibTreasure>=2
+## OptionalDependsOn: LibGPS
 
-Lang\en.lua
-Lang\$(language).lua
+lang\en.lua
+lang\$(language).lua
 
 StartUp.lua
+internal\LogManager.lua
+internal\Utilities.lua
+internal\BugReport.lua
+internal\SavedVars.lua
+internal\MarkOnUsing.lua
+internal\Debug.lua
+internal\Settings.lua
+internal\Notifications.lua
+internal\Mining.lua
+internal\ItemCache.lua
+internal\Pins.lua
 
-LostTreasure_Data.lua
-LostTreasure_BagCache.lua
-LostTreasure_Settings.lua
-LostTreasure_Notification.lua
-LostTreasure_Pins.lua
 LostTreasure.lua
 LostTreasure.xml
-
 API.lua

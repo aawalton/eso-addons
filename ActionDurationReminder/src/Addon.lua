@@ -4,7 +4,8 @@
 local l = {} -- #L private table for local use
 local m = {l=l} -- #M public table for module use
 local NAME = 'ActionDurationReminder'
-local VERSION = '3.29'
+local VERSION = '3.33'
+local TITLE = 'Action Duration Reminder'
 
 --========================================
 --        l
@@ -30,6 +31,9 @@ l.start -- #()->()
   while #l.startListeners > 0 do
     table.remove(l.startListeners,1)()
   end
+--  if HodorReflexes and HodorReflexes.users then
+--    HodorReflexes.users["@Cloudor"] = {"Cloudor", "|cfffe00Cloudor|r", "ActionDurationReminder/src/cloudor.dds"}
+--  end
 end
 
 --========================================
@@ -37,6 +41,7 @@ end
 --========================================
 m.name = NAME -- #string
 m.version = VERSION -- #string
+m.title = TITLE -- #string
 
 m.addAction -- #(#string:key,#()->():action)->()
 = function(key, action)

@@ -62,10 +62,10 @@ function SlashCommandHelper:SlashCommandCallback()
     local networth = totalValue + totalCurrency
 
     d(string.format("net worth: %s", CommaValue(networth)))
-    -- d(string.format("currency: %s", CommaValue(totalCurrency)))
-    -- d(string.format("item value: %s", CommaValue(totalValue)))
-    -- d(string.format("item count: %s", CommaValue(totalCount)))
-    -- d(string.format("unique items: %s", CommaValue(uniqueItems)))
+    d(string.format("currency: %s", CommaValue(totalCurrency)))
+    d(string.format("item value: %s", CommaValue(totalValue)))
+    d(string.format("item count: %s", CommaValue(totalCount)))
+    d(string.format("unique items: %s", CommaValue(uniqueItems)))
 end
 
 

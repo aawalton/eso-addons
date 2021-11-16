@@ -9,8 +9,8 @@
 ESODatabaseExport = {}
 ESODatabaseExport.Name = "ESODatabaseExport"
 ESODatabaseExport.DisplayName = "ESO-Database.com Export"
-ESODatabaseExport.AddonVersion = "4.4.4"
-ESODatabaseExport.AddonVersionInt = 4404
+ESODatabaseExport.AddonVersion = "4.4.6"
+ESODatabaseExport.AddonVersionInt = 4406
 ESODatabaseExport.SavedVariablesName = "ESODBDataExportV4"
 ESODatabaseExport.NumKeepStats = 12
 ESODatabaseExport.VariableVersion = 22
