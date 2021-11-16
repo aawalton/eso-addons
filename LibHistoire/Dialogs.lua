@@ -41,7 +41,7 @@ function internal:ShowQuitWarningDialog(buttonText, callback)
     secondaryButton.text = buttonText
     secondaryButton.callback = callback
 
-    ZO_Dialogs_ShowDialog(DIALOG_ID)
+    -- ZO_Dialogs_ShowDialog(DIALOG_ID)
 end
 
 function internal:ShowForceLinkWarningDialog(callback)
