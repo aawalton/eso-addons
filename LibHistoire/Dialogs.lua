@@ -41,7 +41,7 @@ function internal:ShowQuitWarningDialog(buttonText, callback)
     secondaryButton.text = buttonText
     secondaryButton.callback = callback
 
-    -- ZO_Dialogs_ShowDialog(DIALOG_ID)
+    ZO_Dialogs_ShowDialog(DIALOG_ID)
 end
 
 function internal:ShowForceLinkWarningDialog(callback)
@@ -63,10 +63,10 @@ function internal:SetupDialogHook(name)
     local primaryButton = ESO_Dialogs[name].buttons[1]
     local originalCallback = primaryButton.callback
     primaryButton.callback = function(dialog)
-        if not self.historyCache:HasLinkedAllCaches() then
-            self:ShowQuitWarningDialog(primaryButton.text, originalCallback)
-        else
+        -- if not self.historyCache:HasLinkedAllCaches() then
+            -- self:ShowQuitWarningDialog(primaryButton.text, originalCallback)
+        -- else
             originalCallback(dialog)
-        end
+        -- end
     end
 end
