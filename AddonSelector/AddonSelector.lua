@@ -1,3 +1,6 @@
+--[[
+Known bugs:
+]]
 local ADDON_NAME	= "AddonSelector"
 local ADDON_MANAGER
 local AddonSelector = {}
@@ -9,14 +12,36 @@ AddonSelector.noAddonCheckBoxUpdate = false
 AddonSelector.lastChangedAddOnVars = {}
 AddonSelector.alreadyFound = {}
 AddonSelector.activeUpdateControlEvents = {}
-AddonSelector.version = "1.446"
+AddonSelector.version = "2.000"
 
 AddonSelectorGlobal = AddonSelector
 --TODO:Remove comment for quicker debugging
 --ASG = AddonSelectorGlobal
 
+local EM = EVENT_MANAGER
+local SM = SCENE_MANAGER
+
+local strfor = string.format
+local strlow = string.lower
+local strgma = string.gmatch
+local zopsf = zo_plainstrfind
+local gTab = table
+local tins = gTab.insert
+--local trem = gTab.remove
+local tsor = gTab.sort
+
+--Constant for the global pack name
+local GLOBAL_PACK_NAME = "$G"
+
+local SEARCH_TYPE_NAME = "name"
+
 local AddOnManager = GetAddOnManager()
 --The drop down list for the packs -> ZO_ScrollableComboBox
+local isAreAddonsEnabledFuncGiven = (AddOnManager.AreAddOnsEnabled ~= nil) or false
+
+local currentCharIdNum = GetCurrentCharacterId()
+local currentCharId = tostring(currentCharIdNum)
+local currentCharName = ZO_CachedStrFormat(SI_UNIT_NAME, GetUnitName("player"))
 
 local doNotReloadUI = false
 local lang = GetCVar("language.2")
@@ -24,7 +49,7 @@ local fallbackLang = "en"
 local langArray = {
 	["en"] = {
 		["packName"]			= "Pack name:",
-		["selectPack"]			= "Select pack:",
+		["selectPack"]			= "Select pack",
     	["ERRORpackMissing"] 	= "ADDON SELECTOR: Pack name missing.",
         ["autoReloadUIHint"]	= "Auto-Reload UI on pack selection.",
         ["autoReloadUIHintTooltip"] = "Auto-Reload UI: When ON this will prevent editing and deleting addon packs. You will need to turn it off to edit or delete packs!",
@@ -34,19 +59,32 @@ local langArray = {
         ["deleteButton"]		= "Delete",
         ["deletePackTitle"]     = "Delete: ",
         ["deletePackAlert"]     = "ADDON SELECTOR: You must select a pack to delete.",
-        ["deletePackBody"]      = "Really delete %s?",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
+        ["deletePackBody"]      = "Really delete?\n%s",
         ["DeselectAllAddons"]   = "Deselect all",
         ["SelectAllAddons"]     = "Select all",
         ["SelectAllAddonsSaved"] = "Re-select saved",
         ["AddonSearch"]          = "Search:",
-        ["selectedPackName"]     = "Selected (%s):",
+        ["selectedPackName"]     = "Selected (%s): ",
         ["LibDialogMissing"]     = "Library \'LibDialog\' is missing! This addon will not work without it!",
         ["ReloadUI"]            = GetString(SI_ADDON_MANAGER_RELOAD) or "Reload UI",
         ["ShowActivePack"]      = "Show active pack",
+        ["ShowSubMenuAtGlobalPacks"] = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "Global",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
     ["es"] = {
         ["packName"] = "Nombre del paquete:",
-        ["selectPack"] = "Seleccionar paquete:",
+        ["selectPack"] = "Seleccionar paquete",
         ["ERRORpackMissing"] = "ADDON SELECTOR: Falta el nombre del paquete.",
         ["autoReloadUIHint"]	= "Recarga automática el UI en la selección de paquete",
         ["autoReloadUIHintTooltip"] = "Recarga automática el UI: Cuando está activado, esto evitará editar y eliminar paquetes de complementos. ¡Deberá desactivarlo para editar o eliminar paquetes!",
@@ -55,20 +93,33 @@ local langArray = {
         ["savePackBody"]        = "Sobrescribir paquete existente %s?",
         ["deleteButton"] = "Eliminar",
         ["deletePackAlert"]     = "ADDON SELECTOR: Debes seleccionar un paquete para eliminar.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
         ["deletePackTitle"] = "Eliminar: ",
-        ["deletePackBody"] = "Eliminar el paquete %s?",
+        ["deletePackBody"] = "Eliminar el paquete?\n%s ",
         ["DeselectAllAddons"] = "Deseleccionar todo",
         ["SelectAllAddons"] = "Seleccionar todo",
         ["SelectAllAddonsSaved"] = "Vuelva a seleccionar guardado",
         ["AddonSearch"] = "Buscar:",
-        ["selectedPackName"]     = "Seleccionado (%s):",
+        ["selectedPackName"]     = "Seleccionado (%s): ",
         ["LibDialogMissing"]     = "¡Falta la biblioteca \'LibDialog \'! ¡Este complemento no funcionará sin él!",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "Recargar interfaz de usuario",
         ["ShowActivePack"]      = "Mostrar paquete activo",
+        ["ShowSubMenuAtGlobalPacks"]            = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "Global",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
 	["fr"] = {
 		["packName"]			= "Nom du paquet:",
-		["selectPack"]			= "Sélectionnez paquet:",
+		["selectPack"]			= "Sélectionnez paquet",
     	["ERRORpackMissing"] 	= "ADDON SELECTOR: Nom du paquet manquant.",
         ["autoReloadUIHint"]	= "Auto-Reload UI sur la sélection de paquets",
         ["autoReloadUIHintTooltip"] = "Auto-Reload UI: Lorsque ON cela empêchera l'édition et l'effacer du paquets d'addon . Vous aurez besoin de le désactiver pour modifier et effacer les paquets.",
@@ -77,20 +128,33 @@ local langArray = {
         ["savePackBody"]        = "Ecraser le paquet existant %s?",
         ["deleteButton"]		= "Effacer",
         ["deletePackAlert"]     = "ADDON SELECTOR: Vous devez sélectionner un pack à effacer.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
         ["deletePackTitle"]     = "Effacer: ",
-        ["deletePackBody"]      = "Effacer le paquet %s?",
+        ["deletePackBody"]      = "Effacer le paquet?\n%s",
         ["DeselectAllAddons"]   = "Tout déselectionner",
         ["SelectAllAddons"]     = "Tout selectionner",
         ["SelectAllAddonsSaved"] = "Re-sélectionner enregistré",
         ["AddonSearch"]          = "Chercher:",
-        ["selectedPackName"]     = "Choisie (%s):",
+        ["selectedPackName"]     = "Choisie (%s): ",
         ["LibDialogMissing"]     = "La bibliothèque \'LibDialog \' est manquante! Cet addon ne fonctionnera pas sans elle!",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "Recharger l'interface utilisateur",
         ["ShowActivePack"]      = "Afficher le pack actif",
+        ["ShowSubMenuAtGlobalPacks"]            = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "Global",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
 	["de"] = {
 		["packName"]			= "Pack Name:",
-		["selectPack"]			= "Pack wählen:",
+		["selectPack"]			= "Pack wählen",
     	["ERRORpackMissing"] 	= "ADDON SELECTOR: Pack Name fehlt.",
         ["autoReloadUIHint"]	= "Autom. Reload UI nach Pack Auswahl!",
         ["autoReloadUIHintTooltip"] = "Auto-Reload UI: Wenn diese Option aktiviert wurde können keine AddOn Packs geändert oder gelöscht werden. Sie müssen diese Option deaktivieren, um AddOn Packs ändern oder löschen zu können.",
@@ -99,20 +163,33 @@ local langArray = {
         ["savePackBody"]        = "Überschreibe Pack %s?",
         ["deleteButton"]		= "Löschen",
         ["deletePackAlert"]     = "ADDON SELECTOR: Du musst einen Pack zum Löschen auswählen.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack Löschen Fehler\n%s.",
         ["deletePackTitle"]     = "Löschen: ",
-        ["deletePackBody"]      = "Pack %s wirklich löschen?",
+        ["deletePackBody"]      = "Pack löschen?\n%s",
         ["DeselectAllAddons"]   = "Alle demarkieren",
         ["SelectAllAddons"]     = "Alle markieren",
         ["SelectAllAddonsSaved"] = "Gesicherte re-markieren",
         ["AddonSearch"]          = "Suche:",
-        ["selectedPackName"]     = "Ausgewählt (%s):",
+        ["selectedPackName"]     = "Gewählt (%s): ",
         ["LibDialogMissing"]     = "Bibliothek \'LibDialog \' fehlt! Dieses Addon wird ohne diese nicht funktionieren!",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "UI neu laden",
         ["ShowActivePack"]      = "Aktiven Pack zeigen",
+        ["ShowSubMenuAtGlobalPacks"]            = "Zeige Untermenü am globalen Pack",
+        ["ShowSettings"]        = "\'"..ADDON_NAME.."\' Einstellungen anzeigen",
+        ["ShowGlobalPacks"]     = "Zeige global gespeicherte Packs",
+        ["GlobalPackSettings"] = "Globale Pack Einstellungen",
+        ["CharacterNameSettings"] = "Charaktername Einstellungen",
+        ["SaveGroupedByCharacterName"] = "Speichere Packs je Charaktername",
+        ["ShowGroupedByCharacterName"] = "Zeige Packs der Charakternamen",
+        ["packCharName"]        = "Charakter des Packs",
+        ["packGlobal"]          = "Global",
+        ["searchExcludeFilename"] = "Dateiname nicht durchsuchen",
+        ["searchSaveHistory"] = "Historie der Suchbegriffe speichern",
+        ["searchClearHistory"] = "Historie leeren",
     },
     ["ru"] = {
         ["packName"]            = "Имя сборки:",
-        ["selectPack"]          = "Сборка:",
+        ["selectPack"]          = "Сборка",
         ["ERRORpackMissing"]    = "ADDON SELECTOR: Имя сборки не найдено.",
         ["autoReloadUIHint"]    = "Автоматически перезагружать интерфейс.",
         ["autoReloadUIHintTooltip"] = "Отключить, если вы хотите изменить или удалить сборку.",
@@ -121,8 +198,9 @@ local langArray = {
         ["savePackBody"]        = "Перезаписать существующую сборку %s?",
         ["deleteButton"]        = "Удалить",
         ["deletePackAlert"]     = "ADDON SELECTOR: Вы должны выбрать пакет для удаления.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
         ["deletePackTitle"]     = "Удалить: ",
-        ["deletePackBody"]      = "Действительно удалить сборку %s?",
+        ["deletePackBody"]      = "Действительно удалить сборку?\n%s",
         ["DeselectAllAddons"]   = "Отключить всё",
         ["SelectAllAddons"]     = "Включить всё",
         ["SelectAllAddonsSaved"] = "Включить сохранённые",
@@ -131,10 +209,22 @@ local langArray = {
         ["LibDialogMissing"]     = "Библиотека \'LibDialog\' отсутствует! Этот аддон не будет работать без него!",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "Обновить интерфейс",
         ["ShowActivePack"]      = "Показать активный пакет",
+        ["ShowSubMenuAtGlobalPacks"]            = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "общий",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
     ["br"] = {
         ["packName"] = "Nome do Pacote:",
-        ["selectPack"] = "Escolha pacote:",
+        ["selectPack"] = "Escolha pacote",
         ["ERRORpackMissing"] = "ADDON SELECTOR: Faltando Nome do Pacote.",
         ["autoReloadUIHint"]	= "Auto-Relê UI na seleção do pacote.",
         ["autoReloadUIHintTooltip"] = "Auto-Relê UI: Quando ativada, você também pode evitar a edição ou exclusão de pacotes complementares.",
@@ -143,8 +233,9 @@ local langArray = {
         ["savePackBody"]        = "Substituir pacote existente %s?",
         ["deleteButton"] = "Apaga",
         ["deletePackAlert"]     = "ADDON SELECTOR: Você deve selecionar um pacote para deletar.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
         ["deletePackTitle"] = "Apaga: ",
-        ["deletePackBody"] = "Apaga de Verdade %s?",
+        ["deletePackBody"] = "Apaga de Verdade?\n%s",
         ["DeselectAllAddons"] = "Desmarca tudo",
         ["SelectAllAddons"] = "Marca tudo",
         ["SelectAllAddonsSaved"] = "Re-escolhe salvo",
@@ -153,10 +244,22 @@ local langArray = {
         ["LibDialogMissing"]     = "Biblioteca \'LibDialog \' está faltando! Este addon não funcionará sem ele!",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "Recarregar IU",
         ["ShowActivePack"]      = "Mostrar pacote ativo",
+        ["ShowSubMenuAtGlobalPacks"]            = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "Global",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
     ["pt"] = {
         ["packName"] = "Nome do Pacote:",
-        ["selectPack"] = "Escolha pacote:",
+        ["selectPack"] = "Escolha pacote",
         ["ERRORpackMissing"] = "ADDON SELECTOR: Faltando Nome do Pacote.",
         ["autoReloadUIHint"]	= "Auto-Relê UI na seleção do pacote.",
         ["autoReloadUIHintTooltip"] = "Auto-Relê UI: Quando ativada, você também pode evitar a edição ou exclusão de pacotes complementares.",
@@ -165,8 +268,9 @@ local langArray = {
         ["savePackBody"]        = "Substituir pacote existente %s?",
         ["deleteButton"] = "Apaga",
         ["deletePackAlert"]     = "ADDON SELECTOR: Você deve selecionar um pacote para deletar.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
         ["deletePackTitle"] = "Apaga: ",
-        ["deletePackBody"] = "Apaga de Verdade %s?",
+        ["deletePackBody"] = "Apaga de Verdade?\n%s",
         ["DeselectAllAddons"] = "Desmarca tudo",
         ["SelectAllAddons"] = "Marca tudo",
         ["SelectAllAddonsSaved"] = "Re-escolhe salvo",
@@ -175,10 +279,22 @@ local langArray = {
         ["LibDialogMissing"]     = "Biblioteca \'LibDialog \' está faltando! Este addon não funcionará sem ele!",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "Recarregar IU",
         ["ShowActivePack"]      = "Mostrar pacote ativo",
+        ["ShowSubMenuAtGlobalPacks"]            = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "Global",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
     ["jp"] = {
         ["packName"] = "パック名:",
-        ["selectPack"] = "パック選択:",
+        ["selectPack"] = "パック選択",
         ["ERRORpackMissing"] = "ADDON SELECTOR: パック名が見つかりません",
         ["autoReloadUIHint"] = "自動UIリロード",
         ["autoReloadUIHintTooltip"] = "自動UIリロード: ONにした場合、編集や削除ができなくなります。 編集・削除をする場合はOFFにして下さい。",
@@ -187,8 +303,9 @@ local langArray = {
         ["savePackBody"] = " %sに上書き保存しますか？",
         ["deleteButton"] = "削除",
         ["deletePackAlert"]     = "ADDON SELECTOR: 削除するパックを選択する必要があります.",
+        ["deletePackError"]     = "ADDON SELECTOR: Pack delete error\n%s.",
         ["deletePackTitle"] = "削除: ",
-        ["deletePackBody"] = "本当に %s　を削除しますか？",
+        ["deletePackBody"] = "本当に を削除しますか？\n%s",
         ["DeselectAllAddons"] = "全解除",
         ["SelectAllAddons"] = "全選択",
         ["SelectAllAddonsSaved"] = "再選択",
@@ -197,20 +314,117 @@ local langArray = {
         ["LibDialogMissing"] = "Library \'LibDialog\' が見つかりません！ このアドオンはこれらがないと動きません。",
         ["ReloadUI"]        = GetString(SI_ADDON_MANAGER_RELOAD) or "UIをリロード",
         ["ShowActivePack"]      = "アクティブパックを表示",
+        ["ShowSubMenuAtGlobalPacks"]            = "Show submenu at global packs",
+        ["ShowSettings"]        = "Show \'"..ADDON_NAME.."\' settings",
+        ["ShowGlobalPacks"]     = "Show global saved packs",
+        ["GlobalPackSettings"] = "Global pack settings",
+        ["CharacterNameSettings"] = "Character name settings",
+        ["SaveGroupedByCharacterName"] = "Save packs by character name",
+        ["ShowGroupedByCharacterName"] = "Show packs of character names",
+        ["packCharName"]        = "Character of pack",
+        ["packGlobal"]          = "グローバル",
+        ["searchExcludeFilename"] = "Exclude filename",
+        ["searchSaveHistory"] = "Save history of search terms",
+        ["searchClearHistory"] = "Clear history",
     },
 }
 local langArrayInClientLang = langArray[lang]
 local langArrayInFallbackLang = langArray[fallbackLang]
+local charNamePackColorTemplate = "|cc9b636%s|r"
+local charNamePackColorDef = ZO_ColorDef:New("C9B636")
+local globalPackColorTemplate = "|c7EC8E3%s|r"
+local packNameGlobal = strfor(globalPackColorTemplate, langArrayInClientLang["packGlobal"] or langArrayInFallbackLang["packGlobal"])
+local selectedPackNameStr = langArrayInClientLang["selectedPackName"] or langArrayInFallbackLang["selectedPackName"]
+local deletePackAlertStr = langArrayInClientLang["deletePackAlert"] or langArrayInFallbackLang["deletePackAlert"]
+local deletePackErrorStr = langArrayInClientLang["deletePackError"] or langArrayInFallbackLang["deletePackError"]
+local savedGroupedByCharNameStr = langArrayInClientLang["SaveGroupedByCharacterName"] or langArrayInFallbackLang["SaveGroupedByCharacterName"]
+local autoReloadUIStr = langArrayInClientLang["autoReloadUIHint"] or langArrayInFallbackLang["autoReloadUIHint"]
+local searchMenuStr = langArrayInClientLang["AddonSearch"] or langArrayInFallbackLang["AddonSearch"]
+searchMenuStr = string.sub(searchMenuStr, 1, -2) --remove last char
+local clearSearchHistoryStr = langArrayInClientLang["searchClearHistory"] or langArrayInFallbackLang["searchClearHistory"]
 
 --Clean the color codes from the addon name
+--[[
 local function stripText(text)
     return text:gsub("|c%x%x%x%x%x%x", "")
 end
+]]
 
 --Get localized texts
 function AddonSelector_GetLocalizedText(textToFind)
-    return langArrayInClientLang[textToFind] or langArrayInClientLang[fallbackLang] or "N/A"
+    return langArrayInClientLang[textToFind] or langArrayInFallbackLang[textToFind] or "N/A"
 end
+
+-- Create the pack table or nil it out if it exists.
+-- Distinguish between packs grouped for charactes or general packs
+local function createSVTableForPack(packName)
+    if AddonSelector.acwsv.saveGroupedByCharacterName then
+        AddonSelector.acwsv.addonPacksOfChar[currentCharId] = AddonSelector.acwsv.addonPacksOfChar[currentCharId] or {}
+        AddonSelector.acwsv.addonPacksOfChar[currentCharId]._charName = currentCharName
+        AddonSelector.acwsv.addonPacksOfChar[currentCharId][packName] = {}
+        return AddonSelector.acwsv.addonPacksOfChar[currentCharId][packName]
+    else
+        AddonSelector.acwsv.addonPacks[packName] = {}
+        return AddonSelector.acwsv.addonPacks[packName]
+    end
+    return
+end
+
+local function getSVTableForPacks()
+    if AddonSelector.acwsv.saveGroupedByCharacterName then
+        --Table for current char does not exist yt, so create it. Else a new saved pack will be compared to the global
+        --packs and if the name matches it will be saved as global!
+        AddonSelector.acwsv.addonPacksOfChar = AddonSelector.acwsv.addonPacksOfChar or {}
+        AddonSelector.acwsv.addonPacksOfChar[currentCharId] = AddonSelector.acwsv.addonPacksOfChar[currentCharId] or {}
+        AddonSelector.acwsv.addonPacksOfChar[currentCharId]._charName = currentCharName
+        return AddonSelector.acwsv.addonPacksOfChar[currentCharId], currentCharName
+    end
+    return AddonSelector.acwsv.addonPacks, nil
+end
+
+--[[
+local function getSVTableForPacksOfChar(charId)
+    if AddonSelector.acwsv.saveGroupedByCharacterName then
+        if AddonSelector.acwsv.addonPacksOfChar and AddonSelector.acwsv.addonPacksOfChar[charId] then
+            return AddonSelector.acwsv.addonPacksOfChar[charId], AddonSelector.acwsv.addonPacksOfChar[charId]._charName
+        end
+    end
+    return AddonSelector.acwsv.addonPacks, nil
+end
+]]
+
+local function getSVTableForPacksOfCharname(charName)
+    local addonPacksOfChar = AddonSelector.acwsv.addonPacksOfChar
+    if addonPacksOfChar then
+        for charId, packsData in pairs(addonPacksOfChar) do
+            local addonPacksCharName = packsData["_charName"]
+            if addonPacksCharName ~= GLOBAL_PACK_NAME and addonPacksCharName == charName then
+                return addonPacksOfChar[charId], charId
+            end
+        end
+    end
+    return nil, nil
+end
+
+--[[
+local function getSVTableForPackOfChar(packName, charId)
+    if AddonSelector.acwsv.saveGroupedByCharacterName then
+        if AddonSelector.acwsv.addonPacksOfChar and AddonSelector.acwsv.addonPacksOfChar[charId] and AddonSelector.acwsv.addonPacksOfChar[charId][packName] then
+            return AddonSelector.acwsv.addonPacksOfChar[charId][packName], AddonSelector.acwsv.addonPacksOfChar[charId]._charName
+        end
+    end
+    return AddonSelector.acwsv.addonPacks, nil
+end
+
+local function getCharNameOfPack(charId)
+    if AddonSelector.acwsv.saveGroupedByCharacterName then
+        if AddonSelector.acwsv.addonPacksOfChar and AddonSelector.acwsv.addonPacksOfChar[charId] then
+            return AddonSelector.acwsv.addonPacksOfChar[charId]._charName
+        end
+    end
+    return
+end
+]]
 
 --Deselect the combobox entry
 local function deselectComboBoxEntry()
@@ -247,44 +461,100 @@ local function checkDependsOn(data)
     dependencyLevel = dependencyLevel - 1
 end
 
+--Enable/Disable all the controls of this addon depending on the enabled checkbox for all addons
+local function setThisAddonsControlsEnabledState(enabledState)
+    local addonSelectorTLC = AddonSelector.addonSelectorControl
+    local numChildControls = addonSelectorTLC:GetNumChildren()
+    if numChildControls <= 0 then return end
+    for childindex=1, numChildControls, 1 do
+        local childControl = addonSelectorTLC:GetChild(childindex)
+        if childControl ~= nil and childControl.SetMouseEnabled and childControl.IsHidden then
+            childControl:SetMouseEnabled(enabledState)
+        end
+    end
+end
+
+--Check if the checkbox to disable all addons is enabled or not
+local function areAllAddonsEnabled(noControlUpdate)
+    noControlUpdate = noControlUpdate or false
+    if not isAreAddonsEnabledFuncGiven then
+        --[[
+        if not noControlUpdate then
+            setThisAddonsControlsEnabledState(true)
+        end
+        ]]
+        return true
+    end
+
+    local areAllAddonsCurrentlyEnabled = AddOnManager:AreAddOnsEnabled()
+    if not noControlUpdate then
+        setThisAddonsControlsEnabledState(areAllAddonsCurrentlyEnabled)
+    end
+    --d("[CAS]areAllAddonsEnabled: " ..tostring(areAllAddonsCurrentlyEnabled) .. ", noControlUpdate: " ..tostring(noControlUpdate))
+    return areAllAddonsCurrentlyEnabled
+end
+
 -- Toggles Enabled state when a row is clicked
 -->Using  Votans Addon List function ADD_ON_MANAGER:OnEnabledButtonClicked so that dependencies are enabled too
 local function Addon_Toggle_Enabled(rowControl)
---d("Addon_Toggle_Enabled")
-	--local addonIndex 	= rowControl.data.index
-	local enabledBtn 	= rowControl:GetNamedChild("Enabled")
-	local state 		= ZO_TriStateCheckButton_GetState(enabledBtn)
+    --d("Addon_Toggle_Enabled")
+    if not areAllAddonsEnabled(true) then return end
 
-	if state == TRISTATE_CHECK_BUTTON_CHECKED then
-		-- changed so it automatically refreshes the multiButton (reload UI)
-		--ADD_ON_MANAGER:ChangeEnabledState(addonIndex, TRISTATE_CHECK_BUTTON_UNCHECKED)
-		ADD_ON_MANAGER:OnEnabledButtonClicked(enabledBtn, TRISTATE_CHECK_BUTTON_UNCHECKED)
-		return
-	end
-	--ADD_ON_MANAGER:ChangeEnabledState(addonIndex, TRISTATE_CHECK_BUTTON_CHECKED)
-	ADD_ON_MANAGER:OnEnabledButtonClicked(enabledBtn, TRISTATE_CHECK_BUTTON_CHECKED)
+    --local addonIndex 	= rowControl.data.index
+    local enabledBtn 	= rowControl:GetNamedChild("Enabled")
+    local state 		= ZO_TriStateCheckButton_GetState(enabledBtn)
+
+    if state == TRISTATE_CHECK_BUTTON_CHECKED then
+        -- changed so it automatically refreshes the multiButton (reload UI)
+        --ADD_ON_MANAGER:ChangeEnabledState(addonIndex, TRISTATE_CHECK_BUTTON_UNCHECKED)
+        ADD_ON_MANAGER:OnEnabledButtonClicked(enabledBtn, TRISTATE_CHECK_BUTTON_UNCHECKED)
+        return
+    end
+    --ADD_ON_MANAGER:ChangeEnabledState(addonIndex, TRISTATE_CHECK_BUTTON_CHECKED)
+    ADD_ON_MANAGER:OnEnabledButtonClicked(enabledBtn, TRISTATE_CHECK_BUTTON_CHECKED)
 end
 
-local function getCurrentCharsPackName()
-    --Get the current character's uniqueId and name (clean without gender stuff)
-    local currentCharacterId = tostring(GetCurrentCharacterId())
-    if not currentCharacterId then return nil, nil end
+local function getCurrentCharsPackNameData()
     --Get the currently selected packname from the SavedVariables
-    local packNamesForCharacter = AddonSelector.acwsv.selectedPackNameForCharacters
-    if not packNamesForCharacter then return nil, nil end
-    local currentlySelectedPackName = packNamesForCharacter[currentCharacterId]
-
-    return currentCharacterId, currentlySelectedPackName
+    local packNamesForCharacters = AddonSelector.acwsv.selectedPackNameForCharacters
+    if not packNamesForCharacters then return nil, nil end
+    local currentlySelectedPackData = packNamesForCharacters[currentCharId]
+    return currentCharId, currentlySelectedPackData
 end
 
 --Update the currently selected packName label
-local function UpdateCurrentlySelectedPackName(wasDeleted)
+local function UpdateCurrentlySelectedPackName(wasDeleted, packName, packData)
+--d(">1")
     wasDeleted = wasDeleted or false
     local packNameLabel = AddonSelector.selectedPackNameLabel
     if not packNameLabel then return end
+    local savePackPerCharacter = AddonSelector.acwsv.saveGroupedByCharacterName
 
-    local currentCharacterId, currentlySelectedPackName = getCurrentCharsPackName()
-    if not currentCharacterId then return end
+    local currentlySelectedPackName
+    local currentlySelectedPackCharName
+    local currentCharacterId = currentCharId
+    if packName == nil or packName == "" or packData == nil then
+--d(">2")
+        local currentlySelectedPackNameData
+        currentCharacterId, currentlySelectedPackNameData = getCurrentCharsPackNameData()
+        if not currentCharacterId or not currentlySelectedPackNameData then return end
+        currentlySelectedPackName = currentlySelectedPackNameData.packName
+        if wasDeleted then
+--d(">3")
+            --If pack was deleted:
+            --Reset the pack character to the currently logged in charname if settings to save per character are enabled.
+            --Else reset to "Global" name
+            currentlySelectedPackCharName = (savePackPerCharacter and currentCharName) or packNameGlobal
+        else
+--d(">4")
+            currentlySelectedPackCharName = (currentlySelectedPackNameData.charName and ((currentlySelectedPackNameData.charName == GLOBAL_PACK_NAME and packNameGlobal) or currentlySelectedPackNameData.charName))
+        end
+    else
+--d(">5")
+        currentlySelectedPackName = packName
+        currentlySelectedPackCharName = (packData.charName and ((packData.charName == GLOBAL_PACK_NAME and packNameGlobal) or packData.charName)) or "n/a"
+    end
+--d("[AddonSelector]currentlySelectedPackName: " ..tostring(currentlySelectedPackName) ..", currentlySelectedPackCharName: " ..tostring(currentlySelectedPackCharName))
 
     --Pack wurde nicht gelöscht, sondern soll normal updaten?
     if not wasDeleted then
@@ -295,21 +565,36 @@ local function UpdateCurrentlySelectedPackName(wasDeleted)
         AddonSelector.acwsv.selectedPackNameForCharacters[currentCharacterId] = nil
     end
     if currentlySelectedPackName then
-        local currentCharacterNameClean = ZO_CachedStrFormat(SI_UNIT_NAME, GetUnitName("player"))
-        packNameLabel:SetText(string.format(langArrayInClientLang["selectedPackName"] or langArrayInFallbackLang["selectedPackName"], currentCharacterNameClean) .. currentlySelectedPackName)
+--d(">6")
+        --Packs are saved per character? Show the character that belongs to teh currently selected pack
+        local packNameText
+        local settings = AddonSelector.acwsv
+        --[[
+        if settings.saveGroupedByCharacterName == true then
+            packNameText = strfor(selectedPackNameStr, strfor(charNamePackColorTemplate, currentlySelectedPackCharName))
+        else
+            --Show the "global pack" info
+            packNameText = strfor(selectedPackNameStr, packNameGlobal)
+        end
+        ]]
+        packNameText = strfor(selectedPackNameStr, strfor(charNamePackColorTemplate, currentlySelectedPackCharName))
+        packNameText = packNameText .. currentlySelectedPackName
+        packNameLabel:SetText(packNameText)
     end
 end
 
---Set the currently selected pack name for the currently logged in character
-local function SetCurrentCharacterSelectedPackname(currentlySelectedPackName)
-    if not currentlySelectedPackName or currentlySelectedPackName == "" then return end
+--Set the currently selected pack name and the character owning the pack for the currently logged in character
+local function SetCurrentCharacterSelectedPackname(currentlySelectedPackName, packData)
+--d("SetCurrentCharacterSelectedPackname: " ..tostring(currentlySelectedPackName) .. ", charName: " ..tostring(packData.charName))
+    if not currentlySelectedPackName or currentlySelectedPackName == "" or packData == nil then return end
     --Get the current character's uniqueId
     local currentCharacterId = tostring(GetCurrentCharacterId())
     if not currentCharacterId then return end
-    --Get the currently selected packname from the SavedVariables
-    local packNamesForCharacter = AddonSelector.acwsv.selectedPackNameForCharacters
-    if not packNamesForCharacter then return end
-    packNamesForCharacter[currentCharacterId] = currentlySelectedPackName
+    --Set the currently selected packname to the SavedVariables
+    AddonSelector.acwsv.selectedPackNameForCharacters[currentCharacterId] = {
+        packName = currentlySelectedPackName,
+        charName = (AddonSelector.acwsv.saveGroupedByCharacterName == true and packData.charName) or GLOBAL_PACK_NAME
+    }
 end
 
 --Disable/Enable the delete button's enabled state depending on the autoreloadui after pack change checkbox state
@@ -321,8 +606,8 @@ local function ChangeDeleteButtonEnabledState(autoreloadUICheckboxState, skipSta
     local checkedBool = false
     local newDeleteButtonEnabledState
     if not skipStateCheck then
-        autoreloadUICheckboxState = autoreloadUICheckboxState or AddonSelector.autoReloadBtn:GetState()
-        if autoreloadUICheckboxState == BSTATE_PRESSED then checkedBool = true end
+        --autoreloadUICheckboxState = autoreloadUICheckboxState or AddonSelector.autoReloadBtn:GetState()
+        if autoreloadUICheckboxState == true then checkedBool = true end
     end
     newDeleteButtonEnabledState = not checkedBool
     --New enabled state of delete button would be enabled?
@@ -351,9 +636,19 @@ local function ChangeSaveButtonEnabledState(newEnabledState)
     end
 end
 
+local function clearAndUpdateDDL(wasDeleted)
+--d("[AddonSelector]clearAndUpdateDDL - wasDeleted: " ..tostring(wasDeleted))
+    AddonSelector:UpdateDDL(wasDeleted)
+    AddonSelector.editBox:Clear()
+    --Disable the "delete pack" button
+    ChangeDeleteButtonEnabledState(nil, false)
+end
+
 --Select/Deselect all addon checkboxes
 function AddonSelector_SelectAddons(selectAll)
-    table.sort(ZO_AddOnsList.data, function(a,b) return a.data.addOnFileName == ADDON_NAME end)
+    if not areAllAddonsEnabled(false) then return end
+
+    tsor(ZO_AddOnsList.data, function(a,b) return a.data.addOnFileName == ADDON_NAME end)
     local thisAddonIndex = ZO_AddOnsList.data[1].data.index
     local libStubAddonIndex = -1
     local libDialogAddonIndex = -1
@@ -362,7 +657,7 @@ function AddonSelector_SelectAddons(selectAll)
 
     if not selectAll then
         AddonSelector.acwsv.selectAllSave = {}
-        for i,v in ipairs(ZO_AddOnsList.data) do
+        for _,v in ipairs(ZO_AddOnsList.data) do
             if v.data ~= nil and v.data.index ~= nil then
                 AddonSelector.acwsv.selectAllSave[v.data.index] = v.data.addOnEnabled
                 if v.data.addOnFileName == "LibStub" then
@@ -406,8 +701,8 @@ function AddonSelector_SelectAddons(selectAll)
     end
 
     ZO_AddOnManager.isDirty = true
-    SCENE_MANAGER:RemoveFragment(ADDONS_FRAGMENT)
-    SCENE_MANAGER:AddFragment(ADDONS_FRAGMENT)
+    SM:RemoveFragment(ADDONS_FRAGMENT)
+    SM:AddFragment(ADDONS_FRAGMENT)
 end
 
 --Scroll the scrollbar to an index
@@ -436,7 +731,7 @@ local function unregisterOldEventUpdater(p_sortIndexOfControl, p_addSelection)
             end
             if lastEventUpdateName ~= nil then
                 --Unregister the update function again now
-                EVENT_MANAGER:UnregisterForUpdate(lastEventUpdateName)
+                EM:UnregisterForUpdate(lastEventUpdateName)
 --d("<<Unregistered old events for: " ..tostring(eventData.sortIndex) .. ", " ..  tostring(eventData.addSelection))
                 --Remove the entry from the table again
                 activeUpdateControlEvents[index]= nil
@@ -468,7 +763,7 @@ local function eventUpdateFunc(p_sortIndexOfControl, p_addSelection, p_eventUpda
             end
             selectedAddonControlName:SetText(newAddonText)
             --Unregister the update function again now
-            EVENT_MANAGER:UnregisterForUpdate(p_eventUpdateName)
+            EM:UnregisterForUpdate(p_eventUpdateName)
 --d("<<Control was found and changed, unregistering event updater: " ..tostring(p_eventUpdateName))
             --Remove the entry of enabled event updater again
             unregisterOldEventUpdater(p_sortIndexOfControl, p_addSelection)
@@ -483,14 +778,14 @@ local function changeAddonControlName(sortIndexOfControl, addSelection)
     if sortIndexOfControl == nil then return false end
     --Disable the update checks for the last control (sortIndices) so it will not be skipped and thus be active for ever!
     unregisterOldEventUpdater()
-    --Refresh teh visible controls so their names get resetted to standard
+    --Refresh the visible controls so their names get resetted to standard
     if addSelection then
         ADD_ON_MANAGER:RefreshVisible()
     end
     --Enable the check function which will try to find the addon list row control every 100ms
     local eventUpdateName = "AddonSelector_ChangeZO_AddOnsList_Row_Index_" ..tostring(sortIndexOfControl) .. "_" .. tostring(addSelection)
-    EVENT_MANAGER:UnregisterForUpdate(eventUpdateName)
-    local eventWasRegistered = EVENT_MANAGER:RegisterForUpdate(eventUpdateName, 100, function()
+    EM:UnregisterForUpdate(eventUpdateName)
+    local eventWasRegistered = EM:RegisterForUpdate(eventUpdateName, 100, function()
 --d(">Calling RegisterForUpdateFunc: " ..tostring(eventUpdateName))
         eventUpdateFunc(sortIndexOfControl, addSelection, eventUpdateName)
     end)
@@ -502,25 +797,67 @@ local function changeAddonControlName(sortIndexOfControl, addSelection)
                 ["sortIndex"]       = sortIndexOfControl,
                 ["addSelection"]    = addSelection,
             }
-            table.insert(activeUpdateControlEvents, eventData)
+            tins(activeUpdateControlEvents, eventData)
 --d(">Event was registeerd: " ..tostring(eventUpdateName))
         end
     end
 end
 
+local function updateSearchHistory(searchType, searchValue)
+    local settings = AddonSelector.acwsv
+    local maxSearchHistoryEntries = settings.searchHistoryMaxEntries
+    local searchHistory = settings.searchHistory
+    searchHistory[searchType] = searchHistory[searchType] or {}
+    local searchHistoryOfSearchType = searchHistory[searchType]
+    local toSearch = strlow(searchValue)
+    if not ZO_IsElementInNumericallyIndexedTable(searchHistoryOfSearchType, toSearch) then
+        --Only keep the last 10 search entries
+        tins(searchHistory[searchType], 1, searchValue)
+        local countEntries = #searchHistory[searchType]
+        if countEntries > maxSearchHistoryEntries then
+            for i=maxSearchHistoryEntries+1, countEntries, 1 do
+                searchHistory[searchType][i] = nil
+            end
+        end
+    end
+end
+
+local searchHistoryEventUpdaterName = "AddonSelector_SearchHistory_Update"
+local function updateSearchHistoryDelayed(searchType, searchValue)
+    EM:UnregisterForUpdate(searchHistoryEventUpdaterName)
+    EM:RegisterForUpdate(searchHistoryEventUpdaterName, 1500, function()
+        EM:UnregisterForUpdate(searchHistoryEventUpdaterName)
+        updateSearchHistory(searchType, searchValue)
+    end)
+end
+
+local function clearSearchHistory(searchType)
+    local settings = AddonSelector.acwsv
+    local searchHistory = settings.searchHistory
+    if not searchHistory[searchType] then return end
+    settings.searchHistory[searchType] = nil
+end
 
 --Search for addons by e.g. name and scroll the list to the found addon, or filter (hide) all non matching addons
 function AddonSelector_SearchAddon(searchType, searchValue, doHideNonFound)
-    searchType = searchType or "name"
+    searchType = searchType or SEARCH_TYPE_NAME
     doHideNonFound = doHideNonFound or false
 --d("[AddonSelector]SearchAddon, searchType: " .. tostring(searchType) .. ", searchValue: " .. tostring(searchValue) .. ", hideNonFound: " ..tostring(doHideNonFound))
     local addonList = ZO_AddOnsList.data
     if addonList == nil then return end
+    local isEmptySearch = searchValue == ""
+    local toSearch = (not isEmptySearch and strlow(searchValue)) or searchValue
+    local settings = AddonSelector.acwsv
+    local searchExcludeFilename = settings.searchExcludeFilename
+    local searchSaveHistory = settings.searchSaveHistory
+    if searchSaveHistory == true and not isEmptySearch then
+        updateSearchHistoryDelayed(searchType, searchValue)
+    end
 
     local addonsFound = {}
     local alreadyFound = AddonSelector.alreadyFound
     --No search term given
-    if searchValue == "" then
+    if isEmptySearch then
         --Refresh the visible controls so their names get resetted to standard
         ADD_ON_MANAGER:RefreshVisible()
         --Reset the searched table completely
@@ -529,22 +866,21 @@ function AddonSelector_SearchAddon(searchType, searchValue, doHideNonFound)
         unregisterOldEventUpdater()
         return
     end
-    local toSearch = string.lower(searchValue)
-    for index, addonDataTable in ipairs(addonList) do
+    for _, addonDataTable in ipairs(addonList) do
         local addonData = addonDataTable.data
         if addonData and addonData.index ~= nil and addonData.sortIndex ~= nil then
             local stringFindResult
             local stringFindCleanResult
             local stringFindResultFile
-            if searchType == "name" then
-                local addonName = string.lower(addonData.addOnName)
-                local addonCleanName = string.lower(addonData.strippedAddOnName )
-                local addonFileName = string.lower(addonData.addOnFileName)
+            if searchType == SEARCH_TYPE_NAME then
+                local addonName = strlow(addonData.addOnName)
+                local addonCleanName = strlow(addonData.strippedAddOnName )
+                local addonFileName = strlow(addonData.addOnFileName)
                 --stringFindResult = (string.find(addonFileName, toSearch) or string.find(addonName, toSearch)) or nil
                 --stringFindResult = string.find(addonName, toSearch) or nil
-                stringFindResult = zo_plainstrfind(addonName, toSearch) or nil
-                stringFindCleanResult = zo_plainstrfind(addonCleanName, toSearch) or nil
-                stringFindResultFile = zo_plainstrfind(addonFileName, toSearch) or nil
+                stringFindResult = zopsf(addonName, toSearch) or nil
+                stringFindCleanResult = zopsf(addonCleanName, toSearch) or nil
+                stringFindResultFile = (not searchExcludeFilename and zopsf(addonFileName, toSearch)) or nil
 --d(">addonName: " .. tostring(addonName) .. ", addonFileName: " .. tostring(addonFileName) .. ", search: " .. tostring(toSearch) .. ", found: " .. tostring(stringFindResult))
             end
             --Result of the search
@@ -564,7 +900,7 @@ function AddonSelector_SearchAddon(searchType, searchValue, doHideNonFound)
                     local wasAddedBefore = false
                     if alreadyFound[toSearch] ~= nil then
                         --Check each entry in the list
-                        for index, scrolledToData in ipairs(alreadyFound[toSearch]) do
+                        for _, scrolledToData in ipairs(alreadyFound[toSearch]) do
                             if scrolledToData[sortIndex] ~= nil then
                                 wasAddedBefore = true
                                 if scrolledToData[sortIndex] == true then
@@ -578,7 +914,7 @@ function AddonSelector_SearchAddon(searchType, searchValue, doHideNonFound)
                     if not wasAddedBefore and not wasFoundBefore then
                         --Add the found addon to the already found, but not scrolled-to list
                         AddonSelector.alreadyFound[toSearch] = AddonSelector.alreadyFound[toSearch] or {}
-                        table.insert(AddonSelector.alreadyFound[toSearch], {[sortIndex] = false})
+                        tins(AddonSelector.alreadyFound[toSearch], {[sortIndex] = false})
                     end
                 end
             end
@@ -649,28 +985,31 @@ d(">scrollToIndex: " ..tostring(scrollToIndex) .. ", approximatelyCurrentAddonSo
 end
 
 local function showAddOnsList()
-    if not SCENE_MANAGER then return end
+    if not SM then return end
     if not ADDONS_FRAGMENT then return end
     if ADDONS_FRAGMENT and ADDONS_FRAGMENT.control and not ADDONS_FRAGMENT.control:IsHidden() then return end
     --Show the game menu (as if you have pressed ESC key)
     ZO_SceneManager_ToggleGameMenuBinding()
     --Show the addons
-    SCENE_MANAGER:AddFragment(ADDONS_FRAGMENT)
+    SM:AddFragment(ADDONS_FRAGMENT)
     return true
 end
 
-local function openGameMenuAndAddOnsAndThenSearch(addonName)
+local function openGameMenuAndAddOnsAndThenSearch(addonName, doNotShowAddOnsScene)
     if not addonName or addonName == "" then return end
-    --Show the game menu and open the AddOns
-    if showAddOnsList() then
-        --Set the focus to the addon search box
-        if AddonSelectorSearchBox then
-            AddonSelectorSearchBox:SetText(addonName)
-            AddonSelectorSearchBox:TakeFocus()
-        end
-        --Search for the addonName
-        AddonSelector_SearchAddon("name", addonName, false)
+    doNotShowAddOnsScene = doNotShowAddOnsScene or false
+    if not doNotShowAddOnsScene then
+        --Show the game menu and open the AddOns
+        if not showAddOnsList() then return end
     end
+    --Set the focus to the addon search box
+    local searchBox = AddonSelector.searchBox
+    if searchBox then
+        searchBox:SetText(addonName)
+        searchBox:TakeFocus()
+    end
+    --Search for the addonName
+    AddonSelector_SearchAddon(SEARCH_TYPE_NAME, addonName, false)
 end
 
 --Add the active addon count to the header text
@@ -922,6 +1261,7 @@ local function AddonSelector_HookSingleControlForMultiSelectByShiftKey(control)-
     local controlName = control:GetName()
     if alreadyAddedMultiSelectByShiftKeyHandlers[controlName] then return end
     alreadyAddedMultiSelectByShiftKeyHandlers[controlName] = true
+
 --d("[AddonSelector]AddonSelector_HookSingleControlForMultiSelectByShiftKey: " ..tostring(controlName))
     local name = control:GetNamedChild("Name")
     if name ~= nil then
@@ -930,7 +1270,8 @@ local function AddonSelector_HookSingleControlForMultiSelectByShiftKey(control)-
             ZO_PreHookHandler(enabled, "OnClicked", function(self, button)
                 --d("[Enabled checkbox - OnClicked]")
                 --Do not run the same code (AddonSelector_MultiSelect) again if we come from the left mouse click on the name control
-                if button ~= MOUSE_BUTTON_INDEX_LEFT or AddonSelector.noAddonCheckBoxUpdate then return false end
+                if button ~= MOUSE_BUTTON_INDEX_LEFT then return false end
+                if not areAllAddonsEnabled(true) then return end
 
                 --Check shift key, or not. If yes: Mark/unmark all addons from first clicked row to SHIFT + clicked row.
                 -- Else save clicked name sortIndex + addonIndex
@@ -951,6 +1292,7 @@ local function AddonSelector_HookSingleControlForMultiSelectByShiftKey(control)-
             name:SetHandler("OnMouseDown", nil)
             name:SetHandler("OnMouseDown", function(self, button)
                 if button ~= MOUSE_BUTTON_INDEX_LEFT then return false end
+                if not areAllAddonsEnabled(true) then return end
                 --Check shift key, or not. If yes: Mark/unmark all addons from first clicked row to SHIFT + clicked row.
                 -- Else save clicked name sortIndex + addonIndex
                 local retVar = AddonSelector_MultiSelect(control, enabled, button)
@@ -1000,6 +1342,9 @@ local function OnClickDDL(comboBox, packName, packData, selectionChanged)
 	-- Clear the edit box:
 	AddonSelector.editBox:Clear()
 
+    --TODO: Remove after debugging
+    AddonSelector.SelectedPackData = packData
+
 	local addonTable = packData.addonTable
 	local scrollListData = ZO_ScrollList_GetDataList(ZO_AddOnsList)
 
@@ -1023,7 +1368,10 @@ local function OnClickDDL(comboBox, packName, packData, selectionChanged)
 			end
 		end
 	end
-	if not doNotReloadUI and AddonSelector.acwsv.autoReloadUI == BSTATE_PRESSED then
+
+    if not doNotReloadUI and AddonSelector.acwsv.autoReloadUI == true then
+        --Set the currently selected packname
+        SetCurrentCharacterSelectedPackname(packName, packData)
 		ReloadUI("ingame")
 	else
 		ADD_ON_MANAGER:RefreshData()
@@ -1032,17 +1380,17 @@ local function OnClickDDL(comboBox, packName, packData, selectionChanged)
         --Enable the delete button
         ChangeDeleteButtonEnabledState(nil, true)
         --Set the currently selected packname
-        SetCurrentCharacterSelectedPackname(packName)
+        SetCurrentCharacterSelectedPackname(packName, packData)
         --Update the currently selected packName label
-        UpdateCurrentlySelectedPackName()
+        UpdateCurrentlySelectedPackName(nil, packName, packData)
         --Enable the save pack button
         ChangeSaveButtonEnabledState(true)
 	end
 end
 
 -- Create ItemEntry table for the ddl
-function AddonSelector:CreateItemEntry(packName, addonTable)
-	return {name = packName, callback = OnClickDDL, addonTable = addonTable}
+function AddonSelector:CreateItemEntry(packName, addonTable, isCharacterPackHeader, charName)
+	return {name = packName, callback = OnClickDDL, addonTable = addonTable, isCharacterPackHeader=isCharacterPackHeader, charName=charName}
 end
 
 -- Called on load or when a new addon pack is saved & added to the comboBox
@@ -1051,17 +1399,48 @@ end
 -- a new item would result in duplicates when editing a pack.
 function AddonSelector:UpdateDDL(wasDeleted)
     wasDeleted = wasDeleted or false
-    local addonPacks = AddonSelector.acwsv.addonPacks
-	local packTable = {}
-		
-	for packName, addonTable in pairs(addonPacks) do
-		local itemData = self:CreateItemEntry(packName, addonTable)
-		table.insert(packTable, itemData)
-	end
-	self.comboBox:ClearItems()
-	self.comboBox:AddItems(packTable)
+    --local addonPacks = AddonSelector.acwsv.addonPacks
+    local packTable = {}
+    local settings = AddonSelector.acwsv
+    local wasItemAdded = false
+
+    --Show the addon packs saved per character?
+    if settings.showGroupedByCharacterName == true or settings.saveGroupedByCharacterName == true then
+        for _, addonPacks in pairs(settings.addonPacksOfChar) do
+            local charName = addonPacks._charName
+            local itemData = self:CreateItemEntry("[" .. charName .. "]", addonPacks, true, charName)
+            tins(packTable, itemData)
+            wasItemAdded = true
+        end
+    end
+
+    --Show the addon packs saved without character?
+    if settings.showGlobalPacks == true then
+        for packName, addonTable in pairs(settings.addonPacks) do
+            local itemData = self:CreateItemEntry(packName, addonTable, false, GLOBAL_PACK_NAME)
+            tins(packTable, itemData)
+            wasItemAdded = true
+        end
+    end
+
+    self.comboBox:SetSortsItems(false)
+    self.comboBox:ClearItems()
+
+    if wasItemAdded == true then
+        tsor(packTable, function(entryA, entryB)
+            if entryA.isCharacterPackHeader == true and entryB.isCharacterPackHeader == true then
+                return entryA.name < entryB.name
+            elseif entryA.isCharacterPackHeader == true and not entryB.isCharacterPackHeader then
+                return true
+            elseif not entryA.isCharacterPackHeader and entryB.isCharacterPackHeader == true then
+                return false
+            end
+            return entryA.name < entryB.name
+        end)
+        self.comboBox:AddItems(packTable)
+    end
     --Update the currently selected packName label
-    UpdateCurrentlySelectedPackName(wasDeleted)
+    UpdateCurrentlySelectedPackName(wasDeleted, nil, nil)
 end
 
 --OnMouseUp event function for the XML control editbox
@@ -1071,10 +1450,8 @@ function AddonSelector_OnMouseUp(self, mouseButton, upInside, ctrlKey, altKey, s
         local newText = self:GetText()
         if newText and newText == "" then
             --Get the current character name and format it
-            local currentCharName = zo_strformat(SI_UNIT_NAME, GetUnitName("player"))
             if currentCharName and currentCharName ~= "" then
-                currentCharName = currentCharName .. "_"
-                self:SetText(currentCharName)
+                self:SetText(currentCharName .. "_")
                 self:SetMouseEnabled(true)
                 self:SetKeyboardEnabled(true)
                 self:TakeFocus()
@@ -1103,42 +1480,62 @@ function AddonSelector_TextChanged(self)
     ChangeSaveButtonEnabledState(newEnabledState)
 end
 
--- called from clicking the label
-local function OnClick_AutoReloadLabel(self, button, upInside, ctrl, alt, shift, command)
-	if not upInside then return end
-	if not button == MOUSE_BUTTON_INDEX_LEFT then return end
-	
-	local autoReloadBtn = AddonSelector.autoReloadBtn
-	local curReloadState = autoReloadBtn:GetState()
-	local newState = BSTATE_PRESSED
-	
-	if curReloadState ~= BSTATE_NORMAL then
-		newState = BSTATE_NORMAL
-	end
-	
-	AddonSelector.acwsv.autoReloadUI = newState
-	autoReloadBtn:SetState(newState)
+local function updateSaveModeTexure(doShow)
+    AddonSelector.saveModeTexture:SetHidden(not doShow)
+    ADD_ON_MANAGER:RefreshVisible()
+end
+
+local function updateAutoReloadUITexture(doShow)
+    AddonSelector.autoReloadUITexture:SetHidden(not doShow)
+    ADD_ON_MANAGER:RefreshVisible()
+end
+
+local function checkIfGlobalPacksShouldBeShown()
+    local settings = AddonSelector.acwsv
+    if not settings then return end
+    local showGlobalPacks = settings.showGlobalPacks
+    local savePerCharacter = settings.saveGroupedByCharacterName
+    --Show the global pack entries if neither global packs nor character packs were selected to save/show!
+    if showGlobalPacks == false and savePerCharacter == false then
+        AddonSelector.acwsv.showGlobalPacks = true
+    end
+    updateSaveModeTexure(savePerCharacter)
+end
+
+-- called from clicking the "Auto reload" label
+local function OnClick_CheckBoxLabel(self, currentStateVar)
+--d("OnClick_CheckBoxLabel")
+    if AddonSelector.acwsv[currentStateVar] == nil then return end
+    local currentState = AddonSelector.acwsv[currentStateVar]
+--d(">currentState of \'".. currentStateVar .."\': " ..tostring(currentState))
+    local newState = not currentState
+    AddonSelector.acwsv[currentStateVar] = newState
     --Clear the selected addon pack
-    if newState == BSTATE_PRESSED then
+    if newState == true then
         deselectComboBoxEntry()
     end
     --Reenable/Disable delete button?
-    ChangeDeleteButtonEnabledState(newState)
+    ChangeDeleteButtonEnabledState(newState, nil)
+    if currentStateVar == "autoReloadUI" then
+        updateAutoReloadUITexture(newState)
+    end
 end
 
 -- called from clicking the button
+--[[
 local function OnClick_AutoReload(self, button, upInside, ctrl, alt, shift, command)
 	if not upInside then return end
 	if not button == MOUSE_BUTTON_INDEX_LEFT then return end
 	local checkedState = self:GetState()
     AddonSelector.acwsv.autoReloadUI = checkedState
     --Clear the selected addon pack
-    if checkedState == BSTATE_PRESSED then
+    if checkedState == true then
         deselectComboBoxEntry()
     end
     --Reenable/Disable delete button?
     ChangeDeleteButtonEnabledState(checkedState)
 end
+]]
 
 local function OnClick_SaveDo()
     local aad = ZO_ScrollList_GetDataList(ZO_AddOnsList)
@@ -1153,28 +1550,26 @@ local function OnClick_SaveDo()
         packName = itemData.name
     end
 
-    -- Create the pack table or nil it out if it exists:
-    AddonSelector.acwsv.addonPacks[packName] = {}
+    local svForPack = createSVTableForPack(packName)
 
     -- Add all of the enabled addOn to the pack table
-    for k, addonData in pairs(aad) do
+    for _, addonData in pairs(aad) do
         local data = addonData.data
         local isEnabled = data.addOnEnabled
 
         if isEnabled then
             local fileName = data.addOnFileName
             local addonName = data.strippedAddOnName
-
-            AddonSelector.acwsv.addonPacks[packName][fileName] = addonName
+            --Set the addon to the pack into the SavedVariables
+            svForPack[fileName] = addonName
         end
     end
     -- Create a temporary copy of the itemEntry data so we can select it
     -- after the ddl is updated
-    local addonTable = AddonSelector.acwsv.addonPacks[packName]
-    local itemData = AddonSelector:CreateItemEntry(packName, addonTable)
+    local savePackPerCharacter = AddonSelector.acwsv.saveGroupedByCharacterName
+    local itemData = AddonSelector:CreateItemEntry(packName, svForPack, false, (savePackPerCharacter and currentCharName) or GLOBAL_PACK_NAME)
 
-    AddonSelector.editBox:Clear()
-    AddonSelector:UpdateDDL()
+    clearAndUpdateDDL()
     --Prevent reloadui for a currently new saved addon pack!
     doNotReloadUI = true
     AddonSelector.comboBox:SelectItem(itemData)
@@ -1197,14 +1592,35 @@ local function OnClick_Save()
     if not newPackName or newPackName == "" then
         return
     end
+
     local doesPackAlreadyExist = false
+    local saveGroupedByChar = false
+    local svTable
+    local savePerCharacter = AddonSelector.acwsv.saveGroupedByCharacterName
+    local packCharacter = packNameGlobal
+    --Save grouped by charactername
+--d("[AddonSelector]OnClick_Save - savePerChar: " ..tostring(savePerCharacter) .. ", newPackName: " ..tostring(newPackName))
+    if savePerCharacter then
+        local svTableOfCurrentChar, charName = getSVTableForPacks()
+--d(">charName: " ..tostring(charName))
+        if svTableOfCurrentChar ~= nil and charName ~= nil then
+            saveGroupedByChar = true
+            svTable = svTableOfCurrentChar
+            packCharacter = charName
+        end
+    end
+    if not saveGroupedByChar then
+        svTable = AddonSelector.acwsv.addonPacks
+    end
+
     --Does the pack name already exist?
-    doesPackAlreadyExist = AddonSelector.acwsv.addonPacks[newPackName] ~= nil or false
-    if doesPackAlreadyExist then
+    doesPackAlreadyExist = svTable[newPackName] ~= nil or false
+    if doesPackAlreadyExist == true then
         local addonPackName = "\'" .. newPackName .. "\'"
-        local savePackQuestion = string.format(langArrayInClientLang["savePackBody"] or langArrayInFallbackLang["savePackBody"], tostring(addonPackName))
+        local savePackQuestion = strfor(langArrayInClientLang["savePackBody"] or langArrayInFallbackLang["savePackBody"], tostring(addonPackName))
         ShowConfirmationDialog("SaveAddonPackDialog",
-                (langArrayInClientLang["savePackTitle"] or langArrayInFallbackLang["savePackTitle"]) .. newPackName,
+                (langArrayInClientLang["savePackTitle"] or langArrayInFallbackLang["savePackTitle"]) .. "\n" ..
+                "[".. (saveGroupedByChar and strfor(charNamePackColorTemplate, packCharacter) or packCharacter) .. "]\n" .. newPackName,
                 savePackQuestion,
                 function() OnClick_SaveDo() end,
                 function() end,
@@ -1217,41 +1633,89 @@ local function OnClick_Save()
     end
 end
 
-local function OnClick_DeleteDo(itemData)
+local function OnClick_DeleteDo(itemData, charId)
     if not itemData then
-        ZO_Alert(UI_ALERT_CATEGORY_ERROR, SOUNDS.NEGATIVE_CLICK, langArrayInClientLang["deletePackAlert"] or langArrayInFallbackLang["deletePackAlert"])
+        ZO_Alert(UI_ALERT_CATEGORY_ERROR, SOUNDS.NEGATIVE_CLICK, deletePackAlertStr)
+        return
+    end
+    local function deleteError(reason)
+        ZO_Alert(UI_ALERT_CATEGORY_ERROR, SOUNDS.NEGATIVE_CLICK, strfor(deletePackErrorStr, reason))
+    end
+    if not itemData.name or itemData.name == "" then
+        deleteError("Pack name")
+        return
+    end
+    if not itemData.charName or itemData.charName == "" then
+        deleteError("Pack charName")
         return
     end
 
+    local wasDeleted = false
     local selectedPackName = itemData.name
+    local selectedCharName = itemData.charName
+    local isGlobalPack = (selectedCharName == GLOBAL_PACK_NAME) or false
 
-    AddonSelector.acwsv.addonPacks[selectedPackName] = nil
+    --Save grouped by charactername
+    if isGlobalPack == true then
+        AddonSelector.acwsv.addonPacks[selectedPackName] = nil
+        wasDeleted = true
+    else
+        if charId == nil then
+            deleteError("CharId nil")
+            return
+        end
+        if AddonSelector.acwsv.addonPacksOfChar[charId] and AddonSelector.acwsv.addonPacksOfChar[charId][selectedPackName] then
+            AddonSelector.acwsv.addonPacksOfChar[charId][selectedPackName] = nil
+            wasDeleted = true
+        end
+    end
 
-    AddonSelector:UpdateDDL(true)
-    AddonSelector.editBox:Clear()
+    if wasDeleted == true then
+        clearAndUpdateDDL(true)
 
-    --Disable the "save pack" button
-    ChangeSaveButtonEnabledState(false)
-    --Disable the "delete pack" button
-    ChangeDeleteButtonEnabledState(nil, false)
+        --Disable the "save pack" button
+        ChangeSaveButtonEnabledState(false)
+        --Disable the "delete pack" button
+        ChangeDeleteButtonEnabledState(nil, false)
+    end
 end
 
 -- When delete is clicked, remove the selected addon pack
 local function OnClick_Delete(itemData)
+--d("[AddonSelector]OnClick_Delete")
     itemData = itemData or AddonSelector.comboBox:GetSelectedItemData()
     if not itemData then return end
+    --Debuggin
+    --AddonSelector._SelectedItemDataOnDelete = itemData
+
+    --Deleting a pack could be done for all kinds of packs, so we always need to check for the selected charName of the item!
+    --local saveGroupedByChar = AddonSelector.acwsv.saveGroupedByCharacterName
+    local charId, charName, svTable
+    charName = itemData.charName
+    if charName == currentCharName or charName == GLOBAL_PACK_NAME then
+        svTable = getSVTableForPacks()
+        charId = (charName ~= GLOBAL_PACK_NAME and currentCharId)
+    else
+        svTable, charId = getSVTableForPacksOfCharname(charName)
+    end
+    if not svTable then return end
+
+    --d("[AddonSelector]charName: " ..tostring(charName) .. ", charId: " ..tostring(charId))
+
+    local packCharName
+    if charName ~= GLOBAL_PACK_NAME then packCharName = charName end
     local selectedPackName = itemData.name
     --ShowConfirmationDialog(dialogName, title, body, callbackYes, callbackNo, data)
     local addonPackName = "\'" .. selectedPackName .. "\'"
-    local deletePackQuestion = string.format(langArrayInClientLang["deletePackBody"] or langArrayInFallbackLang["deletePackBody"], tostring(addonPackName))
+    local deletePackQuestion = strfor(langArrayInClientLang["deletePackBody"] or langArrayInFallbackLang["deletePackBody"], tostring(addonPackName))
     ShowConfirmationDialog("DeleteAddonPackDialog",
-            (langArrayInClientLang["deletePackTitle"] or langArrayInFallbackLang["deletePackTitle"]) .. selectedPackName,
-            deletePackQuestion,
-            function() OnClick_DeleteDo(itemData) end,
-            function() end,
-            nil,
-            nil,
-            true
+        (langArrayInClientLang["deletePackTitle"] or langArrayInFallbackLang["deletePackTitle"]) .. "\n[" .. (packCharName and strfor(charNamePackColorTemplate, packCharName) or packNameGlobal) .. "]\n" .. selectedPackName,
+        deletePackQuestion,
+        function() OnClick_DeleteDo(itemData, charId) end,
+        function() end,
+        nil,
+        nil,
+        true
     )
 end
 
@@ -1260,14 +1724,123 @@ local function OnClick_SelectedPackNameLabel(self, button, upInside, ctrl, alt, 
 --d("[AddonSelector]OnClick_SelectedPackNameLabel")
     if not upInside or button ~= MOUSE_BUTTON_INDEX_LEFT or not AddonSelector.editBox then return end
     --Set the "name edit" to the currently selected addon pack entry so you just need to hit the save button afterwards
-    local currentlySelectedPacknameForChar = AddonSelector.acwsv.selectedPackNameForCharacters
-    if not currentlySelectedPacknameForChar then return end
-    local currentCharactersSelectedPackName = AddonSelector.acwsv.selectedPackNameForCharacters[GetCurrentCharacterId()]
-    if currentCharactersSelectedPackName and currentCharactersSelectedPackName ~= "" then
+    local currentlySelectedPacknamesForChars = AddonSelector.acwsv.selectedPackNameForCharacters
+    if not currentlySelectedPacknamesForChars then return end
+    local currentCharactersSelectedPackNameData = currentlySelectedPacknamesForChars[currentCharIdNum]
+    if currentCharactersSelectedPackNameData and currentCharactersSelectedPackNameData.packName ~= "" then
         AddonSelector.editBox:Clear()
-        AddonSelector.editBox:SetText(tostring(currentCharactersSelectedPackName))
+        AddonSelector.editBox:SetText(currentCharactersSelectedPackNameData.packName)
     end
 end
+
+local function setMenuItemCheckboxState(checkboxIndex, newState, doClearAndUpdateDdl)
+    newState = newState or false
+    doClearAndUpdateDdl = doClearAndUpdateDdl or false
+    if newState == true then
+        ZO_CheckButton_SetChecked(ZO_Menu.items[checkboxIndex].checkbox)
+    else
+        ZO_CheckButton_SetUnchecked(ZO_Menu.items[checkboxIndex].checkbox)
+    end
+    if doClearAndUpdateDdl == true then
+        clearAndUpdateDDL()
+    end
+end
+
+--Show the settings context menu at the dropdown button
+function AddonSelector_ShowSettingsDropdown(buttonCtrl)
+    ClearMenu()
+
+    --Add the currently logged in character name as header
+    AddCustomMenuItem(currentCharName, function() end, MENU_ADD_OPTION_HEADER)
+
+    --Add the global pack options
+    checkIfGlobalPacksShouldBeShown()
+    local globalPackSubmenu = {
+        {
+            label    = langArrayInClientLang["ShowGlobalPacks"] or langArrayInFallbackLang["ShowGlobalPacks"],
+            callback = function(state)
+                AddonSelector.acwsv.showGlobalPacks = state
+                checkIfGlobalPacksShouldBeShown()
+                clearAndUpdateDDL()
+            end,
+            checked  = function() return AddonSelector.acwsv.showGlobalPacks end,
+            itemType = MENU_ADD_OPTION_CHECKBOX,
+        },
+        {
+            label    = langArrayInClientLang["ShowSubMenuAtGlobalPacks"] or langArrayInFallbackLang["ShowSubMenuAtGlobalPacks"],
+            callback = function(state)
+                AddonSelector.acwsv.showSubMenuAtGlobalPacks = state
+                clearAndUpdateDDL()
+            end,
+            checked  = function() return AddonSelector.acwsv.showSubMenuAtGlobalPacks end,
+            disabled = function(rootMenu, childControl) return not AddonSelector.acwsv.showGlobalPacks end,
+            itemType = MENU_ADD_OPTION_CHECKBOX,
+        },
+    }
+    AddCustomSubMenuItem(langArrayInClientLang["GlobalPackSettings"] or langArrayInFallbackLang["GlobalPackSettings"], globalPackSubmenu)
+
+    --Add the character pack options
+    local characterNameSubmenu = {
+        {
+            label    = savedGroupedByCharNameStr,
+            callback = function(state)
+                AddonSelector.acwsv.saveGroupedByCharacterName = state
+                checkIfGlobalPacksShouldBeShown()
+                if state == true then
+                    AddonSelector.acwsv.showGroupedByCharacterName = true
+                end
+                clearAndUpdateDDL()
+            end,
+            checked  = function() return AddonSelector.acwsv.saveGroupedByCharacterName end,
+            itemType = MENU_ADD_OPTION_CHECKBOX,
+        },
+        {
+            label    = langArrayInClientLang["ShowGroupedByCharacterName"] or langArrayInFallbackLang["ShowGroupedByCharacterName"],
+            callback = function(state)
+                AddonSelector.acwsv.showGroupedByCharacterName = state
+                checkIfGlobalPacksShouldBeShown()
+                clearAndUpdateDDL()
+            end,
+            checked  = function() return AddonSelector.acwsv.showGroupedByCharacterName end,
+            disabled = function(rootMenu, childControl) return AddonSelector.acwsv.saveGroupedByCharacterName end,
+            itemType = MENU_ADD_OPTION_CHECKBOX,
+        },
+    }
+    AddCustomSubMenuItem(langArrayInClientLang["CharacterNameSettings"] or langArrayInFallbackLang["CharacterNameSettings"], characterNameSubmenu)
+
+
+    --Add the search options
+    local searchOptionsSubmenu = {
+        {
+            label    = langArrayInClientLang["searchExcludeFilename"] or langArrayInFallbackLang["searchExcludeFilename"],
+            callback = function(state)
+                AddonSelector.acwsv.searchExcludeFilename = state
+            end,
+            checked  = function() return AddonSelector.acwsv.searchExcludeFilename end,
+            itemType = MENU_ADD_OPTION_CHECKBOX,
+        },
+        {
+            label    = langArrayInClientLang["searchSaveHistory"] or langArrayInFallbackLang["searchSaveHistory"],
+            callback = function(state)
+                AddonSelector.acwsv.searchSaveHistory = state
+            end,
+            checked  = function() return AddonSelector.acwsv.searchSaveHistory end,
+            itemType = MENU_ADD_OPTION_CHECKBOX,
+        }
+    }
+    AddCustomSubMenuItem(searchMenuStr, searchOptionsSubmenu)
+
+    --Add the auto reload pack after selection checkbox
+    local cbAutoReloadUIindex = AddCustomMenuItem(langArrayInClientLang["autoReloadUIHint"] or langArrayInFallbackLang["autoReloadUIHint"],
+            function(cboxCtrl)
+                OnClick_CheckBoxLabel(cboxCtrl, "autoReloadUI")
+            end,
+            MENU_ADD_OPTION_CHECKBOX)
+    setMenuItemCheckboxState(cbAutoReloadUIindex, AddonSelector.acwsv.autoReloadUI)
+
+    ShowMenu(buttonCtrl)
+end
+
 
 -- Used to change the layout of the Addon scrollList to
 -- make room for the AddonSelector control
@@ -1277,46 +1850,104 @@ function AddonSelector:ChangeLayout()
 	local list = ZO_AddOnsList
 	--local bg = ZO_AddonsBGLeft
 	list:ClearAnchors()
-	list:SetAnchor(TOPLEFT, self.addonSelector, BOTTOMLEFT, 0, 10)
-	-- This does not work ?? Items get cut off. 
+	list:SetAnchor(TOPLEFT, self.addonSelectorControl, BOTTOMLEFT, 0, 10)
+	-- This does not work ?? Items get cut off.
 	--list:SetAnchor(BOTTOMRIGHT, bg, BOTTOMRIGHT, -20, -100)
 	--list:SetDimensions(885, 560)
 	ZO_ScrollList_SetHeight(list, 600)
 	ZO_ScrollList_Commit(list)
 end
 
+local function onMouseEnterTooltip(ctrl)
+    ZO_Tooltips_ShowTextTooltip(ctrl, TOP, ctrl.tooltipText)
+end
+local function onMouseExitTooltip()
+    ZO_Tooltips_HideTextTooltip()
+end
+
 -- Create the AddonSelector control, set references to controls
 -- and click handlers for the save/delete buttons
 function AddonSelector:CreateControlReferences()
+    local settings = AddonSelector.acwsv
     -- Create Controls:
-    local addonSelector = CreateControlFromVirtual("AddonSelector", ZO_AddOns, "AddonSelector")
+    local addonSelector = CreateControlFromVirtual("AddonSelector", ZO_AddOns, "AddonSelectorTLC")
 
     -- Assign references:
-    self.addonSelector = addonSelector
+    self.addonSelectorControl = addonSelector
 
     self.editBox 	= addonSelector:GetNamedChild("EditBox")
     self.ddl 		= addonSelector:GetNamedChild("ddl")
     self.comboBox	= self.ddl.m_comboBox
     self.saveBtn 	= addonSelector:GetNamedChild("Save")
     self.deleteBtn 	= addonSelector:GetNamedChild("Delete")
-    self.autoReloadBtn = addonSelector:GetNamedChild("AutoReloadUI")
-    self.autoReloadLabel = self.autoReloadBtn:GetNamedChild("Label")
+    --self.autoReloadBtn = addonSelector:GetNamedChild("AutoReloadUI")
+    --self.autoReloadLabel = self.autoReloadBtn:GetNamedChild("Label")
+    self.settingsOpenDropdown = addonSelector:GetNamedChild("SettingsOpenDropdown")
+    self.settingsOpenDropdown.onClickHandler = self.settingsOpenDropdown:GetHandler("OnClicked")
+    --PerfectPixel: Reposition of the settings "gear" icon -> move up to other icons (like Votans Addon List)
+    self.settingsOpenDropdown:ClearAnchors()
+    --<Anchor point="TOPLEFT" relativeTo="ZO_AddOns" relativePoint="TOP" offsetX="100" offsetY="65"/>
+    local offsetX = (PP ~= nil and 40) or 100
+    local offsetY = (PP ~= nil and -7) or 65
+    self.settingsOpenDropdown:SetAnchor(TOPLEFT, ZO_AddOns, TOP, offsetX, offsetY)
+
     self.searchBox 	= addonSelector:GetNamedChild("SearchBox")
+    self.searchBox:SetHandler("OnMouseUp", function(selfCtrl, mouseButton, isUpInside)
+        if not settings.searchSaveHistory then return end
+        if isUpInside and mouseButton == MOUSE_BUTTON_INDEX_RIGHT then
+            local searchHistory = settings.searchHistory
+            local searchType = SEARCH_TYPE_NAME
+            local searchHistoryOfSearchMode = searchHistory[searchType]
+            if searchHistoryOfSearchMode ~= nil and #searchHistoryOfSearchMode > 0 then
+                ClearMenu()
+                for _, searchTerm in ipairs(searchHistoryOfSearchMode) do
+                    AddCustomMenuItem(searchTerm, function()
+                        openGameMenuAndAddOnsAndThenSearch(searchTerm, true)
+                        ClearMenu()
+                    end)
+                end
+                AddCustomMenuItem("-", function() end)
+                AddCustomMenuItem(clearSearchHistoryStr, function()
+                    clearSearchHistory(searchType)
+                    ClearMenu()
+                end)
+                ShowMenu(selfCtrl)
+            end
+        end
+    end)
     self.searchLabel = addonSelector:GetNamedChild("SearchBoxLabel")
     self.searchLabel:SetText(AddonSelector_GetLocalizedText("AddonSearch"))
     self.selectedPackNameLabel = addonSelector:GetNamedChild("SelectedPackNameLabel")
 
+    self.saveModeTexture = addonSelector:GetNamedChild("SaveModeTexture")
+    self.saveModeTexture:SetTexture("/esoui/art/characterselect/gamepad/gp_characterselect_characterslots.dds")
+    self.saveModeTexture:SetColor(charNamePackColorDef:UnpackRGBA())
+    self.saveModeTexture:SetMouseEnabled(true)
+    self.saveModeTexture.tooltipText = savedGroupedByCharNameStr
+    self.saveModeTexture:SetHandler("OnMouseEnter", onMouseEnterTooltip)
+    self.saveModeTexture:SetHandler("OnMouseExit", onMouseExitTooltip)
+
+    self.autoReloadUITexture = addonSelector:GetNamedChild("AutoReloadUITexture")
+    self.autoReloadUITexture:SetTexture("/esoui/art/miscellaneous/eso_icon_warning.dds")
+    self.autoReloadUITexture:SetColor(1, 0, 0, 0.6)
+    self.autoReloadUITexture:SetMouseEnabled(true)
+    self.autoReloadUITexture.tooltipText = autoReloadUIStr
+    self.autoReloadUITexture:SetHandler("OnMouseEnter", onMouseEnterTooltip)
+    self.autoReloadUITexture:SetHandler("OnMouseExit", onMouseExitTooltip)
+
     -- Set Saved Btn State for checkbox "Auto reloadui after pack selection"
-    local checkedState = AddonSelector.acwsv.autoReloadUI
-    self.autoReloadBtn:SetState(checkedState)
+    local checkedState = settings.autoReloadUI
+    updateAutoReloadUITexture(checkedState)
+    --self.autoReloadBtn:SetState(checkedState)
     --Disable the "save pack" button
     ChangeSaveButtonEnabledState(false)
     --Disable the "delete pack" button
     ChangeDeleteButtonEnabledState(checkedState)
     --Show the currently selected pack name for the logged in character
-    UpdateCurrentlySelectedPackName()
+    UpdateCurrentlySelectedPackName(nil, nil, nil)
 
     -- Add Tooltips for AutoReloadUI
+    --[[
     local function OnMouseEnter()
         local toolTipText = langArrayInClientLang["autoReloadUIHintTooltip"] or langArrayInFallbackLang["autoReloadUIHintTooltip"]
         InitializeTooltip(InformationTooltip, self.autoReloadLabel, LEFT, 26, 0, RIGHT)
@@ -1325,16 +1956,35 @@ function AddonSelector:CreateControlReferences()
     local function OnMouseExit()
         ClearTooltip(InformationTooltip)
     end
+    ]]
+
+
+
+    local function OnMouseEnter(ctrl)
+        local toolTipText = langArrayInClientLang["ShowSettings"] or langArrayInFallbackLang["ShowSettings"]
+        if not toolTipText then return end
+        ZO_Tooltips_ShowTextTooltip(ctrl, TOP, toolTipText)
+    end
+    local function OnMouseExit()
+        ZO_Tooltips_HideTextTooltip()
+    end
+    local function OnMouseUp_SettingsLabel(settingsLabel, mouseButton, upInside)
+        ZO_Tooltips_HideTextTooltip()
+        if not upInside or not mouseButton == MOUSE_BUTTON_INDEX_LEFT then return end
+        AddonSelector_ShowSettingsDropdown(self.settingsOpenDropdown)
+    end
 
     -- SetHandlers:
     self.saveBtn:SetHandler("OnMouseUp", OnClick_Save)
     self.deleteBtn:SetHandler("OnMouseUp", function() OnClick_Delete() end)
-    self.autoReloadBtn:SetHandler("OnMouseUp", OnClick_AutoReload)
-    self.autoReloadLabel:SetHandler("OnMouseUp", OnClick_AutoReloadLabel)
-    self.autoReloadBtn:SetHandler("OnMouseEnter", OnMouseEnter)
-    self.autoReloadBtn:SetHandler("OnMouseExit", OnMouseExit)
-    self.autoReloadLabel:SetHandler("OnMouseEnter", OnMouseEnter)
-    self.autoReloadLabel:SetHandler("OnMouseExit", OnMouseExit)
+    --self.autoReloadBtn:SetHandler("OnMouseUp", OnClick_AutoReload)
+    --self.autoReloadBtn:SetHandler("OnMouseEnter", OnMouseEnter)
+    --self.autoReloadBtn:SetHandler("OnMouseExit", OnMouseExit)
+    --self.autoReloadLabel:SetHandler("OnMouseUp", OnClick_AutoReloadLabel)
+    --self.autoReloadLabel:SetHandler("OnMouseEnter", OnMouseEnter)
+    --self.autoReloadLabel:SetHandler("OnMouseExit", OnMouseExit)
+    self.settingsOpenDropdown:SetHandler("OnMouseEnter", OnMouseEnter)
+    self.settingsOpenDropdown:SetHandler("OnMouseExit", OnMouseExit)
     self.selectedPackNameLabel:SetHandler("OnMouseUp", OnClick_SelectedPackNameLabel)
 end
 
@@ -1343,13 +1993,14 @@ local OrigAddonGetRowSetupFunc = ZO_AddOnManager.GetRowSetupFunction
 function ZO_AddOnManager:GetRowSetupFunction()
 --d("Manual PreHook ZO_AddOnManager:GetRowSetupFunction")
 	local func = OrigAddonGetRowSetupFunc(self)
-	
+
     return function(control, data)
-			control:SetMouseEnabled(true)
-			control:SetHandler("OnMouseUp", Addon_Toggle_Enabled)
-			func(control, data)
-            AddonSelector_HookSingleControlForMultiSelectByShiftKey(control)
-		end
+        control:SetMouseEnabled(areAllAddonsEnabled(true))
+        control:SetHandler("OnMouseUp", Addon_Toggle_Enabled)
+        local retVar = func(control, data)
+        AddonSelector_HookSingleControlForMultiSelectByShiftKey(control)
+        return retVar
+    end
 end
 
 --[[
@@ -1374,10 +2025,19 @@ function AddonSelector:Initialize()
     local SAVED_VAR_VERSION = 1
 	local defaultSavedVars = {
 		addonPacks = {},
-		autoReloadUI = BSTATE_NORMAL,
+        addonPacksOfChar = {},
+		autoReloadUI = false,
         selectAllSave = {},
         selectedPackNameForCharacters = {},
         svMigrationToServerDone = false,
+        showGlobalPacks = true,
+        showSubMenuAtGlobalPacks = true,
+        saveGroupedByCharacterName = false,
+        showGroupedByCharacterName = false,
+        searchExcludeFilename = false,
+        searchSaveHistory = false,
+        searchHistory = {},
+        searchHistoryMaxEntries = 10,
 	}
     local worldName = GetWorldName()
     --Get the saved addon packages without a server reference
@@ -1415,11 +2075,29 @@ function AddonSelector:Initialize()
         self.acwsv.svMigrationToServerDone = true
     end
 
+    if self.acwsv.autoReloadUI == BSTATE_PRESSED then
+        self.acwsv.autoReloadUI = true
+    elseif self.acwsv.autoReloadUI == BSTATE_NORMAL then
+        self.acwsv.autoReloadUI = false
+    end
+
+    --Packname saved was an old value without charName info? Migrate it
+    for charId, packNameDataOfCharId in pairs(AddonSelector.acwsv.selectedPackNameForCharacters) do
+        if type(packNameDataOfCharId) ~= "table" then
+            local oldData = packNameDataOfCharId
+            --Create the table, overwriting it with the old data's packname and the charName = "global" constant
+            AddonSelector.acwsv.selectedPackNameForCharacters[charId] = {
+                packName = oldData,
+                charName = GLOBAL_PACK_NAME,
+            }
+        end
+    end
+
 	self:CreateControlReferences()
 	self:UpdateDDL()
 	self:ChangeLayout()
-	
-	-- Very hacky, but easiest method: Wipe out the games 
+
+	-- Very hacky, but easiest method: Wipe out the games
 	-- TYPE_ID = 1 dataType and recreate it using my own template.
 	-- Done to make the row controls mouseEnabled
 	--[[ Disabled on advice by Votan, 31.08.2018, Exchanged with code lines below
@@ -1435,9 +2113,9 @@ function AddonSelector:Initialize()
     --Change the description texts now
     AddonSelectorNameLabel:SetText(langArrayInClientLang["packName"] or langArrayInFallbackLang["packName"])
     AddonSelectorSave:SetText(langArrayInClientLang["saveButton"] or langArrayInFallbackLang["saveButton"])
-    AddonSelectorSelectLabel:SetText(langArrayInClientLang["selectPack"] or langArrayInFallbackLang["selectPack"])
+    AddonSelectorSelectLabel:SetText((langArrayInClientLang["selectPack"] or langArrayInFallbackLang["selectPack"]) .. ":")
     AddonSelectorDelete:SetText(langArrayInClientLang["deleteButton"] or langArrayInFallbackLang["deleteButton"])
-    AddonSelectorAutoReloadUILabel:SetText(langArrayInClientLang["autoReloadUIHint"] or langArrayInFallbackLang["autoReloadUIHint"])
+    --AddonSelectorAutoReloadUILabel:SetText(langArrayInClientLang["autoReloadUIHint"] or langArrayInFallbackLang["autoReloadUIHint"])
     --Get the addon manager object
     if ADDON_MANAGER == nil then
         ADDON_MANAGER = GetAddOnManager()
@@ -1455,7 +2133,7 @@ function AddonSelector:Initialize()
             end
             --if AddonSelector.noAddonCheckBoxUpdate then return true end
         end)
-        --EVENT_MANAGER:RegisterForEvent("AddonSelectorMultiselectHookOnShow", EVENT_ACTION_LAYER_PUSHED, function(...) AddonSelector_HookForMultiSelectByShiftKey(...) end)
+        --EM:RegisterForEvent("AddonSelectorMultiselectHookOnShow", EVENT_ACTION_LAYER_PUSHED, function(...) AddonSelector_HookForMultiSelectByShiftKey(...) end)
 
         if ZO_AddOns ~= nil then
             ZO_AddOns:SetMouseEnabled(true)
@@ -1482,6 +2160,14 @@ function AddonSelector:Initialize()
             BuildAddOnReverseLookUpTable()
             --Hook the visible addon rows (controls) to set a hanlder for OnMouseDown
             --AddonSelector_HookForMultiSelectByShiftKey()
+
+            --PostHook the new Enable All addons heckbox function so that the controls of Circonians Addon Selector get disabled/enabled
+            if ZO_AddOnsList2Row1Checkbox ~= nil then
+                ZO_PostHookHandler(ZO_AddOnsList2Row1Checkbox, "OnMouseUp", function(checkboxCtrl, mouseButton, isUpInside)
+                    if not isUpInside or mouseButton ~= MOUSE_BUTTON_INDEX_LEFT then return end
+                    areAllAddonsEnabled(false)
+                end)
+            end
         end, 0) -- Attention: Delay needs to be 500 as AddonSelector_HookForMultiSelectByShiftKey was enabled!!!
     end)
     --[[
@@ -1511,12 +2197,14 @@ end
 
 --Show the current user's active pack in the chat
 function AddonSelector_ShowActivePackInChat()
-    local currentCharacterId, currentlySelectedPackName = getCurrentCharsPackName()
-    if not currentCharacterId or not currentlySelectedPackName or currentlySelectedPackName == "" then return end
+    local currentCharacterId, currentlySelectedPackNameData = getCurrentCharsPackNameData()
+    if not currentCharacterId or not currentlySelectedPackNameData then return end
+    local currentlySelectedPackName = currentlySelectedPackNameData.packName
+    local charIdOfSelectedPack = currentlySelectedPackNameData.charId
+    local charNameOfSelectedPack = tostring(charIdOfSelectedPack)
 
-    d("[ADDON SELECTOR]" .. (langArrayInClientLang["packName"] or langArrayInFallbackLang["packName"]) .. ": " ..tostring(currentlySelectedPackName))
+    d("[ADDON SELECTOR]" .. (langArrayInClientLang["packName"] or langArrayInFallbackLang["packName"]) .. ": " ..tostring(currentlySelectedPackName) .. ", " .. (langArrayInClientLang["packCharName"] or langArrayInFallbackLang["packCharName"]) .. ": " ..tostring(charNameOfSelectedPack))
 end
-
 
 local function searchAddOnSlashCommandHandlder(args)
     if not args or args == "" then
@@ -1525,9 +2213,9 @@ local function searchAddOnSlashCommandHandlder(args)
         --Parse the arguments string
         local options = {}
         --local searchResult = {} --old: searchResult = { string.match(args, "^(%S*)%s*(.-)$") }
-        for param in string.gmatch(args, "([^%s]+)%s*") do
+        for param in strgma(args, "([^%s]+)%s*") do
             if (param ~= nil and param ~= "") then
-                options[#options+1] = string.lower(param)
+                options[#options+1] = strlow(param)
             end
         end
         if options and options[1] then
@@ -1564,49 +2252,112 @@ local function OnAddOnLoaded(event, addonName)
 
     --Hook the scrollable combobox OnMouseEnter function to show the menu entry to delete the pack of the row
     --SecurePostHook("ZO_ScrollableComboBox_Entry_OnMouseEnter", PackScrollableComboBox_Entry_OnMouseEnter)
-    if AddonSelector.LCM ~= nil then
-        ZO_PreHook(ZO_ComboBox, "AddMenuItems", function(selfVar)
-            if not AddonSelector or not AddonSelector.comboBox or selfVar ~= AddonSelector.comboBox then return end
+    AddonSelector.LCM = AddonSelector.LCM or LibCustomMenu
+    checkIfGlobalPacksShouldBeShown()
 
-            for i = 1, #selfVar.m_sortedItems do
-                -- The variable item must be defined locally here, otherwise it won't work as an upvalue to the selection helper
-                local item = selfVar.m_sortedItems[i]
-                --AddMenuItem(item.name, function() selfVar:ItemSelectedClickHelper(item) end, MENU_ADD_OPTION_LABEL, selfVar.m_font, selfVar.m_normalColor, selfVar.m_highlightColor, NO_PADDING_Y, selfVar.horizontalAlignment)
-                --AddCustomMenuItem(item.name, function() selfVar:ItemSelectedClickHelper(item) end, MENU_ADD_OPTION_LABEL, selfVar.m_font, selfVar.m_normalColor, selfVar.m_highlightColor, NO_PADDING_Y, selfVar.horizontalAlignment)
-                local itemName = item.name
-                local subMenuEntries = {
-                    {
-                        label = (langArrayInClientLang["selectPack"] or langArrayInFallbackLang["selectPack"]) .. " " .. itemName,
-                        callback = function()
-                            selfVar:ItemSelectedClickHelper(item)
-                        end,
-                    },
-                    {
-                        label = "-",
-                        callback = function() end,
-                        disabled = true,
-                    },
-                    {
-                        label =  (langArrayInClientLang["deletePackTitle"] or langArrayInFallbackLang["deletePackTitle"]) .. " " .. itemName,
-                        callback = function()
-                            OnClick_Delete(item)
-                        end,
-                    }
-                }
-                --AddCustomSubMenuItem(itemName, subMenuEntries)
-                local function mainEntryOnClickCallback(control)
-                    selfVar:ItemSelectedClickHelper(item)
+    ZO_PreHook(ZO_ComboBox, "AddMenuItems", function(selfVar)
+        if not AddonSelector or not AddonSelector.comboBox or selfVar ~= AddonSelector.comboBox then return end
+        local settings = AddonSelector.acwsv
+        local saveGroupedByCharacterName = settings.saveGroupedByCharacterName
+        local showGroupedByCharacterName = settings.showGroupedByCharacterName
+        local showGlobalPacks = settings.showGlobalPacks
+        local showSubMenuAtGlobalPacks = settings.showSubMenuAtGlobalPacks
+        if showSubMenuAtGlobalPacks == false and (saveGroupedByCharacterName == false and showGroupedByCharacterName == false) then return false end
+
+        for i = 1, #selfVar.m_sortedItems do
+            local subMenuEntries = {}
+            local addedSubMenuEntry = false
+            local itemName
+            -- The variable item must be defined locally here, otherwise it won't work as an upvalue to the selection helper
+            local item = selfVar.m_sortedItems[i]
+
+            local function mainEntryOnClickCallback(control)
+                if item.isCharacterPackHeader == true then return end
+                selfVar:ItemSelectedClickHelper(item) --will call "OnClickDDL", defined in "AddonSelector:CreateItemEntry" as callback of the entry
+            end
+
+
+            --Packs are saved grouped below character names
+            if (saveGroupedByCharacterName == true or showGroupedByCharacterName == true) and item.isCharacterPackHeader == true then
+                local packDataOfChar = item.addonTable
+                local charName = packDataOfChar._charName
+                --The entry in the DDL is the characterName -> We need to add the submenu entries for each packName
+                if charName ~= nil and packDataOfChar ~= nil then
+                    itemName = item.name
+                    for packNameOfChar, addonsOfPack in pairs(packDataOfChar) do
+                        if packNameOfChar ~= "_charName" then
+                            tins(subMenuEntries, {
+                                label = (langArrayInClientLang["selectPack"] or langArrayInFallbackLang["selectPack"]) .. ": " .. packNameOfChar,
+                                callback = function()
+                                    local packItem = AddonSelector:CreateItemEntry(packNameOfChar, addonsOfPack, false, charName)
+                                    selfVar:ItemSelectedClickHelper(packItem) --will call "OnClickDDL", defined in "AddonSelector:CreateItemEntry" as callback of the entry
+                                end,
+                            })
+                            addedSubMenuEntry = true
+                        end
+                    end
                 end
+            end
+
+            if showGlobalPacks == true and not item.isCharacterPackHeader then
+                --Packs are saved without character name grouping
+                --The entry in the DDL is the packname
+                itemName = item.name
+                if showSubMenuAtGlobalPacks == true then
+                    subMenuEntries = {
+                        {
+                            label = (langArrayInClientLang["selectPack"] or langArrayInFallbackLang["selectPack"]) .. ": " .. itemName,
+                            callback = function()
+                                selfVar:ItemSelectedClickHelper(item) --will call "OnClickDDL", defined in "AddonSelector:CreateItemEntry" as callback of the entry
+                            end,
+                        },
+                        {
+                            label = "-",
+                            callback = function() end,
+                            disabled = true,
+                        },
+                        {
+                            label = (langArrayInClientLang["selectPack"] or langArrayInFallbackLang["selectPack"]) .. " & " .. (langArrayInClientLang["ReloadUI"] or langArrayInFallbackLang["ReloadUI"]) .. ": " .. itemName,
+                            callback = function()
+                                selfVar:ItemSelectedClickHelper(item) --will call "OnClickDDL", defined in "AddonSelector:CreateItemEntry" as callback of the entry
+                                ReloadUI("ingame")
+                            end,
+                        },
+                        {
+                            label = "-",
+                            callback = function() end,
+                            disabled = true,
+                        },
+                        {
+                            label =  (langArrayInClientLang["deletePackTitle"] or langArrayInFallbackLang["deletePackTitle"]) .. " " .. itemName,
+                            callback = function()
+                                if item.charName == nil then
+                                    local packDataOfChar = item.addonTable
+                                    local charName = packDataOfChar._charName
+                                    item.charName = charName
+                                    item.charNameWasAddedByContextMenuClick = true
+                                end
+                                OnClick_Delete(item)
+                            end,
+                        }
+                    }
+                    addedSubMenuEntry = true
+                else
+                    AddCustomMenuItem(itemName, mainEntryOnClickCallback, nil, nil, nil, nil, nil)
+                end
+            end
+
+            if addedSubMenuEntry == true then
                 AddCustomSubMenuItem(itemName, subMenuEntries, nil, nil, nil, nil, mainEntryOnClickCallback)
             end
-            return true
-        end)
-    end
+        end
+        return true
+    end)
 
-	EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED)
+	EM:UnregisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED)
 end
 
 ---------------------------------------------------------------------
 --  Register Events --
 ---------------------------------------------------------------------
-EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
+EM:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddOnLoaded)

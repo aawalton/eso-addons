@@ -9,17 +9,17 @@
 			</OnMouseUp>
 		</Control>
 	-->
-	
-        <TopLevelControl name="AddonSelector" virtual="true" clampedToScreen="true" mouseEnabled="false" movable="false" hidden="false" >
+        <TopLevelControl name="AddonSelectorTLC" virtual="true" clampedToScreen="true" mouseEnabled="false" movable="false" hidden="false" >
             <Dimensions x="400" y="80"/>
 			<Anchor point="TOPLEFT" relativeTo="ZO_AddOnsDivider" relativePoint="BOTTOMLEFT" offsetX="10" offsetY="0" />
 			<Controls>
-				<EditBox name="$(parent)SearchBox" font="ZoFontChat" horizontalAlignment="LEFT" verticalAlignment="CENTER" text="" editEnabled="true" maxInputCharacters="64" multiLine="false" newLineEnabled="false" inherits="ZO_DefaultEditForBackdrop">
+				<EditBox name="$(parent)SearchBox" font="ZoFontChat" editEnabled="true" maxInputCharacters="64" multiLine="false" newLineEnabled="false" inherits="ZO_DefaultEditForBackdrop">
 					<Dimensions x="200" y="20"/>
 					<Anchor point="TOPRIGHT" relativeTo="ZO_AddOns" relativePoint="TOPRIGHT"  offsetX="-5" offsetY="75" />
 					<OnEnter>
 						AddonSelector_SearchAddon("name", self:GetText(), false)
 					</OnEnter>
+					<OnTextChanged>ClearMenu()</OnTextChanged>
 					<Controls>
 						<Backdrop name="$(parent)Bg" inherits="ZO_EditBackdrop" alpha="1"  >
 							<AnchorFill />
@@ -38,7 +38,7 @@
 					<Dimensions x="200" y="20"/>
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NameLabel" relativePoint="TOPRIGHT"  offsetX="20" offsetY="0" />
 				</Backdrop>
-				<EditBox name="$(parent)EditBox" font="ZoFontChat" horizontalAlignment="LEFT" verticalAlignment="CENTER" text="" editEnabled="true" maxInputCharacters="64" multiLine="false" newLineEnabled="false" inherits="ZO_DefaultEditForBackdrop">
+				<EditBox name="$(parent)EditBox" font="ZoFontChat" editEnabled="true" maxInputCharacters="64" multiLine="false" newLineEnabled="false" inherits="ZO_DefaultEditForBackdrop">
 					<Dimensions x="200" y="20"/>
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NameLabel" relativePoint="TOPRIGHT"  offsetX="20" offsetY="0" />
 					<OnTextChanged>
@@ -53,6 +53,14 @@
 					<Dimensions x="100" y="30" />
 					<Anchor point="TOPLEFT" relativeTo="$(parent)EditBox" relativePoint="TOPRIGHT" offsetX="20" offsetY="0"/>
 				</Button>
+				<Texture name="$(parent)SaveModeTexture">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Save" />
+					<Dimensions x="26" y="24" />
+				</Texture>
+				<Texture name="$(parent)AutoReloadUITexture">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)SaveModeTexture" />
+					<Dimensions x="26" y="24" />
+				</Texture>
 				<Label name="$(parent)SelectLabel" font="ZoFontWinH5" color="FFFFFF" wrapMode="ELLIPSIS" text="" verticalAlignment="CENTER" horizontalAlignment="LEFT" alpha="1" >
 					<Dimensions x="100" y="24" />
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NameLabel" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="0"/>
@@ -75,6 +83,7 @@
                     <Anchor point="BOTTOM" />
                 </Control>
 
+				<!--
 				<Button name="$(parent)AutoReloadUI" inherits="ZO_CheckButton" >
 					<Anchor point="TOPLEFT" relativeTo="ZO_AddOnsLoadOutOfDateAddOns" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="10"/>
 
@@ -84,6 +93,17 @@
 						</Label>
 					</Controls>
 				</Button>
+				-->
+				<Button name="$(parent)SettingsOpenDropdown" inherits="ZO_DropdownButton">
+                    <Anchor point="TOPLEFT" relativeTo="ZO_AddOns" relativePoint="TOP" offsetX="100" offsetY="65"/>
+					<Dimensions x="45" y="45" />
+					<Textures normal="esoui/art/chatwindow/chat_options_up.dds"
+							  pressed="esoui/art/chatwindow/chat_options_down.dds"
+							  mouseOver="esoui/art/chatwindow/chat_options_over.dds"/>
+					<OnClicked>
+                        AddonSelector_ShowSettingsDropdown(self)
+					</OnClicked>
+                </Button>
 
                 <Control name="$(parent)DeselectAddonsButton" inherits="ZO_DialogButton">
                     <Anchor point="TOPLEFT" relativeTo="ZO_AddOnsList" relativePoint="BOTTOMLEFT" offsetY="5" />

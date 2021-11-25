@@ -17,8 +17,6 @@ end
 ----- lang setup                            -----
 -------------------------------------------------
 
-Destinations.client_lang    = GetCVar("Language.2")
-Destinations.effective_lang = nil
 --[[
 FX is an alternate Polish lang file
 KB is Korean Beta and TR is some kind of Korean and English
@@ -26,14 +24,28 @@ Index Mix that I don't understand how that works
 
 Most languages only have Quest Names or Quest Givers that
 change, which won't matter once LibQuestData is fully updated
+
+client_lang
+effective_lang
+supported_lang
 ]]--
-Destinations.supported_lang = { "de", "en", "fr", "fx", "jp", "kb", "kr", "pl", "ru", }
-if is_in(Destinations.client_lang, Destinations.supported_lang) then
-  Destinations.effective_lang = Destinations.client_lang
+Destinations.client_lang    = GetCVar("Language.2")
+Destinations.effective_quest_lang = nil
+Destinations.effective_menu_lang = nil
+local supported_quest_langs = { "br", "de", "en", "es", "fr", "fx", "it", "jp", "kb", "kr", "pl", "ru", }
+local supported_menu_langs = { "de", "en", "fr", "fx", "jf", "jp", "pl", "ru", "zh", }
+if is_in(Destinations.client_lang, supported_quest_langs) then
+  Destinations.effective_quest_lang = Destinations.client_lang
 else
-  Destinations.effective_lang = "en"
+  Destinations.effective_quest_lang = "en"
 end
-Destinations.supported_lang = Destinations.client_lang == Destinations.effective_lang
+if is_in(Destinations.client_lang, supported_menu_langs) then
+  Destinations.effective_menu_lang = Destinations.client_lang
+else
+  Destinations.effective_menu_lang = "en"
+end
+Destinations.supported_quest_lang = Destinations.client_lang == Destinations.effective_quest_lang
+Destinations.supported_menu_lang = Destinations.client_lang == Destinations.effective_menu_lang
 
 -------------------------------------------------
 ----- Destinations                          -----
@@ -109,7 +121,7 @@ end
 -------------------------------------------------
 
 local ADDON_AUTHOR                              = "Sharlikran |c990000Snowman|r|cFFFFFFDK|r & MasterLenman & Ayantir"
-local ADDON_VERSION                             = "29.0"
+local ADDON_VERSION                             = "29.1"
 local ADDON_WEBSITE                             = "http://www.esoui.com/downloads/info667-Destinations.html"
 
 local LMP                                       = LibMapPins
@@ -2934,7 +2946,7 @@ local function QuestPinFilters(QuestID, dataName, questLine, questSeries)
   if questLine == 99990 then
     -- Hide Mage's Guild quest while not the required rank in the guild.
     local skillLineLevel = nil
-    local SkillLine      = LQD:get_quest_giver(500114, Destinations.effective_lang)
+    local SkillLine      = LQD:get_quest_giver(500114, Destinations.effective_quest_lang)
     for i = 1, GetNumSkillLines(SKILL_TYPE_GUILD) do
       local skillLineName = GetSkillLineInfo(SKILL_TYPE_GUILD, i)
       if skillLineName and skillLineName == SkillLine then
@@ -2949,7 +2961,7 @@ local function QuestPinFilters(QuestID, dataName, questLine, questSeries)
   if questLine == 99995 then
     -- Hide Fighter's Guild quest while not the required rank in the guild.
     local skillLineLevel = nil
-    local SkillLine      = LQD:get_quest_giver(500115, Destinations.effective_lang)
+    local SkillLine      = LQD:get_quest_giver(500115, Destinations.effective_quest_lang)
     for i = 1, GetNumSkillLines(SKILL_TYPE_GUILD) do
       local skillLineName = GetSkillLineInfo(SKILL_TYPE_GUILD, i)
       if skillLineName and skillLineName == SkillLine then
@@ -3144,7 +3156,7 @@ local function QuestPinFilters(QuestID, dataName, questLine, questSeries)
   if QuestID == 5549 or QuestID == 5545 or QuestID == 5581 or QuestID == 5553 then
     -- check for Thieves Guild level.
     local skillLineLevel = nil
-    local SkillLine      = LQD:get_quest_giver(500113, Destinations.effective_lang)
+    local SkillLine      = LQD:get_quest_giver(500113, Destinations.effective_quest_lang)
     for i = 1, GetNumSkillLines(SKILL_TYPE_GUILD) do
       local skillLineName = GetSkillLineInfo(SKILL_TYPE_GUILD, i)
       if skillLineName and skillLineName == SkillLine then
@@ -3159,7 +3171,7 @@ local function QuestPinFilters(QuestID, dataName, questLine, questSeries)
   if QuestID == 5595 or QuestID == 5599 or QuestID == 5596 or QuestID == 5567 or QuestID == 5597 or QuestID == 5598 or QuestID == 5600 then
     -- check for Dark Brotherhood level.
     local skillLineLevel = nil
-    local SkillLine      = LQD:get_quest_giver(500119, Destinations.effective_lang)
+    local SkillLine      = LQD:get_quest_giver(500119, Destinations.effective_quest_lang)
     for i = 1, GetNumSkillLines(SKILL_TYPE_GUILD) do
       local skillLineName = GetSkillLineInfo(SKILL_TYPE_GUILD, i)
       if skillLineName and skillLineName == SkillLine then
@@ -4310,7 +4322,7 @@ end
 
 local function RegisterQuestDone(eventCode, questName, level, previousExperience, currentExperience, championPoints, questType, instanceDisplayType)
   local questFound, questID = false, 0
-  local tempQuestID         = LQD:get_questids_table(questName, Destinations.effective_lang)
+  local tempQuestID         = LQD:get_questids_table(questName, Destinations.effective_quest_lang)
   local questData           = {}
   if tempQuestID then
     if #tempQuestID == 1 then
@@ -4718,7 +4730,7 @@ local function GetInProgressQuests()
   local numQuests = GetNumJournalQuests()
   for i = 1, numQuests do
     local questName, _, _, _, _, _, _, _, _, _ = GetJournalQuestInfo(i)
-    QTableStore                                = LQD.quest_names[Destinations.effective_lang]
+    QTableStore                                = LQD.quest_names[Destinations.effective_quest_lang]
     for y, z in pairs(QTableStore) do
       if z == questName then
         local questId = y
@@ -4850,7 +4862,7 @@ local function ShowQuestEditingMenu(pin)
   end
 
   local questTableName
-  local allQuestNames = LQD.quest_names[Destinations.effective_lang]
+  local allQuestNames = LQD.quest_names[Destinations.effective_quest_lang]
   for questTableID, questData in pairs(allQuestNames) do
     questTableName = questData
     if questTableName then
@@ -6423,7 +6435,7 @@ end
 
 local function DisableEnglishFunctionnalities()
 
-  if Destinations.effective_lang == "en" then
+  if Destinations.client_lang == "en" then
     DestinationsSV.settings.AddEnglishOnUnknwon = false
     DestinationsSV.settings.AddEnglishOnKeeps   = false
   end
@@ -6779,7 +6791,7 @@ local function InitSettings()
           getFunc = function() return DestinationsSV.settings.AddEnglishOnUnknwon end,
           setFunc = function(state) DestinationsSV.settings.AddEnglishOnUnknwon = state end,
           default = defaults.settings.AddEnglishOnUnknwon,
-          disabled = function() return Destinations.effective_lang == "en" end,
+          disabled = function() return Destinations.client_lang == "en" end,
         },
         { -- Color of English name
           type = "colorpicker",
@@ -6800,7 +6812,7 @@ local function InitSettings()
           getFunc = function() return DestinationsSV.settings.AddEnglishOnKeeps end,
           setFunc = function(state) DestinationsSV.settings.AddEnglishOnKeeps = state end,
           default = defaults.settings.AddEnglishOnKeeps,
-          disabled = function() return Destinations.effective_lang == "en" end,
+          disabled = function() return Destinations.client_lang == "en" end,
         },
         { -- Color for English name on Keeps
           type = "colorpicker",
@@ -10011,7 +10023,7 @@ local function OnLoad(eventCode, name)
     --d("Checking Map State")
     check_map_state()
 
-    if not Destinations.supported_lang then
+    if not Destinations.supported_menu_lang then
       --chat messages aren't shown before player is activated
       EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_PLAYER_ACTIVATED, ShowLanguageWarning)
     end

@@ -1,7 +1,7 @@
 ## Title: Show TTC Price
-## APIVersion: 100034
+## APIVersion: 101032
 ## Author: @MarioKness (EU)
-## Description: Replaces items's sell value with TTC prices in inventory, craft bag and while deconstructing.
+## Description: Displays TTC price of items in inventories, craft bag and deconstruction.
 ## DependsOn: TamrielTradeCentre LibAddonMenu-2.0>=30
 ## SavedVariables: ShowTTCPriceVars
 

@@ -363,7 +363,7 @@ function DynamicCP:OnConfirmClicked(button)
         PrepareChampionPurchaseRequest(needsRespec)
         DynamicCP.ConvertPendingPointsToPurchase()
         DynamicCP.ConvertPendingSlottablesToPurchase()
-        CHAMPION_PERKS:SpendPointsConfirmed(needsRespec)
+        SendChampionPurchaseRequest()
 
         isRespeccing = false
         DynamicCP.ClearPendingCP()

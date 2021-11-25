@@ -58,7 +58,7 @@ L.Binding_ToggleUltimateExchange                    = "Toggle Ultimate"
 --------------------------------
 L.Settings_Ultimate_Header                           = "Ultimate Exchange (beta)"
 L.Settings_Ultimate_Description                      = "This feature allows you to send your ultimate to your teammates so they can see how close you are to casting it. It uses your cost based on whatever cost reduction you might have from sets or passives."
--- Settings 
+-- Settings
 L.Settings_Ultimate_Enabled                          = "Enabled"
 L.Settings_Ultimate_Enabled_TT                       = "Enable the sharing and receiving of ultimate values. It is always disabled outside of trials."
 L.Settings_Ultimate_Hidden                           = "Hidden"
@@ -155,7 +155,7 @@ L.Settings_Archive_Overcharge                       = "Mobs: Overcharge"
 L.Settings_Archive_Overcharge_TT                    = "Alerts you when an Overcharger targets you with his Overcharge ability."
 L.Settings_Archive_Call_Lightning                   = "Mobs: Call Lightning"
 L.Settings_Archive_Call_Lightning_TT                = "Alerts you when an Overcharger targets you with his Call Lightning ability."
--- Alerts 
+-- Alerts
 L.Alerts_Archive_StormAtro_ImpendingStorm           = "Incoming |cFF0000Impending Storm|r!"
 L.Alerts_Archive_StormAtro_LightningStorm           = "Incoming |cfef92eLightning Storm|r! Go into the light!"
 L.Alerts_Archive_StoneAtro_BoulderStorm             = "Incoming |cFF0000Boulder Storm|r! Block to avoid knockback!"
@@ -352,7 +352,7 @@ L.Settings_HallsFab_Scalded_Debuff_TT               = "Displays a small status i
 L.Settings_HallsFab_Overcharge_Aura                 = "Committee: Overcharging Aura"
 L.Settings_HallsFab_Overcharge_Aura_TT              = "Alerts you when reclaimer start overcharging aura."
 L.Settings_HallsFab_Overpower_Auras                 = "Committee: Overpowering Auras"
-L.Settings_HallsFab_Overpower_Auras_TT              = "Alerts you when the tanks need to swap the committee bosses" 
+L.Settings_HallsFab_Overpower_Auras_TT              = "Alerts you when the tanks need to swap the committee bosses"
 L.Settings_HallsFab_Overpower_Auras_Duration        = "       - Countdown Duration"
 L.Settings_HallsFab_Overpower_Auras_Duration_TT     = "The duration of the countdown in milliseconds."
 L.Settings_HallsFab_Overpower_Auras_Dynamic         = "       - Dynamic Countdown"
@@ -561,6 +561,12 @@ L.Settings_KynesAegis_Blood_Fountain                = "General: Blood Fountain"
 L.Settings_KynesAegis_Blood_Fountain_TT             = "Alerts you when Bloodknight starts his Blood Fountain attack, counting down until it is unleashed. It looks like cross-shaped AoE, and need to be avoided as it deals heavy damage."
 L.Settings_KynesAegis_Totem                         = "Yandir: Totems spawn"
 L.Settings_KynesAegis_Totem_TT                      = "Alerts you when certain totem appeared during the battle with Yandir the Butcher boss.\n\nDragon Totems: always two appears at the same time; each one blows out fire along a straight line in two opposite directions.\nHarpy Totem: spawns a lightning aura that will radiate out.\nGargoyle totem: encases random players into stone.\nChaurus Totem: poisons several people, and this poison should not be spread to others, that's why you should not stack at this phase."
+L.Settings_KynesAegis_Vrol_FireMage_Meteor          = "Vrol: Meteors"
+L.Settings_KynesAegis_Vrol_FireMage_Meteor_TT       = "Alerts you when Vrolsworn Fire Mages from the boat will cast meteors on players."
+L.Settings_KynesAegis_Ichor_Eruption                = "Falgravn: Ichor Eruption"
+L.Settings_KynesAegis_Ichor_Eruption_TT             = "Shows countdown until Falgravn will release his Ichor Eruption."
+L.Settings_KynesAegis_Ichor_Eruption_CD_Time        = "       - Countdown time"
+L.Settings_KynesAegis_Ichor_Eruption_CD_Time_TT     = "Time before Ichor Eruption when countdown should pop up."
 
 -- Alerts
 L.Alerts_KynesAegis_Crashing_Wall                   = "|cd2a100Crashing Wall|r in"
@@ -570,6 +576,47 @@ L.Alerts_KynesAegis_Dragon_Totem                    = "Two |cffa500Dragon Totems
 L.Alerts_KynesAegis_Harpy_Totem                     = "|c00bfffHarpy Totem|r spawned."
 L.Alerts_KynesAegis_Gargoyle_Totem                  = "|cf5f5dcGargoyle Totem|r spawned."
 L.Alerts_KynesAegis_Chaurus_Totem                   = "|c39942eChaurus Totem|r spawned. Don't stack!"
+L.Alerts_KynesAegis_Vrol_FireMage_Meteor            = "|cffa500Meteor|r on you in"
+L.Alerts_KynesAegis_Vrol_FireMage_Meteor_Other      = "Meteors in"
+L.Alerts_KynesAegis_Ichor_Eruption                  = "|cb00000Ichor Eruption|r in"
+
+
+--------------------------------
+------   ROCKGROVE         -----
+--------------------------------
+L.Settings_Rockgrove_Header                        = "Rockgrove"
+-- Settings
+L.Settings_Rockgrove_Sundering_Strike              = "General: Sundering Strike"
+L.Settings_Rockgrove_Sundering_Strike_TT           = "Alerts you when the Sul-Xan Reaper makes Sundering Strike attack. Roll dodge it."
+L.Settings_Rockgrove_Astral_Shield                 = "General: Astral Shield"
+L.Settings_Rockgrove_Astral_Shield_TT              = "Alerts you when the Sul-Xan Soulweaver casts his Astral Shield."
+L.Settings_Rockgrove_Soul_Remnant                  = "General: Soul Remnant (Soulweaver)"
+L.Settings_Rockgrove_Soul_Remnant_TT               = "Alerts you when Soul Remnants targets you (as result of breaking Sul-Xan Soulweaver's Astral Shield)."
+L.Settings_Rockgrove_Prime_Meteor                  = "General: Prime Meteor"
+L.Settings_Rockgrove_Prime_Meteor_TT               = "Shows countdown when meteor appears indicating the time before it explodes. Make sure to kill the meteor in time."
+L.Settings_Rockgrove_Hasted_Assault                = "General: Hasted Assault"
+L.Settings_Rockgrove_Hasted_Assault_TT             = "Alerts you when the Havocrel Barbarian makes Hasted Assault attack. He teleports from player to player in random order and attacks them. This should be blocked."
+L.Settings_Rockgrove_Savage_Blitz                  = "Oaxiltso: Savage Blitz"
+L.Settings_Rockgrove_Savage_Blitz_TT               = "Alerts you when the Oaxiltso charges at the furthest player."
+L.Settings_Rockgrove_Noxious_Sludge                = "Oaxiltso: Noxious Sludge"
+L.Settings_Rockgrove_Noxious_Sludge_TT             = "Alerts you when someone is poisoned by Oaxiltso and has to go cleanse in the pool."
+L.Settings_Rockgrove_Embrace_Of_Death              = "Flame-Herald Bahsei: Embrace of Death"
+L.Settings_Rockgrove_Embrace_Of_Death_TT           = "Alerts you when someone got cursed by Flame-Herald Bahsei. That person will explode after 8 seconds, spreading the curse. It's important to keep cursed player separated from the group."
+L.Settings_Rockgrove_Embrace_Of_Death_TT_All       = "|cFF0000WARNING!|r If your group will get too much curses your screen may be fully covered in countdowns for a duration of those curses! We're working on ways to improve this notification."
+
+-- Alerts
+L.Alerts_Rockgrove_Sundering_Strike                = "Incoming |cCDCDCDSundering Strike|r on you!"
+L.Alerts_Rockgrove_Sundering_Strike_Other          = "Incoming |cCDCDCDSundering Strike|r on |cFF0000<<!aC:1>>|r!"
+L.Alerts_Rockgrove_Astral_Shield_Cast              = "|cFFFF8FAstral Shield|r has been casted. Prepare to dodge or block!"
+L.Alerts_Rockgrove_Soul_Remnant                    = "Incoming |c8FF2FFSoul Remnant|r!"
+L.Alerts_Rockgrove_Prime_Meteor                    = "|cFFD600Prime Meteor|r will explode in"
+L.Alerts_Rockgrove_Hasted_Assault                  = "Incoming |cFF0000Hasted Assault|r! Block!"
+L.Alerts_Rockgrove_Savage_Blitz                    = "Oaxiltso charges at |cFF0000<<!aC:1>>|r!"
+L.Alerts_Rockgrove_Noxious_Sludge_Self             = "You're poisoned by |c008C22Noxious Sludge|r! Cleanse in the pool!"
+L.Alerts_Rockgrove_Noxious_Sludge_Other1           = "|cFF0000<<!aC:1>>|r is poisoned by |c008C22Noxious Sludge|r."
+L.Alerts_Rockgrove_Noxious_Sludge_Other2           = "|cFF0000<<!aC:1>>|r and |cFF0000<<!aC:2>>|r are poisoned by |c008C22Noxious Sludge|r."
+L.Alerts_Rockgrove_Embrace_Of_Death                = "You're cursed by |c370073Embrace of Death|r! Stay away! Explosion in"
+L.Alerts_Rockgrove_Embrace_Of_Death_Other          = "|cFF0000<<!aC:1>>|r cursed by |c370073Embrace of Death|r! Explosion in"
 
 
 --------------------------------
@@ -605,7 +652,7 @@ function RaidNotifier:MissingLocale()
 	d("Obviously not missing any english strings....")
 end
 
---if (GetCVar('language.2') == 'de') then 
+--if (GetCVar('language.2') == 'de') then
 --	local MissingL = {}
 --	for k, v in pairs(RaidNotifier:GetLocale()) do
 --		if (not L[k]) then
@@ -613,10 +660,10 @@ end
 --			L[k] = v
 --		end
 --	end
---	function RaidNotifier:GetLocale() 
+--	function RaidNotifier:GetLocale()
 --		return L
 --	end
---	-- for debugging 
+--	-- for debugging
 --	function RaidNotifier:MissingLocale()
 --		df("Missing strings for '%s'", GetCVar('language.2'))
 --		d(MissingL)

@@ -1496,6 +1496,10 @@ Destinations.ChampionTableStore = {
   },
 }
 -- X: 0.5710620880127 Y: 0.63778245449066
+
+-- alias for pulkupper_base_0
+Destinations.ChampionTableStore["pulkupper_base_0"]  = Destinations.ChampionTableStore["pulklower_base_0"]
+
 -- alias for Gloomreach
 Destinations.ChampionTableStore["gloomreach2_base_0"]  = Destinations.ChampionTableStore["gloomreach_base_0"]
 Destinations.ChampionTableStore["gloomreach2b_base_0"] = Destinations.ChampionTableStore["gloomreach_base_0"]

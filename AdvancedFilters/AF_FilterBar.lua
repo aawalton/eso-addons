@@ -93,6 +93,9 @@ function AF_FilterBar:Initialize(inventoryName, tradeSkillname, groupName, subfi
     --Function for the mouse right click on the dropdown box (filter plugins) of the subfilterBar
     local function DropdownOnMouseUpHandler(dropdown, mouseButton, upInside)
         local comboBox = dropdown.m_comboBox
+        AF.currentCombobox = comboBox
+        AF.currentComboboxSelectedItem = nil
+
         if not upInside then return end
         --Get the current subfilterBar button
         local button = selfVar:GetCurrentButton()
@@ -427,6 +430,9 @@ function AF_FilterBar:Initialize(inventoryName, tradeSkillname, groupName, subfi
             local item = p_comboBox.m_sortedItems[i]
 
             local function OnSelect()
+                AF.currentCombobox = p_comboBox
+                AF.currentComboboxSelectedItem = item
+
                 ZO_ComboBox_Base_ItemSelectedClickHelper(p_comboBox, item)
                 button.previousDropdownSelection = button.previousDropdownSelection or {}
                 button.previousDropdownSelection[filterPanelIdActive] = item

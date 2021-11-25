@@ -83,10 +83,11 @@ end
 ---------------------------------------------------------------------------------------------------------------------------
 --Check if the first parameter "slot" is the bagId of a crafting station item row, or the dataEntry.data table of another
 --inventory row and prepare the slot variable then properly for the filter functions
+local prepareSlot = util.prepareSlot
 local function checkCraftingStationSlot(slot, slotIndex)
-    if util.prepareSlot and slotIndex ~= nil and type(slot) ~= "table" then
+    if prepareSlot and slotIndex ~= nil and type(slot) ~= "table" then
         --Slot is the bagId!
-        slot = util.prepareSlot(slot, slotIndex)
+        slot = prepareSlot(slot, slotIndex)
     end
     return slot
 end

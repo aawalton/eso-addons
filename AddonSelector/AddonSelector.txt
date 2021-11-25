@@ -1,12 +1,11 @@
 ## Title: Addon Selector
-## APIVersion: 100035 101031
+## APIVersion: 101032 101033
 ## SavedVariables: AddonSelectorSavedVars
-## AddOnVersion: 1446
-## Version: 1.446
+## AddOnVersion: 2000
+## Version: 2.000
 ## Author: Circonian & Baertram
 ## Description: Allows you to save & reload packages of addons, whether they are turned ON/OFF.
-## DependsOn: LibDialog>=126
-## OptionalDependsOn: LibCustomMenu>=700
+## DependsOn: LibCustomMenu>=711 LibDialog>=126
 
 ## Addon source
 xml/AddonSelector.xml

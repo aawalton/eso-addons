@@ -3141,6 +3141,7 @@ Destinations.ACHDataStore = {
     { 0.4413733482, 0.1940076649, 20, 999999, 1, "X" }, -- Sharlikran
     { 0.6365278959, 0.7118381261, 25, 999999, 1, "X" }, -- Sharlikran Deadlands
     { 0.6542717814, 0.5402227044, 25, 999999, 1, "X" }, -- Sharlikran Deadlands
+    { 0.6057025790, 0.2294649928, 25, 999999, 1, "X" }, -- Sharlikran Deadlands
   },
   -- Arkthzand Cavern
   ["vunalk2_base_0"] = {
