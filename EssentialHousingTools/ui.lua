@@ -101,6 +101,31 @@ end
 
 do
 	local enabled = false
+	
+	local function OnNightModeUpdate()
+		if not enabled or not EHT.Housing.IsHouseZone() then
+			enabled = false
+			EHT.Effect.RequestBrightness( nil, "Override", nil )
+			EVENT_MANAGER:UnregisterForUpdate("EHT.UI.OnNightModeUpdate", OnNightModeUpdate)
+			EHT.UI.RefreshEditToggles()
+			return
+		end
+
+		if EHT.Util.IsDayTime() then
+			EHT.Effect.RequestBrightness( nil, "Override", 0.25 )
+		else
+			EHT.Effect.RequestBrightness( nil, "Override", nil )
+		end
+	end
+	
+	local function OnNightModeChanged()
+		EHT.UI.RefreshEditToggles()
+		
+		if enabled then
+			EVENT_MANAGER:RegisterForUpdate("EHT.UI.OnNightModeUpdate", 5000, OnNightModeUpdate)
+			OnNightModeUpdate()
+		end
+	end
 
 	function EHT.UI.IsNightModeEnabled()
 		return enabled
@@ -108,13 +133,7 @@ do
 
 	function EHT.UI.ToggleNightMode()
 		enabled = not enabled
-		if enabled then
-			EHT.Effect.RequestBrightness( nil, "Override", 0.35 )
-		else
-			EHT.Effect.RequestBrightness( nil, "Override", nil )
-		end
-
-		EHT.UI.RefreshEditToggles()
+		OnNightModeChanged()
 	end
 end
 
@@ -3652,7 +3671,7 @@ end
 ---[ Operations : UI Functions  ]---
 
 function EHT.UI.ShowPopulationNotification( message )
-	if EHT.SavedVars.Doorbell then
+	if message and EHT.SavedVars.Doorbell then
 		df( "|c00ccff%s|r", message )
 	end
 end
@@ -3675,7 +3694,7 @@ function EHT.UI.OnHousePopulationChanged( population )
 	local previousPopulation = EHT.CurrentHousePopulation or 0
 	EHT.CurrentHousePopulation = population
 
-	if 0 == population then
+	if 0 == population or not EHT.Housing.IsHouseZone() then
 		return
 	end
 
@@ -23320,18 +23339,13 @@ end
 ---[ HUD Fragment ]---
 
 do
-	local HUDFragment = ZO_Object:Subclass()
+	local HUDFragment = ZO_InitializingObject:Subclass()
 
-	function HUDFragment:New( ... )
-		local obj = ZO_Object.New( self )
-		obj:Initialize( ... )
-		return obj
-	end
-	
 	function HUDFragment:Initialize()
 		local control = WINDOW_MANAGER:CreateTopLevelWindow( "EHTHUDFragment" )
 		self.control = control
 		control:SetAnchorFill()
+		local fragmentOwner = self
 
 		local button = WINDOW_MANAGER:CreateControlFromVirtual( "KeybindButton", control, "ZO_KeybindButton" )
 		self.keybindButton = button
@@ -23342,10 +23356,10 @@ do
 		button:SetAnchor( BOTTOMRIGHT, nil, BOTTOMRIGHT, -315, -25 )
 
 		EVENT_MANAGER:RegisterForEvent( "EHTHUDFragment", EVENT_GAME_CAMERA_UI_MODE_CHANGED, function()
-			self:UpdateVisibility()
+			fragmentOwner:UpdateVisibility()
 		end )
 		EVENT_MANAGER:RegisterForEvent( "EHTHUDFragment", EVENT_PLAYER_ACTIVATED, function()
-			self:UpdateVisibility()
+			fragmentOwner:UpdateVisibility()
 		end )
 	end
 

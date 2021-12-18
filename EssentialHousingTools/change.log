@@ -1,3 +1,10 @@
+Version 1767
+2021-11-28
+
+Fixed several long-standing Lua errors.
+Improved the performance of several FX including Dazzling and Star Cube.
+Improved the EHT button | Environment | Night Mode toggle feature.
+
 Version 1766
 2021-10-30
 

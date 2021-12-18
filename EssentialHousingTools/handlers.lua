@@ -565,7 +565,7 @@ function EHT.Handlers.OnHousingEditorModeChanged( event, oldMode, newMode )
 ]]
 	if not EHT.TabTargeting then EHT.UI.UpdateUIMode() end
 	if EHT.Biz.IsUninterruptableProcessRunning( true ) then return end
-	zo_callLater( function() EHT.UI.UpdateKeybindStrip( newMode ) end, 500 )
+	EHT.UI.UpdateKeybindStrip( newMode )
 
 	if nil == furnitureId then
 		-- Clear the Tab Target Origin Furniture Id if the mode change was not caused by the user Tab Targeting.

@@ -1132,7 +1132,7 @@ end
 
 function EHT.Util.IsDayTime()
 	local hours = EHT.Util.GetInGameTime()
-	return hours >= 4 and hours <= 20
+	return hours >= 4 and hours <= 22
 end
 
 function EHT.Util.GetInGameTimeCommand()
@@ -1255,7 +1255,7 @@ end
 
 ---[ Friends ]---
 
--- Single Ladyton / Singleton
+-- Singleton
 EHT.Friends = ZO_Object.New( ZO_Object:Subclass() )
 
 function EHT.Friends:GetAllDisplayNames()
@@ -1827,30 +1827,7 @@ do
 end
 
 ---[ Camera ]---
---[[
-function EHT.Util.CameraZoom( isIn, initialDelay, speed )
-	if not tonumber( speed ) then
-		speed = 1
-	else
-		speed = 2 - zo_clamp( ( tonumber( speed ) or 1 ), 0.5, 1 )
-	end
 
-	local duration = speed * 16000
-
-	for index = 1, 16 do
-		zo_callLater(
-			function()
-				if isIn then
-					CameraZoomIn()
-				else
-					CameraZoomOut()
-				end
-			end,
-			zo_clamp( 1000 * ( tonumber( initialDelay ) or 0 ), -10000, 10000 ) + ( ( math.log( zo_clamp( 0.35 + 0.65 * ( index / 16 ), 0.0000455, 1 ) ) / -10 ) ) * duration
-		)
-	end
-end
-]]
 do
 	local ZOOM_TICKS = 16
 	local ZOOM_INTERVAL = 330

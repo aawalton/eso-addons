@@ -481,10 +481,18 @@ mAction.optEffectOf -- #(#Action:self,#Effect:effect1,#Effect:effect2)->(#Effect
     local longDur = isEffect1Bigger and effect1.duration or effect2.duration
     local percent = shortDur*100/longDur
     local shortIcon = isEffect1Bigger and effect2.ability.icon or effect1.ability.icon -- #string
+    local longIcon = isEffect1Bigger and effect1.ability.icon or effect2.ability.icon -- #string
     if shortDur>4900 --[[ filter trivia effects less than 5 sec ]]
       and percent > 32
       and percent < 65
       and not shortIcon:find('expedition',30,true) -- reject expedition buffs as 1/2 stage
+    then
+      self.data.firstStageId = isEffect1Bigger and effect2.ability.id or effect1.ability.id
+      return isEffect1Bigger and effect2 or effect1
+    end
+    if longIcon:find('ability_buff_m',1,true) -- for Balance 4s healing and 30s major resolve
+      and percent < 15
+      and not shortIcon:find('ability_buff_m',30,true)
     then
       self.data.firstStageId = isEffect1Bigger and effect2.ability.id or effect1.ability.id
       return isEffect1Bigger and effect2 or effect1
@@ -499,7 +507,7 @@ mAction.optEffectOf -- #(#Action:self,#Effect:effect1,#Effect:effect2)->(#Effect
     local px1=0
     local px2=0
     -- don't opt buffs which have difference durations
-    if effect.duration ~= self.duration and effect.ability.icon:find('ability_buff_m',1,true) then return -1,-1 end
+    if self.duration and self.duration >0 and effect.duration ~= self.duration and effect.ability.icon:find('ability_buff_m',1,true) then return -1,-1 end
     -- opt non-player effect for dps, if not area effect
     if role==LFG_ROLE_DPS and not self.flags.forArea and not effect:isOnPlayer() then px1=2 end
     -- opt player effect for tank
@@ -529,7 +537,7 @@ mAction.optEffectOf -- #(#Action:self,#Effect:effect1,#Effect:effect2)->(#Effect
     if GetGameTimeMilliseconds() - minorEffect.startTime > 500 then minorEffect.ignored = true end
     return majorEffect
   end
-  return effect1.endTime < effect2.endTime and effect2 or effect1 -- opt last end
+  return effect1.duration < effect2.duration and effect2 or effect1 -- opt longer duration
 end
 
 mAction.optGallopEffect -- #(#Action:self)->(#Effect)

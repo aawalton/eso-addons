@@ -105,8 +105,9 @@ local MAX_CHATCAST_LENGTH = 350
 local MAX_GUILDCAST_LENGTH = 254
 local MAX_MAILCAST_LENGTH = 700
 local MAX_EDITOR_DRAW_LEVEL = 250000
-local MAX_PARTICLE_DRAW_LEVEL = 200000
-local DRAW_LEVEL_OVERLAY_EFFECT = MAX_PARTICLE_DRAW_LEVEL * 1.2
+-- REPLACED WITH LOCAL NUMBERS FOR PERF
+-- local MAX_PARTICLE_DRAW_LEVEL = 200000
+local DRAW_LEVEL_OVERLAY_EFFECT = 200000 * 1.2
 local MAX_PARTICLE_INIT_TIME = 2000
 local MAX_RETICLE_DISTANCE = 100000
 local MAX_RETICLE_RADIUS = 70
@@ -131,7 +132,7 @@ local DEFAULT_PARAM_TITLE_TEXT = "Type a title"
 
 EHT.Effects.MAX_EFFECTS = MAX_EFFECTS
 EHT.Effects.MAX_EDITOR_DRAW_LEVEL = MAX_EDITOR_DRAW_LEVEL
-EHT.Effects.MAX_PARTICLE_DRAW_LEVEL = MAX_PARTICLE_DRAW_LEVEL
+EHT.Effects.MAX_PARTICLE_DRAW_LEVEL = 200000
 
 
 EHT.EffectType.CATEGORY = {
@@ -3603,7 +3604,7 @@ function EHT.Particle:AutoUpdateDrawLevel( cameraChanged, cacheOnly )
 			end
 		end
 
-		local distance = zo_clamp( MAX_PARTICLE_DRAW_LEVEL - minDistance + ( self.EffIndex or 0 ), 1, MAX_PARTICLE_DRAW_LEVEL )
+		local distance = zo_clamp( 200000 - minDistance + ( self.EffIndex or 0 ), 1, 200000 )
 		if 1 < self.EffIndex then
 			if self.PredecessorRelativeDrawLevel or self.Effect.EffectType.OrderDrawLevelByIndex then
 				local pred = self.Effect.Particles[self.EffIndex - 1]
@@ -6320,7 +6321,6 @@ do
 
 		isUpdatingEffect = true
 
-		local sticky = self:GetStickyParticlesEnabled()
 		local x, y, z, pitch, yaw, roll = self:GetPositionAndOrientation()
 		local offsetX, offsetY, offsetZ, offsetPitch, offsetYaw, offsetRoll
 		local offsetOrientation = 0 ~= yaw or 0 ~= pitch or 0 ~= roll
@@ -6332,7 +6332,7 @@ do
 			for index = 1, #self.Particles do
 				local p = self.Particles[index]
 
-				if p.AutoPositionEnabled and ( not sticky or not p.X ) then
+				if p.AutoPositionEnabled then
 					local offsetX, offsetY, offsetZ = p:GetPositionOffsetValues()
 					local offsetPitch, offsetYaw, offsetRoll = p:GetOrientationOffsets()
 
@@ -6544,14 +6544,6 @@ end
 function EHT.Effect:GetLuminosity()
 	local r, g, b = self:GetColor()
 	return 0.33333 * ( r + g + b )
-end
-
-function EHT.Effect:GetStickyParticlesEnabled()
-	return true == self.StickyParticlesEnabled
-end
-
-function EHT.Effect:SetStickyParticlesEnabled( enabled )
-	self.StickyParticlesEnabled = enabled
 end
 
 function EHT.Effect:GetAutoColorEnabled()
@@ -26128,7 +26120,23 @@ AddSkyEffect(
 -- /sc StartChatInput( tostring( GetTimeStamp() ) )
 EHT.EffectType:SetDefaultDateAdded( 1565156976 )
 
-local function AddStarCubeEffect( id, name, texture, numP, size, interval, randomize )
+local StarSizeOffsets =
+{
+	0.0080,
+	0.0075,
+	0.0090,
+	0.0100,
+	0.0085,
+	0.0070,
+}
+
+local function AddStarCubeEffect( id, name, texture, size, interval, randomize )
+	local rand = math.random
+	local numP = 27
+	local interval2 = interval * 2
+	local interval02 = interval * 0.2
+	local interval04 = interval * 0.4
+
 	return EHT.EffectType:New( id, name, {
 		Category = CAT.ANIM,
 		CanPitch = true,
@@ -26137,49 +26145,60 @@ local function AddStarCubeEffect( id, name, texture, numP, size, interval, rando
 		ResetOnPosition = true,
 
 		Init = function( self )
+			local ft = FrameTime
+			local ftBase = rand(0, interval)
 			self.Alphas = { }
-
-			if randomize then
-				self:SetStickyParticlesEnabled( true )
-			end
 
 			for index = 1, numP do
 				local m = index % 6
 				local c = 1 - ( m / 12 )
+				local pp = index / numP
 				local p
-
 				if "string" == type( texture ) then
 					p = self:AddParticle( texture,	0, 0, 0,	0, 0, 0,	c, c, c, 0,		0, 0,	true, false, false )
 				else
 					p = self:AddParticle( texture[1 + ( index % #texture )],	0, 0, 0,	0, 0, 0,	c, c, c, 0,		0, 0,	true, false, false )
 				end
 
+				local sizeOffset = size
+				if "table" == type( sizeOffset ) then
+					sizeOffset = sizeOffset[ 1 + ( index % #sizeOffset ) ]
+				end
+				sizeOffset = 0.5 * sizeOffset + sizeOffset * pp
+				p:SetSizeOffsets( sizeOffset, sizeOffset )
+				p.SizeOffset = sizeOffset
+				p.BaseSizeOffset = sizeOffset
+
+				local colorOffset = 0.5 + 0.5 * pp
+				p:SetColorOffsets( colorOffset, colorOffset, colorOffset, 0 )
 				p:SetSampleProcessing( 1.5, 0 )
+
+				local intervalOffset = ftBase + interval * ( ( pp * 2.5 ) % 1 )
+				p.IntervalStart, p.Interval = ft + intervalOffset, interval
 			end
 
-			if not randomize then
-				local axisP = 4
-				local numP = axisP * axisP * axisP
-				local ux, uy, uz = 1 / axisP, 1 / axisP, 1 / axisP
-				local ox, oy, oz = -0.5 * ux, -0.5 * uy, -0.5 * uz
-				local bx, by, bz = -0.5 - ox, -0.5 - oy, -0.5 - oz
-				local ps = self.Particles
-				local index = 1
+			local numPerAxis = 3
+			local maxAxisIndex = numPerAxis - 1
+			local numP = numPerAxis * numPerAxis * numPerAxis
+			local ux, uy, uz = 1 / numPerAxis, 1 / numPerAxis, 1 / numPerAxis
+			local ux2, uy2, uz2 = 0.5 * ux, 0.5 * uy, 0.5 * uz
+			local ux4, uy4, uz4 = 0.25 * ux, 0.25 * uy, 0.25 * uz
+			local ps = self.Particles
+			local index = 1
 
-				for ix = 1, axisP do
-					for iy = 1, axisP do
-						for iz = 1, axisP do
-							local p = ps[index]
-							if not p then break end
+			for ix = 0, maxAxisIndex do
+				for iy = 0, maxAxisIndex do
+					for iz = 0, maxAxisIndex do
+						local p = ps[index]
+						if not p then break end
 
-							p:SetSizeOffsets( size, size )
-							p:SetPositionOffsets(
-								bx + ox + ux * ( ix - 1 ) + ux * math.random(),
-								by + oy + uy * ( iy - 1 ) + uy * math.random(),
-								bz + oz + uz * ( iz - 1 ) + uz * math.random() )
+						p.AlphaOffset = 1 + ( index % 3 )
+						p:SetPositionOffsets(
+							ix * ux + ux4 + ux2 * rand() - 0.5,
+							iy * uy + uy4 + uy2 * rand() - 0.5,
+							iz * uy + uz4 + uz2 * rand() - 0.5 )
 
-							index = index + 1
-						end
+						index = index + 1
 					end
 				end
 			end
@@ -26194,83 +26213,35 @@ local function AddStarCubeEffect( id, name, texture, numP, size, interval, rando
 		Update = function( self )
 			local ft = FrameTime
 			local ps = self.Particles
-			local sc = 1 + 1 - self:GetLuminosity()
+			local baseAlpha = self:GetAlpha() or 1
 
 			if randomize then
-				local minInterval, maxInterval = 0.65 * interval, interval
-				local numP = #ps
-
-				for index = 1, numP do
-					local p = ps[index]
-					local pp = index / numP
-
-					if not p.IntervalOffset or ( p.IntervalOffset + p.Interval ) <= ft then
-						p.Interval = math.random( minInterval, maxInterval )
-						p.IntervalOffset = ft
-						p.ColorOffset = 0.6 + 0.5 * pp
-						local s = size
-						if "table" == type( s ) then s = s[ 1 + ( index % #s )] end
-						p.SizeOffset = sc * ( 0.5 * s + s * pp )
-						p:SetColorOffsets( p.ColorOffset, p.ColorOffset, p.ColorOffset, int )
-						p:SetPositionOffsets( -0.49 + 0.98 * math.random(), -0.49 + 0.98 * math.random(), -0.49 + 0.98 * math.random() )
-						p:SetTextureRotation( math.rad( math.random( 360 ) ) )
-					end
-
-					local int = GetEasedLoopInterval( p.Interval, p.IntervalOffset )
-					local s = int * 0.5 * p.SizeOffset + 0.5 * p.SizeOffset
-					p:SetColorOffsets( nil, nil, nil, 3 * int )
-					p:SetSizeOffsets( int * p.SizeOffset, int * p.SizeOffset )
-					p:SetSampleProcessing( ( 2 - pp ) * int )
+				for index, p in ipairs( ps ) do
+					local i = ( GetLoopInterval( p.Interval, p.IntervalStart ) - 0.66 ) * 3.0
+					p:SetAlpha( baseAlpha * i )
 				end
 			else
 				local alphas = self.Alphas
-				alphas[1] = 0.4 + 0.3 * GetEasedInterval( interval )
-				alphas[2] = 0.4 + 0.4 * GetEasedInterval( interval, 0.4 * interval )
-				alphas[3] = 0.5 + 0.3 * GetEasedInterval( 2 * interval, 0.2 * interval )
-				alphas[4] = 0.4 + 0.5 * GetEasedInterval( 2 * interval, 0.1 * interval )
-				alphas[5] = 0.5 * alphas[3] + 0.5 * alphas[4]
-				alphas[6] = 0.2 * alphas[1] + 0.8 * alphas[2]
+				alphas[1] = baseAlpha * ( 0.1 + 0.6 * GetLoopInterval( interval ) )
+				alphas[2] = baseAlpha * ( 0.8 * GetLoopInterval( interval, interval04 ) )
+				alphas[3] = baseAlpha * ( 0.2 + 0.8 * GetLoopInterval( interval2, interval02 ) )
 
 				for index, p in ipairs( ps ) do
-					local m = 1 + ( index % 6 )
-					p:SetColorOffsets( nil, nil, nil, alphas[m] )
+					p:SetAlpha( alphas[ p.AlphaOffset ] )
 				end
 			end
-
-			self:Update()
 		end,
 
 		Reset = function( self )
 			local ps = self.Particles
-			local sx, _, sy = self:GetSize()
-
-			sy, sz = sx, sx
-			self:SetSize( sx, sy, sz )
+			local sx = self:GetSize()
+			self:SetSize( sx, sx, sx )
 
 			if not randomize then
-				local sizeX, sizeY
 				local c = 1 + 1 - self:GetLuminosity()
-
 				for index, p in ipairs( ps ) do
-					local m = index % 8
-
-					if 0 == m then
-						p:SetSizeOffsets( c * 0.008, c * 0.008 )
-					elseif 1 == m then
-						p:SetSizeOffsets( c * 0.01, c * 0.01 )
-					elseif 2 == m then
-						p:SetSizeOffsets( c * 0.006, c * 0.006 )
-					elseif 3 == m then
-						p:SetSizeOffsets( c * 0.0065, c * 0.0065 )
-					elseif 4 == m then
-						p:SetSizeOffsets( c * 0.005, c * 0.0005 )
-					elseif 5 == m then
-						p:SetSizeOffsets( c * 0.0085, c * 0.0085 )
-					elseif 6 == m then
-						p:SetSizeOffsets( c * 0.009, c * 0.009 )
-					elseif 7 == m then
-						p:SetSizeOffsets( c * 0.007, c * 0.007 )
-					end
+					local sizeOffset = c * StarSizeOffsets[ 1 + (index % 6) ]
+					p:SetSizeOffsets( sizeOffset, sizeOffset )
 				end
 			end
 
@@ -26279,7 +26250,7 @@ local function AddStarCubeEffect( id, name, texture, numP, size, interval, rando
 	} )
 end
 
-AddStarCubeEffect( 897, "Star Cube", TEXTURES.CIRCLE_SOFT, 64, 0.01, 3400 )
+AddStarCubeEffect( 897, "Star Cube", TEXTURES.CIRCLE_SOFT, 0.01, 3400 )
 --[[
 do
 	local function GetAlphaInterp( self, h, m )
@@ -27434,7 +27405,7 @@ do
 	AddEyesEffect( 921, "Eyes, Watchful", TEXTURES.EYES_2, TEXTURES.EYES_2_GLOW, 20, 5, 0.9, 0.9, 0.9, 0, 1, 0, 0.35 )
 end
 
-AddStarCubeEffect( 923, "Dazzling", { TEXTURES.CIRCLE_SOFT, TEXTURES.CIRCLE_SOFT_2, TEXTURES.STARBURST_2, TEXTURES.CIRCLE_SOFT_2, TEXTURES.STARBURST_1 }, 60, { 0.005, 0.01, 0.022, 0.008, 0.016 }, 1200, true )
+AddStarCubeEffect( 923, "Dazzling", { TEXTURES.CIRCLE_SOFT, TEXTURES.CIRCLE_SOFT_2, TEXTURES.STARBURST_2, TEXTURES.CIRCLE_SOFT_2, TEXTURES.STARBURST_1 }, { 0.005, 0.01, 0.022, 0.008, 0.016 }, 4000, true )
 
 do
 	local LERP_INTERVAL = 1000

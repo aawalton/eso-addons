@@ -14,8 +14,8 @@ FurC.EventItems[FURC_DRAGONS] = {
   ["Jester Festival"] = {
     ["Jester Boxes"] = {
       [134680] = true,   -- Jester Box
-    }
-  }
+    },
+  },
 }
 
 FurC.EventItems[FURC_MORROWIND] = {
@@ -34,7 +34,6 @@ FurC.EventItems[FURC_MORROWIND] = {
   ["New Life"] = {
     ["Gift Box"] = {      
       [118053] = true,   -- Common Campfire, Outdoor
-      [130326] = true,   -- Witches Brazier, Primitive Log,
     },
   },
 }
@@ -44,8 +43,8 @@ FurC.EventItems[FURC_KITTY] = {
     ["Plunder Skull"] = {    
       [118149] = true,		   -- Block and Axe, Chopping
       [145317] = true,       -- Gravestone, Broken
-    }
-  }
+    },
+  },
 }
 
 FurC.EventItems[FURC_REACH] = {
@@ -61,7 +60,7 @@ FurC.EventItems[FURC_REACH] = {
       [130339] = true,   -- Witches Totem, Twisted Vines and Skull
       [130338] = true,   -- Witches Bones, Offering,
       [145318] = true,   -- Small Gravestone
-      [130302] = GetString(SI_FURC_WW),   -- Shrub, Burnt Brush"
+      [130302] = GetString(SI_FURC_WW),   -- Shrub, Burnt Brush
       [130298] = GetString(SI_FURC_WW),  -- Branch, Curved Laurel
       [130296] = GetString(SI_FURC_WW),  -- Branch, Sturdy Laurel
       [130295] = GetString(SI_FURC_WW),  -- Branch, Sturdy Burnt
@@ -72,8 +71,8 @@ FurC.EventItems[FURC_REACH] = {
       [130300] = GetString(SI_FURC_WW),  -- Saplings, Burnt Tall
       [130297] = GetString(SI_FURC_WW),  -- Branch, Forked Laurel
       [130280] = GetString(SI_FURC_WW),  -- Sapling, Petrified Ashen
-    }
-  }
+    },
+  },
 }
 
 FurC.EventItems[FURC_HARROW] = {
@@ -85,6 +84,44 @@ FurC.EventItems[FURC_HARROW] = {
       [159467] = { itemPrice = 3 }, -- Replica Jubilee Cake 2019
       [159470] = { itemPrice = 3 }, -- Replica Jubilee Cake 2020
       [171601] = { itemPrice = 3 }, -- Replica Jubilee Cake 2021
-    }
-  }
+    },
+  },
+}
+
+FurC.EventItems[FURC_DEADL] = {
+ ["Bounties of Blackwood"] = { -- 2021-9-30 - 2021-10-12
+	["Impressario"] = {
+	  [181488] = { itemPrice = 5 },-- Statue, Saint Kaladas
+	},
+  },
+ 
+ ["Witches' Festival"] = {
+	["Plunder Skull"] = {
+	  [178799] = true,   -- Ruby Candlefly Gathering,
+	  [181491] = true, 	 -- Vampiric Lightpost, Azure Double,
+      [181490] = true,   -- Vampiric Lightpost, Azure Single,
+      [181489] = true,   -- Vampiric Lamp, Azure Tall,
+	  [181494] = true,   -- Vampiric Container, Yellow Liquid,
+      [181492] = true,   -- Vampiric Flask Stand, Double,
+	  [181493] = true,   -- Vampiric Container, Congealed Liquid,
+	  
+	  -- update 12-1-21
+	  [130316] = true,   -- Pumpkin, Frail
+	  [130317] = true,   -- Pumpkin, Sickly
+      [130318] = true,   -- Crop, Wheat Pile
+      [130319] = true,   -- Crop, Wheat Stack
+      [130322] = true,   -- Tool, Harvest Scythe
+	  [130326] = true,   -- Witches Brazier, Primitive Log,
+      [125670] = true,   -- Toadstool, Bloodtooth
+      [125671] = true,   -- Toadstool, Bloodtooth Cap
+      [125672] = true,   -- Toadstool, Bloodtooth Cluster	  
+      [125595] = true,   -- Mushroom, Poison Pax Shelf
+      [125596] = true,   -- Mushroom, Poison Pax Stool
+      [125590] = true,   -- Mushrooms, Lavaburst Cluster
+	  [125589] = true,	 -- Mushroom, Lavaburst Bud
+	  [125598] = true,	 -- Mushroom, Emerging Stinkhorn
+	  [125583] = true,	 -- Mushroom, Cave Bracket
+	  [120878] = true,	 -- Gravestone, Ornamented
+	  },
+  },
 }

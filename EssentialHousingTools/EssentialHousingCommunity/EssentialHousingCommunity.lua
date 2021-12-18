@@ -76,7 +76,14 @@ C.SAVED_VARS_FILE = "EssentialHousingCommunitySavedVars"
 C.SAVED_VARS_DEFAULTS = { PublicRecords = { } }
 
 C.RECORD_MAX_LENGTH = 699990
-C.RECORD_TYPES = { fx = "FX", oh = "Open House", gb = "Guest Journal", cr = "Contest Registration" }
+C.RECORD_TYPES =
+{
+	fx = "FX",
+	oh = "Open House",
+	gb = "Guest Journal",
+	cr = "Contest Registration",
+	sc = "Streamer Channel",
+}
 
 C.MAX_CONNECTION_MESSAGE_AGE_SECONDS = 60 * 60 * 24
 C.MAX_RELOAD_UI_SECONDS = 45
@@ -786,28 +793,65 @@ end
 function C.DumpRecordTypes()
 	local ids, list = { }, { }
 
-	for key in pairs( C.Records ) do
-		local id = string.match( key, "^(%w%w)__" )
-
+	for key, data in pairs( C.Records ) do
+		local id = string.match( key, "^(%w+)__" )
 		if id then
-			ids[id] = ( ids[id] or 0 ) + 1
+			local dataLength = 0
+			if "string" == type( data ) then
+				dataLength = #data
+			else
+				dataLength = C.EstimateRecordSize( key )
+			end
+
+			local item = ids[id]
+			if item then
+				item[1] = item[1] + 1
+				item[2] = item[2] + dataLength
+			else
+				item =
+				{
+					1,
+					dataLength,
+				}
+				ids[id] = item
+			end
 		end
 	end
 
-	local totalCount = 0
+	local totalCount, totalDataLength = 0, 0
 
-	for id, count in pairs( ids ) do
-		table.insert( list, { id, count } )
+	for id, idItem in pairs( ids ) do
+		local count, dataLength = idItem[1], idItem[2]
+		local item =
+		{
+			string.lower( C.GetRecordTypeName( id ) or string.format( "%q", id or "" ) ),
+			count,
+			dataLength,
+		}
+		table.insert( list, item )
 		totalCount = totalCount + count
+		totalDataLength = totalDataLength + dataLength
 	end
 
 	table.sort( list, function( a, b ) return a[1] < b[1] end )
-
-	for index = 1, #list do
-		df( "%s %s records\n", tostring( list[index][2] ), C.GetRecordTypeName( list[index][1] ) or "" )
+	
+	local function GetDataLengthDescription( dataLength )
+		if dataLength >= 10240 then
+			return string.format( "%dKb", dataLength / 1024 )
+		else
+			return string.format( "%.2fKb", dataLength / 1024 )
+		end
 	end
 
-	df( "\n%d total records", totalCount )
+	for index, item in ipairs( list ) do
+		local recordTypeName, count, dataLength = item[1], item[2], item[3]
+		recordTypeName = recordTypeName .. " " .. string.rep( "_", 24 - #recordTypeName )
+		local dataLengthDescription = GetDataLengthDescription( dataLength )
+
+		df( " %s %d rec (%s)\n", recordTypeName, count, dataLengthDescription )
+	end
+
+	df( "\n%d total rec (%s)", totalCount, GetDataLengthDescription( totalDataLength ) )
 end
 
 function C.DumpStats()

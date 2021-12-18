@@ -2,8 +2,8 @@
 ## Description: Join thousands of players in the largest Housing Community for The Elder Scrolls Online, tour their homes, showcase your own and see who stopped by... all in one central hub.
 ## Author: @Architectura @Cardinal05
 ## APIVersion: 101031
-## AddOnVersion: 1766
-## Version: 1766
+## AddOnVersion: 1767
+## Version: 1767
 ## SavedVariables: HousingHubSavedVars
 ## DependsOn: EssentialHousingCommunity LibAddonMenu-2.0
 ## OptionalDependsOn: DecoTrack

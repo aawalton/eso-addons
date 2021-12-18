@@ -1303,20 +1303,7 @@ function EHT.Setup.SetupSettingsMenu()
 		default = EHT.SAVED_VARS_DEFAULTS.DirectionalControlsFocusPositionEditor,
 		disabled = function() return false end,
 	} )
---[[
-	table.insert( options, {
-		type = "checkbox",
-		name = "Auto-level manually placed \"sittable\" items",
-		tooltip = "When toggled ON, chairs, sofas and other \"sittable\" furnishings will automatically be made level " ..
-			"(parallel to the floor) after you manually place or move them. This aids in placing the furnishing in a " ..
-			"position that is interactive (|c00ff00green highlight|r).\n\n" ..
-			"NOTE: Furnishings must still be placed directly on the floor surface or they will remain non-interactive (|cff0000red highlight|r).",
-		getFunc = function() return false ~= EHT.SavedVars.AutoLevelInteractives end,
-		setFunc = function(value) EHT.SavedVars.AutoLevelInteractives = value end,
-		default = true,
-		disabled = function() return false end,
-	} )
-]]
+
 	table.insert( options, {
 		type = "custom",
 	} )
@@ -1398,7 +1385,9 @@ function EHT.Setup.SetupSettingsMenu()
 		getFunc = function() return EHT.GetSetting( "MinimumWindowOpacity" ) end,
 		setFunc = function(value)
 			EHT.SavedVars.MinimumWindowOpacity = value
-			EHT.UI.ToolDialogAlpha()
+			if EHT.UI and EHT.UI.SetupToolDialog() then
+				EHT.UI.ToolDialogAlpha()
+			end
 		end,
 		default = 65,
 		disabled = function() return false end,
@@ -1413,7 +1402,9 @@ function EHT.Setup.SetupSettingsMenu()
 		getFunc = function() return EHT.GetSetting( "RetainEditButtonVisibility" ) end,
 		setFunc = function(value)
 			EHT.SavedVars.RetainEditButtonVisibility = value
-			EHT.UI.UpdateEditButtonVisibility()
+			if EHT.UI and EHT.UI.SetupToolDialog() then
+				EHT.UI.UpdateEditButtonVisibility()
+			end
 		end,
 		default = false,
 		disabled = function() return false end,
@@ -1428,7 +1419,9 @@ function EHT.Setup.SetupSettingsMenu()
 		getFunc = function() return EHT.GetSetting( "SelectionListFontSize" ) end,
 		setFunc = function(value)
 			EHT.SavedVars.SelectionListFontSize = value
-			EHT.UI.RefreshSelectionListAppearance()
+			if EHT.UI and EHT.UI.SetupToolDialog() then
+				EHT.UI.RefreshSelectionListAppearance()
+			end
 		end,
 		default = "Standard",
 		disabled = function() return false end,
