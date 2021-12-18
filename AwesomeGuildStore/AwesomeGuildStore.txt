@@ -1,8 +1,8 @@
 ## Title: AwesomeGuildStore
 ## Author: sirinsidiator
-## Version: 1.5.5
-## APIVersion: 100035
-## AddOnVersion: 2751
+## Version: 1.5.6
+## APIVersion: 101031 101032
+## AddOnVersion: 2763
 ## DependsOn: LibCustomMenu>=680 LibDebugLogger>=196 LibDateTime>=28 LibAddonMenu-2.0>=31 LibMapPing>=900 LibGPS>=17 LibPromises>=10 LibTextFilter>=10 LibGetText>=10 LibChatMessage>=87
 ## OptionalDependsOn: LibFilters-3.0>=312 LibCustomTitles LibAnnyoingUpdateNotificationInGame CraftedPotions>=20
 ## SavedVariables: AwesomeGuildStore_Data
@@ -86,9 +86,6 @@ backend/filter/ItemCategoryFilter.lua
 backend/filter/PriceFilter.lua
 backend/filter/LevelFilter.lua
 backend/filter/UnitPriceFilter.lua
-backend/filter/UnitValueFilter.lua
-backend/filter/TotalValueFilter.lua
-backend/filter/TotalCountFilter.lua
 backend/filter/QualityFilter.lua
 backend/filter/TextFilter.lua
 backend/filter/ItemStyleFilter.lua

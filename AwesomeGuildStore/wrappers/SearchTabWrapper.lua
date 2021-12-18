@@ -91,15 +91,6 @@ function SearchTabWrapper:InitializeFilters(tradingHouseWrapper)
     AGS:RegisterFilter(AGS.class.UnitPriceFilter:New())
     AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.UNIT_PRICE_FILTER))
 
-    AGS:RegisterFilter(AGS.class.UnitValueFilter:New())
-    AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.UNIT_VALUE_FILTER))
-
-    AGS:RegisterFilter(AGS.class.TotalValueFilter:New())
-    AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.TOTAL_VALUE_FILTER))
-
-    AGS:RegisterFilter(AGS.class.TotalCountFilter:New())
-    AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.TOTAL_COUNT_FILTER))
-
     AGS:RegisterFilter(AGS.class.QualityFilter:New())
     AGS:RegisterFilterFragment(AGS.class.QualityFilterFragment:New(FILTER_ID.QUALITY_FILTER))
 
