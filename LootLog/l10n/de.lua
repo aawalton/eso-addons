@@ -23,7 +23,8 @@ ZO_CreateStringId("SI_LOOTLOG_MODE4"             , "Wertvolles")
 ZO_CreateStringId("SI_LOOTLOG_MODE5"             , "Alles (nur eigenes Loot)")
 ZO_CreateStringId("SI_LOOTLOG_MODE6"             , "Alles")
 
-ZO_CreateStringId("SI_LOOTLOG_HISTORY_LABEL"     , "Loot Übersicht der letzten %d Std. (|c336699|l0:1:1:1:1:336699|lÄndern/Zurücksetzen|l|r)")
+ZO_CreateStringId("SI_LOOTLOG_HISTORY_LABEL"     , "Loot Übersicht der letzten %d Std. (|c336699|l0:1:1:1:1:336699|lÄndern|l|r)")
+ZO_CreateStringId("SI_LOOTLOG_CHATCOMMANDS_LINK" , "Willst du Set Gegenstände binden oder teilen? |c336699|l0:1:1:1:1:336699|lChat Befehle|l|r")
 
 ZO_CreateStringId("SI_LOOTLOG_CHATCOMMANDS"      , "Chat Befehle")
 ZO_CreateStringId("SI_LOOTLOG_LINKTRADE"         , "Überschüssige Gegenstände linken")
@@ -37,6 +38,8 @@ ZO_CreateStringId("SI_LOOTLOG_TRADE_OVERFLOW"    , "Übrige Gegenstände: %d")
 ZO_CreateStringId("SI_LOOTLOG_BIND_COMPLETED"    , "%d Gegenstände gebunden%s")
 ZO_CreateStringId("SI_LOOTLOG_BIND_OVERFLOW"     , "Übrige Gegenstände: %d; bitte kurz warten um den „zu viele Nachrichten“ Disconnect zu vermeiden, und dann den Befehl |c00CCFF/binduncollected|r fürs Binden der restlichen Gegenstäde aufrufen.")
 ZO_CreateStringId("SI_LOOTLOG_BIND_SHOW"         , "Gegenstände anzeigen")
+ZO_CreateStringId("SI_LOOTLOG_AUTOBIND_ON"       , "Nicht gesammelte Set Gegenstände werden für die nächsten %d Minuten automatisch gebunden.")
+ZO_CreateStringId("SI_LOOTLOG_AUTOBIND_OFF"      , "Nicht gesammelte Set Gegenstände werden nicht mehr automatisch gebunden.")
 
 ZO_CreateStringId("SI_LOOTLOG_SECTION_HISTORY"   , "Übersicht")
 ZO_CreateStringId("SI_LOOTLOG_SECTION_CHAT"      , "Loot Benachrichtigungen im Chat")

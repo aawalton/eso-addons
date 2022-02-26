@@ -132,6 +132,10 @@
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)List" offsetX="300" offsetY="6" />
 				</Control>
 
+				<Control name="$(parent)ServerDrop" inherits="ExtendedJournalFooterComboBox" hidden="true">
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)List" offsetX="600" offsetY="6" />
+				</Control>
+
 				<Label name="$(parent)Counter" inherits="ExtendedJournalFooterLabel" horizontalAlignment="RIGHT">
 					<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)List" offsetY="6" />
 				</Label>

@@ -8,6 +8,11 @@ internal.savedVars = savedVars
 
 local BLANK_SAVED_VARS = LOST_TREASURE_BLANK_SAVED_VARS
 
+local function HasUpdatedPath(path)
+	local pathLower = path:lower()
+	return path:find("EsoUI") ~= nil or path:find("LibTreasure") ~= nil
+end
+
 local function GetTexturePath(index)
 	local textures = LibTreasure_GetIcons()
 	local numTextures = #textures
@@ -18,7 +23,6 @@ local function GetTexturePath(index)
 	logger:Debug("numTextures: %d, index: %d, texture: \"%s\"", numTextures, index, texture)
 	return texture
 end
-
 
 savedVars.DEFAULTS =
 {
@@ -59,6 +63,10 @@ savedVars.DEFAULTS =
 		APITimeStamp = BLANK_SAVED_VARS,
 		data = { },
 	},
+	misc =
+	{
+		hasNewIconPath = false,
+	},
 }
 
 function savedVars:Initialize()
@@ -68,8 +76,21 @@ function savedVars:Initialize()
 		:Version(20, function(savedVarsTable)
 			ZO_ClearTable(savedVarsTable)
 		end)
-		-- :RemoveSettings(10, "*")
 
+	-- update icons
+	-- This can be removed few versions later
+	if self.db.misc.hasNewIconPath == false then
+		logger:Debug("The addon has to update the old icon path to the new one. Update initializing...")
+		for pinType, settings in pairs(self.db.pinTypes) do
+			local texture = self:GetNewTexturePath(settings.texture, pinType)
+			self.db.pinTypes[pinType].texture = texture
+		end
+		self.db.misc.hasNewIconPath = true
+	else
+		logger:Debug("The addon refers to LibTreasure already")
+	end
+
+	-- debug
 	logger:Debug("initialized")
 end
 
@@ -79,4 +100,26 @@ end
 
 function savedVars:GetDefaults()
 	return self.DEFAULTS
+end
+
+function savedVars:GetNewTexturePath(path, pinType)
+	local textures = LibTreasure_GetIcons()
+	local utilities = internal.utilities
+	local fileName = utilities:GetFileNameFromPath(path)
+	for i, value in ipairs(textures) do
+		if utilities:DoesPathContainsFileName(value, fileName) then
+			local iconPath = textures[i]
+			logger:Debug("Use new iconPath, path: %s", iconPath)
+			-- save the icon into savedVars
+			local db = self:GetSavedVars()
+			db.pinTypes[pinType].texture = iconPath
+			return iconPath
+		end
+	end
+
+	-- return default value as a fallback
+	local defaults = self:GetDefaults()
+	local iconPath = defaults.pinTypes[pinType].texture
+	logger:Debug("Use default iconPath, path: %s", iconPath)
+	return iconPath
 end

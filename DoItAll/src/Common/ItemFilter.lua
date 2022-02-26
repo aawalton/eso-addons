@@ -36,8 +36,6 @@ end
 
 --Is item saved by FCOItemSaver?
 local function IsItemSavedByFCOItemSaver(slot)
---local itemLink = GetItemLink(data.bagId, data.slotIndex)
---d("[DoItAll]bag: " .. tostring(data.bagId) .. ", slot: " .. tostring(data.slotIndex) .. ", " .. itemLink .. ", FCOIS loaded: " .. tostring(FCOISisLoaded) .. ", deconHandlerSupported: " .. tostring(FCOISdeconHandlerSupported) .. ", respectItemSavers: " .. tostring(respectItemSavers) .. ", useFCOISPanelAntiSettings: " ..tostring(useFCOISPanelAntiSettings))
     --FCOItemSaver addon is not loaded?
     if not FCOISisLoaded then return false end
 	local settings = DoItAll.Settings
@@ -46,13 +44,18 @@ local function IsItemSavedByFCOItemSaver(slot)
     if not respectItemSavers then return false end
     --if not useFCOISPanelAntiSettings then return false end
 	local retVar = false
+	local data = slot.data
 	--Is the new FCOIS DeconstructionSelectionHandler supported?
     --FCOItemSaver "current panel" (Deconstruction, Refinement) checks should be used to allow some marker icons to be deconstructed/extracted, depending on the current settings within FCOIS?
-    local data = slot.data
     local useFCOISPanelAntiSettings = settings.GetUseFCOISFilterPanelChecks()
+
+	local itemLink = GetItemLink(data.bagId, data.slotIndex)
+--d("[DoItAll]bag: " .. tostring(data.bagId) .. ", slot: " .. tostring(data.slotIndex) .. ", " .. itemLink .. ", FCOIS loaded: " .. tostring(FCOISisLoaded) .. ", respectItemSavers: " .. tostring(respectItemSavers) .. ", useFCOISPanelAntiSettings: " ..tostring(useFCOISPanelAntiSettings))
+
 	if useFCOISPanelAntiSettings then
 		--Are we inside the refinement panel? Then abort here directly
 		if DoItAll.IsShowingRefinement() then
+--d(">refinement")
 		--	Get the marked icons on the item that will be deconstructed
 			local isAnyIconMarked, markedArray
 			--FCOItemSaver version >= 1.0
@@ -60,10 +63,11 @@ local function IsItemSavedByFCOItemSaver(slot)
 --d(">> Refinement, marked: " .. tostring(isAnyIconMarked))
 			return isAnyIconMarked
 		else
+--d(">deconstruction/enchanting extract")
 			--Call the FCOItemSaver DeconstructionSelectionHandler
 			--FCOIS.callDeconstructionSelectionHandler(bag, slot, echo, overrideChatOutput, suppressChatOutput, overrideAlert, suppressAlert, calledFromExternalAddon, panelId)
 			--IMPORTANT: parameter "calledFromExternalAddon" MUST be set to true in order to let this function call work here !!!
-			retVar = FCOIS.callDeconstructionSelectionHandler(data.bagId, data.slotIndex, false, false, true, false, true, true, nil) -- Leave panel ID empty so Decon and Decon Jewelry can be distinguished automatically!
+			retVar = FCOIS.callDeconstructionSelectionHandler(data.bagId, data.slotIndex, false, false, true, false, true, true, nil) -- Do not send actual panel ID of FCOIS so Enchanting Extract, Decon and Decon Jewelry can be distinguished automatically!
 		end
     else
 		--Use old checks
@@ -106,10 +110,11 @@ end
 function DoItAll.ItemFilter:Filter(slot, filterWhere)
 	filterWhere = filterWhere or ""
 	local isFilteredFCOIS, isFilteredIS, isFilteredBank = false, false, false
-	isFilteredFCOIS = IsItemSavedByFCOItemSaver(slot)
+	isFilteredFCOIS = FCOIS ~= nil and IsItemSavedByFCOItemSaver(slot)
 	if not isFilteredFCOIS then
-		isFilteredIS = IsItemSavedByItemSaver(slot)
+		isFilteredIS = ItemSaver_IsItemSaved ~= nil and IsItemSavedByItemSaver(slot)
 	end
+--d(">isFilteredFCOIS: " ..tostring(isFilteredFCOIS))
 	if filterWhere ~= nil and filterWhere ~= "" then
 		if filterWhere == "BANK_DEPOSIT" then
 			isFilteredBank = canBeMovedToBank(slot)

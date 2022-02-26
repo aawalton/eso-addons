@@ -963,7 +963,7 @@ function lib.IsSetByItemLink(itemLink)
     local isSet, setName, setId, numBonuses, numEquipped, maxEquipped = checkSet(itemLink)
     if not isSet then
         --Maybe it is a set with no ESO setId, but an own defined setId
-        isSet, setName, setId, numBonuses, numEquipped, maxEquipped = checkNoSetIdSet(itemId)
+        isSet, setName, setId, numBonuses, numEquipped, maxEquipped = checkNoSetIdSet(GetItemLinkItemId(itemLink))
     end
     return isSet, setName, setId, numBonuses, numEquipped, maxEquipped
 end
@@ -1818,6 +1818,33 @@ function lib.GetSetEquipTypes(setId)
     end
     --Return the equipTypesOfSet table
     return equipTypesOfSet
+end
+
+
+--Returns the id number of the set nameprovided
+--> Parameters: setName String: The set's name
+--> lang String: The language to check for. Can be left empty and the client language will be used then
+--> Returns:  NILABLE number setId, NILABLE table setNames
+function lib.GetSetByName(setName, lang)
+    lang = lang or lib.clientLang
+    lang = string.lower(lang)
+    if not lib.supportedLanguages[lang] then return end
+    if not lib.checkIfSetsAreLoadedProperly() then return end
+    local setNamesNonESO = preloaded[LIBSETS_TABLEKEY_SETNAMES_NO_SETID]
+    local setNames = preloaded[LIBSETS_TABLEKEY_SETNAMES]
+    for setId, namesOfSets in pairs(setNames) do
+        local setNameInLanguageToSearch = namesOfSets[lang]
+        if setNameInLanguageToSearch ~= nil and setNameInLanguageToSearch == setName then
+            return setId, namesOfSets
+        end
+    end
+    for setId, namesOfSetsNonESO in pairs(setNamesNonESO) do
+        local setNameNonESOInLanguageToSearch = namesOfSetsNonESO[lang]
+        if setNameNonESOInLanguageToSearch ~= nil and setNameNonESOInLanguageToSearch == setName then
+            return setId, namesOfSetsNonESO
+        end
+    end
+    return nil
 end
 
 

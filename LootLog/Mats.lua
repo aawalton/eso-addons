@@ -84,8 +84,7 @@ function LootLogMats:Setup( )
 
 	self.searchBox = self.frame:GetNamedChild("SearchFieldBox")
 	self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
-	self.search = ZO_StringSearch:New()
-	self.search:AddProcessor(SORT_TYPE, function(...) return self:ProcessItemEntry(...) end)
+	self.search = self:InitializeSearch(SORT_TYPE)
 
 	self:RefreshData()
 end

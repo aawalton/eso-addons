@@ -398,6 +398,7 @@ L.Alerts_Asylum_Storm_The_Heavens                = "Приближается |cF
 L.Alerts_Asylum_Eruption                         = "|c595959Eruption|r нацелена на тебя!"
 L.Alerts_Asylum_Eruption_Other                   = "|c595959Eruption|r нацелена на игрока |cFC0000<<!aC:1>>|r!"
 L.Alerts_Asylum_Gusts_Of_Steam                   = "Приближается |cFF9900Gusts Of Steam|r! СПРЯЧЬСЯ!"
+L.Alerts_Asylum_Pre_Gusts_Of_Steam               = "|cFF0000<<1>>%|r до |cFF9900прыжка|r! ГОТОВЬСЯ прятаться!"
 L.Alerts_Asylum_Trial_By_Fire                    = "Приближается |cFF5500Fire|r!"
 L.Alerts_Asylum_Protector_Spawn                  = "Появляется |c0000FFЗащитник|r!"
 L.Alerts_Asylum_Protector_Active                 = "|c0000FFЗащитник|r активирован!"

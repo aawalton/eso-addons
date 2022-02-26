@@ -22,6 +22,7 @@ ZO_CreateStringId("SI_LOOTLOG_MODE5"             , "All Loot (Personal)")
 ZO_CreateStringId("SI_LOOTLOG_MODE6"             , "All Logged")
 
 ZO_CreateStringId("SI_LOOTLOG_HISTORY_LABEL"     , "History Retention: %dh (|c336699|l0:1:1:1:1:336699|lChange/Clear|l|r)")
+ZO_CreateStringId("SI_LOOTLOG_CHATCOMMANDS_LINK" , "Want to bind or share set items? |c336699|l0:1:1:1:1:336699|lChat Commands|l|r")
 
 ZO_CreateStringId("SI_LOOTLOG_CHATCOMMANDS"      , "Chat Commands")
 ZO_CreateStringId("SI_LOOTLOG_LINKTRADE"         , "Link Surplus Set Items")
@@ -35,6 +36,8 @@ ZO_CreateStringId("SI_LOOTLOG_TRADE_OVERFLOW"    , "Items remaining: %d")
 ZO_CreateStringId("SI_LOOTLOG_BIND_COMPLETED"    , "Items bound: %d%s")
 ZO_CreateStringId("SI_LOOTLOG_BIND_OVERFLOW"     , "Items remaining: %d; to avoid message rate limit errors, wait briefly and use the |c00CCFF/binduncollected|r command again to bind the remaining items.")
 ZO_CreateStringId("SI_LOOTLOG_BIND_SHOW"         , "Show Items")
+ZO_CreateStringId("SI_LOOTLOG_AUTOBIND_ON"       , "Uncollected set items will be automatically bound for the next %d minutes.")
+ZO_CreateStringId("SI_LOOTLOG_AUTOBIND_OFF"      , "Uncollected set items will no longer be automatically bound.")
 
 ZO_CreateStringId("SI_LOOTLOG_SECTION_HISTORY"   , "History Data")
 ZO_CreateStringId("SI_LOOTLOG_SECTION_CHAT"      , "Loot Notifications in Chat")

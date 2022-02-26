@@ -79,6 +79,7 @@ quest giver.
 6706 = "Mettle and Stone", "Torn Journal Page",
 6730 =  "Courier's Folly", "Telofasa's Diary",
 6705 =  "Death Stalks the Weak", "Note for Khazasha",
+6728 =  "A Gem of a Mystery", "Mikget's To-Do List",
 
 ID   = Quest Name, Object for comments
 --]]
@@ -156,6 +157,7 @@ lib.questid_giver_lookup = {
     [6706] = 96004,
     [6730] = 96005,
     [6705] = 96006,
+    [6728] = 100209,
 }
 
 --[[ This list contains Prologue quests that can be
@@ -176,9 +178,13 @@ accepted anywhere
 [6629] = "A Visit to Elsweyr",
 [6701] = "An Apocalyptic Situation",
 [6687] = "Bounties of Blackwood",
+[6729] = "Guidance for Guides",
 ]]--
 lib.prologue_quest_list = {
-  4831, 5941, 6370, 5935, 6023, 6097, 6226, 6299, 6395, 6454, 6549, 6612, 6629, 6701, 6687,
+  4831, 5941, 6370, 5935, 6023, 6097, 6226, 6299, 6395, 6454, 6549, 6612, 6629, 6701, 6687, 6729,
+  --[[Jan 2022: Added for Companion Quests that can be accepted anywhere
+  ]]--
+  6662, 6664, 6666, 6667,
 }
 
 --[[ List of what the numbers mean
@@ -205,6 +211,9 @@ change it
 xx - xx : Quest ID 5102: "The Mage's Tower"
 5057 - First Mate Elvira Derre : Quest ID 1637: "Divert and Deliver",
 6624 - Tyree Marence : Quest ID 728: "Repair Koeglin Lighthouse"
+xxxx - Josajeh: Quest ID 6181: "Breaches On the Bay"
+xxxx - Gathwen: Quest ID 4625: "Tears of the Two Moons"
+xxxx - "Initiate Delighre" ? : Quest ID 4552: "Chasing Shadows"
 
 Note: Table is of Quest ID numbers since that
 is part of the XY location information from
@@ -221,7 +230,7 @@ and the quests in the Dragonguard place
 ]]--
 lib.quest_giver_moves = {
 -- regular quests
-  5450, 4220, 5058, 4264, 3992, 5923, 5950, 2251, 5742, 5102, 3856, 3858, 3885, 2451, 728,
+  5450, 4220, 5058, 4264, 3992, 5923, 5950, 2251, 5742, 5102, 3856, 3858, 3885, 2451, 728, 6181, 4625, 4552,
 
 --[[
 [6428] = "Sticks and Bones",
@@ -257,7 +266,7 @@ lib.quest_has_skill_point = { 465, 467, 575, 1633, 2192, 2222, 2997, 3006, 3235,
 -- new
 6560, 6547, 6548, 6550, 6551, 6552, 6570, 6554, 6566, 4296, 5540, 6399, 6349, 6394, 6351, 5534,
 --also new
-5889, 3910, 5447, 4555, 4813, 6414, 4303, 6416, 4822, 5595, 5532, 5597, 5598, 5599, 5600, 4641, 5481, 4202, 6507, 6188, 5549, 5545, 6576, 4145, 6578, 5468, 5556, 4469, 5403, 6505, 4336, 5113, 5342, 6186, 6249, 5596, 5702, 5567, 4246, 4589, 4675, 4831, 6304, 6113, 6315, 6126, 6336, 6048, 5922, 4867, 6052, 6025, 6063, 5136, 6003, 6132, 4597, 4379, 4538, 5531, 5948, 5120, 6046, 6047, 6432,
+5889, 3910, 5447, 4555, 4813, 6414, 4303, 6416, 4822, 5595, 5532, 5597, 5598, 5599, 5600, 4641, 5481, 4202, 6507, 6188, 5549, 5545, 6576, 4145, 6578, 5468, 5556, 4469, 5403, 6505, 4336, 5113, 5342, 6186, 6249, 5596, 5702, 5567, 4246, 4589, 4675, 4831, 6304, 6113, 6315, 6126, 6336, 6048, 5922, 4867, 6052, 6025, 6063, 5136, 6003, 6132, 4597, 4379, 4538, 5531, 5948, 5120, 6046, 6047, 6432, 6064, 6065,
 --blackwood
 6616, 6660, 6619, 6404, 6402, 6403,
 --Deadlands

@@ -23,7 +23,7 @@ function LootLog.InitializeHistory( )
 		{
 			name = GetString(SI_LOOTLOG_CHATCOMMANDS),
 			keybind = "LOOTLOG_CHATCOMMANDS",
-			callback = function() RequestOpenUnsafeURL("http://eso.code65536.com/addons/lootlog/#chatcommands") end,
+			callback = LootLog.ChatCommandsReference,
 		},
 		{
 			name = GetString(SI_LOOTLOG_LINKTRADE),
@@ -50,6 +50,7 @@ function LootLog.InitializeHistory( )
 			LootLog.LazyInitializeHistory()
 			LootLog.RefreshHistory(true)
 			LootLog.SetRetentionText(FRAME:GetNamedChild("History"))
+			FRAME:GetNamedChild("ChatCommands"):SetText((LootLog.vars.tradeCommandsCount < 4) and GetString(SI_LOOTLOG_CHATCOMMANDS_LINK) or "")
 			KEYBIND_STRIP:AddKeybindButtonGroup(buttons)
 		end,
 		callbackHide = function( )
@@ -153,8 +154,7 @@ function LootLogList:Setup( )
 
 	self.searchBox = self.frame:GetNamedChild("SearchFieldBox")
 	self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
-	self.search = ZO_StringSearch:New()
-	self.search:AddProcessor(SORT_TYPE, function(...) return self:ProcessItemEntry(...) end)
+	self.search = self:InitializeSearch(SORT_TYPE)
 
 	self:RefreshData()
 end

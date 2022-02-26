@@ -143,6 +143,13 @@
 					</OnMouseUp>
 				</Label>
 
+				<Label name="$(parent)ChatCommands" inherits="ExtendedJournalFooterLabel" horizontalAlignment="LEFT" mouseEnabled="true">
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)List" offsetX="300" offsetY="6" />
+					<OnMouseUp>
+						LootLog.ChatCommandsReference()
+					</OnMouseUp>
+				</Label>
+
 				<Label name="$(parent)Counter" inherits="ExtendedJournalFooterLabel" horizontalAlignment="RIGHT">
 					<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)List" offsetY="6" />
 				</Label>

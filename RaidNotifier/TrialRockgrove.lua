@@ -100,6 +100,13 @@ function RaidNotifier.RG.OnCombatEvent(_, result, isError, aName, aGraphic, aAct
             if (settings.oaxiltso_savage_blitz and tName ~= "") then
                 self:AddAnnouncement(zo_strformat(GetString(RAIDNOTIFIER_ALERTS_ROCKGROVE_SAVAGE_BLITZ), tName), "rockgrove", "oaxiltso_savage_blitz")
             end
+        -- Havocrel Annihilator's Cinder Cleave at the fight with Oaxiltso
+        elseif (abilityId == buffsDebuffs.oaxiltso_annihilator_cinder_cleave) then
+            if (settings.oaxiltso_annihilator_cinder_cleave >= 1 and tType == COMBAT_UNIT_TYPE_PLAYER) then
+                self:AddAnnouncement(GetString(RAIDNOTIFIER_ALERTS_ROCKGROVE_CINDER_CLEAVE), "rockgrove", "oaxiltso_annihilator_cinder_cleave")
+            elseif (settings.oaxiltso_annihilator_cinder_cleave == 2 and tName ~= "") then
+                self:AddAnnouncement(zo_strformat(GetString(RAIDNOTIFIER_ALERTS_ROCKGROVE_CINDER_CLEAVE_OTHER), tName), "rockgrove", "oaxiltso_annihilator_cinder_cleave")
+            end
         end
     elseif (result == ACTION_RESULT_EFFECT_FADED) then
         -- Sul-Xan Soulweaver's Soul Remnant attack (his Astral Shield is broken)

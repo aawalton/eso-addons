@@ -51,10 +51,10 @@ function SlashCommandHelper:SlashCommandCallback()
             totalValue = totalValue + value
             totalCount = totalCount + itemCount
             if itemCount > 0 then uniqueItems = uniqueItems + 1 end
-            -- if value > 10000000 then
-            --     d(itemLink)
-            --     d(string.format("%s x %s = %s", CommaValue(itemCount), CommaValue(price), CommaValue(value), itemLink))
-            -- end
+            if value > 10000000 then
+                d(itemLink)
+                d(string.format("%s x %s = %s", CommaValue(itemCount), CommaValue(price), CommaValue(value), itemLink))
+            end
         end
     end
 

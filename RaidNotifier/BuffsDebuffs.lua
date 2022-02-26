@@ -627,6 +627,8 @@ rockgrove.oaxiltso_savage_blitz = {
 }
 -- Oaxiltso's Noxious Sludge
 rockgrove.oaxiltso_noxious_sludge = 157860
+-- Havocrel Annihilator's Cinder Cleave at the fight with Oaxiltso
+rockgrove.oaxiltso_annihilator_cinder_cleave = 152688
 -- Radiating Heat (player gains this effect while Prime Meteor is present)
 rockgrove.meteor_radiating_heat = {
 	[152462] = true, -- on trash

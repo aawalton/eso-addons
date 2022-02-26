@@ -15,7 +15,7 @@ local dx = math.ceil(GuiRoot:GetWidth()/tonumber(GetCVar("WindowedWidth"))*1000)
 LIBCOMBAT_LINE_SIZE = dx
 
 local lib = {}
-lib.version = 55
+lib.version = 58
 LibCombat = lib
 
 -- Basic values
@@ -242,23 +242,16 @@ local SourceBuggedBuffs = {   -- buffs where ZOS messed up the source, causing C
 
 }
 
+
 local abilityConversions = {	-- Ability conversions for tracking skill activations
 
 	[22178] = {22179, 2240, nil, nil}, --Sun Shield --> Sun Shield
 	[22182] = {22183, 2240, nil, nil}, --Radiant Ward --> Radiant Ward
 	[22180] = {49091, 2240, nil, nil}, --Blazing Shield --> Blazing Shield
 
-	[22304] = {22307, 2240, nil, nil}, --Healing Ritual --> Healing Ritual
-	[22327] = {22331, 2240, nil, nil}, --Ritual of Rebirth --> Ritual of Rebirth
-	[22314] = {22318, 2240, nil, nil}, --Hasty Prayer --> Hasty Prayer
-
-	[22259] = {26301, 2240, nil, nil}, --Ritual of Retribution --> Ritual of Retribution
-	[22265] = {26287, 2240, nil, nil}, --Cleansing Ritual --> Healing Ritual
-	[22262] = {26306, 2240, nil, nil}, --Extended Ritual --> Extended Ritual
-
 	[26209] = {26220, 2240, nil, nil}, --Restoring Aura --> Minor Magickasteal
 	[26807] = {26809, 2240, nil, nil}, --Radiant Aura --> Minor Magickasteal
-	[26821] = {29824, 16, nil, nil}, --Repentance? --> Repentance?
+	[26821] = {29824, nil, nil, nil}, --Repentance? --> Repentance?
 
 	[29173] = {53881, 2240, nil, nil}, --Weakness to Elements --> Major Breach
 	[39089] = {62775, 2240, nil, nil}, --Elemental Susceptibility --> Major Breach
@@ -274,7 +267,7 @@ local abilityConversions = {	-- Ability conversions for tracking skill activatio
 
 	[103503] = {103521, 2240, nil, nil}, --Accelerate --> Minor Force
 	[103706] = {103706, nil, 103708, 2240}, --Channeled Acceleration --> Minor Force
-	[103710] = {103712, nil, nil, nil}, --Race Against Time --> Minor Force
+	[103710] = {122260, 2240, nil, nil}, --Race Against Time --> Race Against Time
 
 	[103478] = {108609, 2240, nil, nil}, --Undo --> Undo
 	[103557] = {108621, 2240, nil, nil}, --Precognition --> Precognition
@@ -292,16 +285,16 @@ local abilityConversions = {	-- Ability conversions for tracking skill activatio
 	[40223] = {40224, 2240, nil, nil}, --Aggressive Horn --> Aggressive Horn
 	[40220] = {40221, 2240, nil, nil}, --Sturdy Horn --> Sturdy Horn
 
-	[28279] = {28279, 2200, 28279, 1}, --Uppercut --> Uppercut
-	[38814] = {38814, 2200, 38814, 1}, --Dizzying Swing --> Dizzying Swing
-	[38807] = {38807, 2200, 38807, 1}, --Wrecking Blow --> Wrecking Blow
+	[28279] = {28279, 2200, 28279, nil}, --Uppercut --> Uppercut
+	[38814] = {38814, 2200, 38814, nil}, --Dizzying Swing --> Dizzying Swing
+	[38807] = {38807, 2200, 38807, nil}, --Wrecking Blow --> Wrecking Blow
 
-	[83600] = {85156, 2240, nil, nil}, --Lacerate --> Lacerate
-	[85187] = {85192, 2240, nil, nil}, --Rend --> Rend
-	[85179] = {85182, 2240, nil, nil}, --Thrive in Chaos --> Thrive in Chaos
+	[83600] = {83600, 2200, 85156, 2240}, --Lacerate --> Lacerate
+	[85187] = {85187, 2200, 85192, 2240}, --Rend --> Rend
+	[85179] = {85179, 2200, 85182, 2240}, --Thrive in Chaos --> Thrive in Chaos
 
-	[31531] = {31531, 2200, 88565, 2240}, --Force Siphon --> Force Siphon
-	[40109] = {40109, 2200, 88575, 2240}, --Siphon Spirit --> Siphon Spirit
+	[31531] = {88565, 2240, nil, nil}, --Force Siphon --> Force Siphon
+	[40109] = {88575, 2240, nil, nil}, --Siphon Spirit --> Siphon Spirit
 	[40116] = {88606, nil, nil, nil}, --Quick Siphon --> Minor Lifesteal
 
 	[29043] = {92507, 2240, nil, nil}, --Molten Weapons --> Major Sorcery
@@ -312,17 +305,14 @@ local abilityConversions = {	-- Ability conversions for tracking skill activatio
 	[35414] = {90593, 2240, nil, nil}, --Mirage --> Major Evasion
 	[35419] = {90620, 2240, nil, nil}, --Phantasmal Escape --> Major Evasion
 
-	[25375] = {25376, 2240, nil, nil}, --Shadow Cloak --> Shadow Cloak
-	[25380] = {25381, 2240, nil, nil}, --Shadowy Disguise --> Shadowy Disguise
+	[35445] = {35451, 2250, nil, nil}, --Shadow Image Teleport --> Shadow Image
 
-	[35445] = {35451, 2250, nil, nil}, --Shadow Image Teleport --> Shadow
-
-	[24584] = {nil, nil, 114903, 2250}, --Dark Exchange -->
+	[24584] = {nil, nil, 114903, 2250}, --Dark Exchange --> Dark Exchange
 	[24595] = {nil, nil, 114908, 2250}, --Dark Deal -->
 	[24589] = {nil, nil, 114909, 2250}, --Dark Conversion -->
 
 	[108840] = {108842, 2240, nil, nil}, --Summon Unstable Familiar --> Unstable Familiar Damage Pulse
-	[76076] = {76078, 16, nil, nil}, --Summon Unstable Clannfear --> Clannfear Heal
+	[76076] = {76078, nil, nil, nil}, --Summon Unstable Clannfear --> Clannfear Heal
 	[77182] = {77187, 2240, nil, nil}, --Summon Volatile Familiar --> Volatile Famliiar Damage Pulsi
 
 	[108845] = {108846, 16, nil, nil}, --Winged Twilight Restore --> Winged Twilight Restore
@@ -332,7 +322,7 @@ local abilityConversions = {	-- Ability conversions for tracking skill activatio
 	[23234] = {51392, 2240, nil, nil}, --Bolt Escape --> Bolt Escape Fatigue
 	[23236] = {51392, 2240, nil, nil}, --Streak --> Bolt Escape Fatigue
 
-	[85922] = {85925, 32, nil, nil}, --Budding Seeds --> Budding Seeds Heal
+	[85922] = {85841, nil, nil, nil}, --Budding Seeds (2nd cast) --> Budding Seeds Heal
 
 	[86122] = {86224, 2240, nil, nil}, --Frost Cloak --> Major Resolve
 	[86126] = {88758, 2240, nil, nil}, --Expansive Frost Cloak --> Major Resolve
@@ -342,6 +332,8 @@ local abilityConversions = {	-- Ability conversions for tracking skill activatio
 	[118623] = {118624, 2240, nil, nil}, --Deaden Pain --> Deaden Pain
 	[118639] = {121797, 2240, nil, nil}, --Necrotic Potency --> Necrotic Potency
 
+	[114860] = {114861, 2240, nil, nil}, --Blastbones --> Blastbones
+	[117330] = {114861, 2240, nil, nil}, --Blastbones --> Blastbones
 	[117690] = {117691, 2240, nil, nil}, --Blighted Blastbones --> Blighted Blastbones
 	[117693] = {117691, 2240, nil, nil}, --Blighted Blastbones --> Blighted Blastbones (Id when greyed out)
 	[117749] = {117750, 2240, nil, nil}, --Stalking Blastbones --> Stalking Blastbones
@@ -351,15 +343,13 @@ local abilityConversions = {	-- Ability conversions for tracking skill activatio
 	[117940] = {117947, 2240, nil, nil}, --Expunge and Modify --> Expunge and Modify
 	--[117919] = {???, nil, nil, nil}, --Hexproof -->
 
-	[88158] = {88163, 1, nil, nil}, --Materialize --> Materialize
-
 	[28567] = {126370, 2240, nil, nil}, --Entropy --> Entropy
 	[40457] = {126374, 2240, nil, nil}, --Degeneration --> Degeneration
 	[40452] = {126371, 2240, nil, nil}, --Structured Entropy --> Structured Entropy
 
-	[26768] = {126890, 2240, nil, nil}, --Soul Trap --> Soul Trap
-	[40328] = {126894, 2240, nil, nil}, --Soul Splitting Trap --> Soul Splitting Trap
-	[40317] = {126898, 2240, nil, nil}, --Consuming Trap --> Consuming Trap
+	[16536] = {163227, 2240, nil, nil}, --Meteor --> Meteor
+	[40493] = {163236, 2240, nil, nil}, --Shooting Star --> Shooting Star
+	[40489] = {163238, 2240, nil, nil}, --Ice Comet --> Meteor
 
 }
 
@@ -378,40 +368,6 @@ for k,v in pairs(abilityAdditions) do
 
 	abilityAdditionsReverse[v] = k
 
-end
-
-local function SetAmbiguousSkillData()
-
-    local effectiveSpellPower, effectiveWeaponPower
-	local stats = data.stats
-
-    if stats[LIBCOMBAT_STAT_SPELLPOWER] == nil or stats[LIBCOMBAT_STAT_MAXMAGICKA] == nil or stats[LIBCOMBAT_STAT_WEAPONPOWER] == nil or stats[LIBCOMBAT_STAT_MAXSTAMINA] == nil then
-
-        _, effectiveSpellPower, _ = GetUnitPower("player", POWERTYPE_MAGICKA)
-        _, effectiveWeaponPower, _ = GetUnitPower("player", POWERTYPE_STAMINA)
-
-        if effectiveSpellPower == nil or effectiveWeaponPower == nil then return end
-
-    else
-
-        effectiveSpellPower = stats[LIBCOMBAT_STAT_SPELLPOWER] + stats[LIBCOMBAT_STAT_MAXMAGICKA]/10.5
-        effectiveWeaponPower = stats[LIBCOMBAT_STAT_WEAPONPOWER] + stats[LIBCOMBAT_STAT_MAXSTAMINA]/10.5
-
-    end
-
-	if effectiveSpellPower > effectiveWeaponPower then
-
-		abilityConversions[26768] = {126890, 2240, nil, nil} --Soul Trap --> Soul Trap
-		abilityConversions[40328] = {126895, 2240, nil, nil} --Soul Splitting Trap --> Soul Splitting Trap
-		abilityConversions[40317] = {126897, 2240, nil, nil} --Consuming Trap --> Consuming Trap
-
-	else
-
-		abilityConversions[26768] = {126891, 2240, nil, nil} --Soul Trap --> Soul Trap
-		abilityConversions[40328] = {126894, 2240, nil, nil} --Soul Splitting Trap --> Soul Splitting Trap
-		abilityConversions[40317] = {126898, 2240, nil, nil} --Consuming Trap --> Consuming Trap
-
-	end
 end
 
 local DirectHeavyAttacks = {	-- for special handling to detect their end
@@ -645,6 +601,7 @@ function FightHandler:Initialize()
 	self.playerid = data.playerid
 	self.bosses = {}
 	self.dataVersion = 2
+	self.special = {}
 end
 
 local onCombatState
@@ -696,6 +653,21 @@ local function GetShadowBonus(effectSlot)
 	data.critBonusMundus = calcBonus - ZOSBonus -- mundus bonus difference
 
 	Print("other", LOG_LEVEL_INFO, "Shadow Mundus Offset: %d%% (calc %d%% - ZOS %d%%)", data.critBonusMundus, calcBonus, ZOSBonus)
+end
+
+local function GetGlacialPresence()
+
+	if GetUnitClassId("player") ~= 4 then return 0 end
+
+	local skillDataTable = SKILLS_DATA_MANAGER.abilityIdToProgressionDataMap
+	local skillData = skillDataTable and skillDataTable[86192] and skillDataTable[86192].skillData
+
+	local rank = skillData.currentRank	-- Glacial Presence
+	local purchased = skillData.isPurchased	-- Glacial Presence
+
+	local bonus = purchased and rank or 0
+
+	return bonus * 0.5
 end
 
 local function GetPlayerBuffs(timems)
@@ -778,84 +750,66 @@ local function GetCurrentCP()
 
 	local CP = {}
 
-	if GetAPIVersion() >= 100034 then
+	CP.version = 2
 
-		CP.version = 2
+	-- collect slotted stars
 
-		-- collect slotted stars
+	local championBarData = CHAMPION_PERKS.championBar.slots
 
-		local championBarData = CHAMPION_PERKS.championBar.slots
+	local slotsById = {}
 
-		local slotsById = {}
+	for i, slot in pairs(championBarData) do
 
-		for i, slot in pairs(championBarData) do
+		local slotData = slot:GetSavedChampionSkillData()
 
-			local slotData = slot:GetSavedChampionSkillData()
+		if slotData then
 
-			if slotData then
+			local starId = slotData:GetId()
 
-				local starId = slot:GetSavedChampionSkillData():GetId()
-
-				slotsById[starId] = i
-			end
+			slotsById[starId] = i
 		end
-
-		--  collect CP data
-
-		local disciplines = CHAMPION_DATA_MANAGER.disciplineDatas
-
-		for _, discipline in pairs(disciplines) do
-
-			local disciplineId = discipline.disciplineId
-			local stars = discipline.championSkillDatas
-
-			local disciplineData = {}
-			CP[disciplineId] = disciplineData
-
-			disciplineData.total = discipline:GetNumSavedSpentPoints()
-			disciplineData.stars = {}
-			disciplineData.slotted = {}
-
-			local discStarData = disciplineData.stars
-			local discSlotData = disciplineData.slotted
-
-			for _, star in pairs(stars) do
-
-				local savedPoints = star:GetNumSavedPoints()
-
-				if savedPoints > 0 then
-
-					local starId = star.championSkillId
-
-					local slotable = star:IsTypeSlottable()
-					local slotted = slotsById[starId] ~= nil
-
-					local starType = (slotted and LIBCOMBAT_CPTYPE_SLOTTED) or (slotable and LIBCOMBAT_CPTYPE_UNSLOTTED) or LIBCOMBAT_CPTYPE_PASSIVE
-
-					discStarData[starId] = {savedPoints, starType}
-					if slotted then discSlotData[starId] = true end
-
-				end
-			end
-		end
-
-		return CP
-
-	else	-- Legacy
-
-		for i = 1,9 do
-
-			CP[i] = {}
-
-			for j = 1,4 do
-
-				CP[i][j] = GetNumPointsSpentOnChampionSkill(i, j)
-
-			end
-		end
-
-		return CP
 	end
+
+	--  collect CP data
+
+	local disciplines = CHAMPION_DATA_MANAGER.disciplineDatas
+
+	for _, discipline in pairs(disciplines) do
+
+		local disciplineId = discipline.disciplineId
+		local stars = discipline.championSkillDatas
+
+		local disciplineData = {}
+		CP[disciplineId] = disciplineData
+
+		disciplineData.total = discipline:GetNumSavedSpentPoints()
+		disciplineData.stars = {}
+		disciplineData.slotted = {}
+
+		local discStarData = disciplineData.stars
+		local discSlotData = disciplineData.slotted
+
+		for _, star in pairs(stars) do
+
+			local savedPoints = star:GetNumSavedPoints()
+
+			if savedPoints > 0 then
+
+				local starId = star.championSkillId
+
+				local slotable = star:IsTypeSlottable()
+				local slotted = slotsById[starId] ~= nil
+
+				local starType = (slotted and LIBCOMBAT_CPTYPE_SLOTTED) or (slotable and LIBCOMBAT_CPTYPE_UNSLOTTED) or LIBCOMBAT_CPTYPE_PASSIVE
+
+				discStarData[starId] = {savedPoints, starType}
+				if slotted then discSlotData[starId] = true end
+
+			end
+		end
+	end
+
+	return CP
 end
 
 local function PurgeEffectBuffer(timems)
@@ -1025,6 +979,7 @@ function FightHandler:PrepareFight()
 		data.resources[POWERTYPE_ULTIMATE] = GetUnitPower("player", POWERTYPE_ULTIMATE)
 
 		data.backstabber = GetCritBonusFromCP(self.CP)
+		self.special.glacial = GetGlacialPresence()
 
 		self.prepared = true
 
@@ -1033,8 +988,6 @@ function FightHandler:PrepareFight()
 		data.stats = {}
 		data.advancedStats = {}
 		self:GetNewStats(timems)
-
-		SetAmbiguousSkillData()
 
 		GetCurrentSkillBars()
 
@@ -1909,8 +1862,9 @@ local function SpecialBuffEventHandler(isdebuff, _, result, _, _, _, _, _, sourc
 	if BadAbility[abilityId] == true then return end
 
 	-- if unitName ~= data.rawPlayername then return end
-
+	
 	local changeType = result == ACTION_RESULT_EFFECT_GAINED_DURATION and 1 or result == ACTION_RESULT_EFFECT_FADED and 2 or nil
+	-- Print("debug", LOG_LEVEL_INFO, "%s (%d): %d (%d)", GetFormattedAbilityName(abilityId), abilityId, changeType, result)
 
 	local effectType = isdebuff and BUFF_EFFECT_TYPE_DEBUFF or BUFF_EFFECT_TYPE_BUFF
 	BuffEventHandler(true, GROUP_EFFECT_NONE, _, changeType, 0, _, _, _, _, _, _, _, effectType, ABILITY_TYPE_BONUS, _, unitName, unitId, abilityId, sourceType)
@@ -3224,16 +3178,16 @@ Events.Effects = EventHandler:New(
 		self:RegisterEvent(EVENT_EFFECT_CHANGED, onEffectChanged, REGISTER_FILTER_UNIT_TAG, "player", REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_OTHER)
 
 		for i=1,#SpecialBuffs do
-			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialBuffEvent, REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_GAINED_DURATION, REGISTER_FILTER_ABILITY_ID, SpecialBuffs[i], REGISTER_FILTER_IS_ERROR, false)
-			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialBuffEvent, REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_FADED, REGISTER_FILTER_ABILITY_ID, SpecialBuffs[i], REGISTER_FILTER_IS_ERROR, false)
+			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialBuffEvent, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_GAINED_DURATION, REGISTER_FILTER_ABILITY_ID, SpecialBuffs[i], REGISTER_FILTER_IS_ERROR, false)
+			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialBuffEvent, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_FADED, REGISTER_FILTER_ABILITY_ID, SpecialBuffs[i], REGISTER_FILTER_IS_ERROR, false)
 
 			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialBuffEventOnSelf, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_GAINED_DURATION, REGISTER_FILTER_ABILITY_ID, SpecialBuffs[i], REGISTER_FILTER_IS_ERROR, false)
 			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialBuffEventOnSelf, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_FADED, REGISTER_FILTER_ABILITY_ID, SpecialBuffs[i], REGISTER_FILTER_IS_ERROR, false)
 		end
 
 		for i=1,#SpecialDebuffs do
-			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialDebuffEvent, REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_GAINED_DURATION, REGISTER_FILTER_ABILITY_ID, SpecialDebuffs[i], REGISTER_FILTER_IS_ERROR, false)
-			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialDebuffEvent, REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_FADED, REGISTER_FILTER_ABILITY_ID, SpecialDebuffs[i], REGISTER_FILTER_IS_ERROR, false)
+			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialDebuffEvent, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_GAINED_DURATION, REGISTER_FILTER_ABILITY_ID, SpecialDebuffs[i], REGISTER_FILTER_IS_ERROR, false)
+			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialDebuffEvent, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_FADED, REGISTER_FILTER_ABILITY_ID, SpecialDebuffs[i], REGISTER_FILTER_IS_ERROR, false)
 
 			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialDebuffEventOnSelf, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_GAINED_DURATION, REGISTER_FILTER_ABILITY_ID, SpecialDebuffs[i], REGISTER_FILTER_IS_ERROR, false)
 			self:RegisterEvent(EVENT_COMBAT_EVENT, onSpecialDebuffEventOnSelf, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER, REGISTER_FILTER_COMBAT_RESULT, ACTION_RESULT_EFFECT_FADED, REGISTER_FILTER_ABILITY_ID, SpecialDebuffs[i], REGISTER_FILTER_IS_ERROR, false)

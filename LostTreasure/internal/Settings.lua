@@ -53,16 +53,11 @@ local MINIMAP_SIZES =
 	},
 }
 
-
-local savedVars = internal.savedVars
-local LibAddonMenu = LibAddonMenu2
-
-
 function settings:Initialize()
+	local savedVars = internal.savedVars
 	local db = savedVars:GetSavedVars()
 	local defaults = savedVars:GetDefaults()
 
-	local utilities = internal.utilities
 	local pins = internal.pins
 	local markOnUsing = internal.markOnUsing
 
@@ -263,6 +258,7 @@ function settings:Initialize()
 	}
 
 	local globalPanelName = ADDON_NAME .. "LAMSettings"
+	local LibAddonMenu = LibAddonMenu2
 	LibAddonMenu:RegisterAddonPanel(globalPanelName, panelData)
 	LibAddonMenu:RegisterOptionControls(globalPanelName, menu)
 
@@ -270,11 +266,13 @@ function settings:Initialize()
 end
 
 function settings:GetSettingsFromPinType(pinType, key)
+	local savedVars = internal.savedVars
 	local db = savedVars:GetSavedVars()
 	return db.pinTypes[pinType][key]
 end
 
 function settings:GetSettingDeletionDelay(pinType)
+	local savedVars = internal.savedVars
 	local db = savedVars:GetSavedVars()
 	local deletionDelay
 

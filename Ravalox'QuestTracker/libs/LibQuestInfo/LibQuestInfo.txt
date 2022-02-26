@@ -1,7 +1,7 @@
 ﻿## Title: LibQuestInfo
-## APIVersion: 101031 101032
-## Version: 3.8.2.8
-## AddOnVersion: 3080208
+## APIVersion: 101032 101033
+## Version: 3.8.2.10
+## AddOnVersion: 3080210
 ## Author: |cFF2222Ravalox Darkshire|r & |c4EFFF6Calia1120|r
 ## Description: Embedded library of the Ravalox' QuestTracker
 ## IsLibrary: true

@@ -19,6 +19,7 @@ local zhFlags = {
 --@type AlertSavedVars
 local alertSavedVarsDefaults ={
   alertEnabled = true,
+  alertIconOnly = false,
   alertPlaySound = false,
   alertSoundName = 'NEW_TIMED_NOTIFICATION',
   alertAheadSeconds = 1,
@@ -77,7 +78,7 @@ l.alert -- #(Models#Ability:ability, #number:startTime)->()
   local fontstr = (zhFlags[GetCVar("language.2")] and "EsoZH/fonts/univers67.otf" or ("$("..savedVars.alertFontName..")")) .."|"..savedVars.alertFontSize.."|"..savedVars.alertFontStyle
   control.label:SetFont(fontstr)
 
-  control.label:SetText(zo_strformat('<<C:1>>',ability.showName))
+  control.label:SetText(savedVars.alertIconOnly and '' or zo_strformat('<<C:1>>',ability.showName))
   control.icon:SetTexture(ability.icon)
   control:SetAnchor(BOTTOMLEFT, GuiRoot, CENTER, -150 + savedVars.alertOffsetX, -150 + savedVars.alertOffsetY)
   control:SetHidden(false)
@@ -99,6 +100,8 @@ end
 
 l.checkAction --#(Models#Action:action)->()
 = function(action)
+  -- check ultimate
+  if action.slotNum == 8 then return end
   -- check action alerted
   if action.data.alerted then return end
   -- check action just override without new effects
@@ -302,6 +305,14 @@ addon.extend(settings.EXTKEY_ADD_MENUS, function ()
         setFunc = function(value) l.getSavedVars().alertEnabled = value end,
         width = "full",
         default = alertSavedVarsDefaults.alertEnabled,
+      },  {
+        type = "checkbox",
+        name = text("Icon Only"),
+        getFunc = function() return l.getSavedVars().alertIconOnly end,
+        setFunc = function(value) l.getSavedVars().alertIconOnly = value end,
+        disabled = function() return not l.getSavedVars().alertEnabled end,
+        width = "full",
+        default = alertSavedVarsDefaults.alertIconOnly,
       }, {
         type = "checkbox",
         name = text("Remove When Cast Again"),
@@ -362,7 +373,7 @@ addon.extend(settings.EXTKEY_ADD_MENUS, function ()
         type = "slider",
         name = text("Seconds to Show"),
         --tooltip = "",
-        min = 1, max = 5, step = 0.5,
+        min = 1, max = 18, step = 0.5,
         getFunc = function() return l.getSavedVars().alertKeepSeconds end,
         setFunc = function(value) l.getSavedVars().alertKeepSeconds = value end,
         width = "full",
@@ -374,7 +385,7 @@ addon.extend(settings.EXTKEY_ADD_MENUS, function ()
         choices = {"MEDIUM_FONT", "BOLD_FONT", "CHAT_FONT", "ANTIQUE_FONT", "HANDWRITTEN_FONT", "STONE_TABLET_FONT", "GAMEPAD_MEDIUM_FONT", "GAMEPAD_BOLD_FONT"},
         getFunc = function() return l.getSavedVars().alertFontName end,
         setFunc = function(value) l.getSavedVars().alertFontName = value end,
-        disabled = function() return not l.getSavedVars().alertEnabled end,
+        disabled = function() return not l.getSavedVars().alertEnabled or l.getSavedVars().alertIconOnly end,
         width = "full",
         default = alertSavedVarsDefaults.alertFontName,
       }, {
@@ -394,7 +405,7 @@ addon.extend(settings.EXTKEY_ADD_MENUS, function ()
         min = 18, max = 48, step = 2,
         getFunc = function() return l.getSavedVars().alertFontSize end,
         setFunc = function(value) l.getSavedVars().alertFontSize = value end,
-        disabled = function() return not l.getSavedVars().alertEnabled end,
+        disabled = function() return not l.getSavedVars().alertEnabled or l.getSavedVars().alertIconOnly end,
         width = "full",
         default = alertSavedVarsDefaults.alertFontSize,
       },{
@@ -403,7 +414,7 @@ addon.extend(settings.EXTKEY_ADD_MENUS, function ()
         choices = {"thick-outline","soft-shadow-thick","soft-shadow-thin"},
         getFunc = function() return l.getSavedVars().alertFontStyle end,
         setFunc = function(value) l.getSavedVars().alertFontStyle = value end,
-        disabled = function() return not l.getSavedVars().alertEnabled end,
+        disabled = function() return not l.getSavedVars().alertEnabled or l.getSavedVars().alertIconOnly end,
         width = "full",
         default = alertSavedVarsDefaults.alertFontStyle,
       },{

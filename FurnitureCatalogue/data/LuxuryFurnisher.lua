@@ -2,32 +2,212 @@ FurC.LuxuryFurnisher = FurC.LuxuryFurnisher or {}
 
 
 FurC.LuxuryFurnisher[FURC_DEADL] = {
-		-- ====================================================================
-	[182613] = {		-- Bush, Flowering Ivy
+	
+	-- ====================================================================
+	[182631] = {		-- Redguard Seal
+		itemPrice   = 3000,
+		itemDate	= "2022-02-05",
+	},
+
+	
+	-- ====================================================================
+	[182620] = {		-- Clockwork Door, Arched
+		itemPrice   = 25000,
+		itemDate	= "2022-01-29",		
+	},
+    -- ====================================================================
+	[182619] = {		-- Clockwork Altar, Devotional
+		itemPrice   = 15000,
+		itemDate	= "2022-01-22",
+	},
+		
+	-- ====================================================================
+
+
+	[167352] = {		-- Pelt, Fox
+		itemPrice   = 2500,
+		itemDate  = "2022-01-16",
+	},
+	[153696] = {    -- Taxidermy, Bird of Prey
+ 		itemPrice   = 2500,
+		itemDate  = "2022-01-16",
+	},
+	[141762] = {        -- Animal Trap, Welded Open
+ 		itemPrice   = 2500,
+		itemDate  = "2022-01-16",
+	},
+	-- Nov. 11th
+	[118285] = {  -- Carcass, Fresh Pheasant
+ 		itemPrice = 7500,
+		itemDate  = "2022-01-16",
+	},
+	[118292] = {  -- Elk Head, Wall Mount
+ 		itemPrice = 20000,
+		itemDate  = "2022-01-16",
+	},
+	[116506] = {  -- Orcish Grand Table with Skins
+ 		itemPrice = 50000,
+		itemDate  = "2022-01-16",
+	},
+	[118243] = {  -- Tapestry, Echatere Pelt
+ 		itemPrice = 25000,
+		itemDate  = "2022-01-16",
+	},
+	[182618] = { -- Nord Stone, Marked,
+		itemPrice = 4000,
+		itemDate = "2022-01-15",
+	},
+	
+	-- ====================================================================
+	
+	[167351] = {		-- Crocodile Skeleton, Complete
+		itemPrice   = 9000,
+		itemDate    = "2022-01-08",
+	},
+	[118294] = {        -- Echatere Horns, Wall Mount
+		itemPrice   = 15000,
+		itemDate    = "2022-01-08",
+	},
+	[118286] = {  -- Carcass, Grey Hare
+		itemPrice = 5000,
+		itemDate  = "2022-01-08",
+	},
+	[118281] = {  -- Carcass, Hanging Geese
+		itemPrice = 7000,
+		itemDate  = "2022-01-08",
+	},
+	[118279] = {  -- Deer Head, Wall Mount
+		itemPrice = 15000,
+		itemDate  = "2022-01-08",
+	},
+	[118298] = {  -- Wolf Head, Wall Mount
+		itemPrice = 20000,
+		itemDate  = "2022-01-08",
+	},	
+	[182617] = {		-- Unidentified Fargrave Bones
+		itemPrice   = 9000,
+		itemDate	= "2022-01-08",
+	},	
+	-- ====================================================================
+	
+	[167348] = {		-- Orcish Figurine, Bear
+		itemPrice   = 12000,
+		itemDate  = "2022-01-01",
+	},
+	[141759] = {        -- Orcish Gazebo, Orsinium
+ 		itemPrice   = 20000,
+		itemDate  = "2022-01-01",
+	},
+	[132152] = {        -- Orsinium Sarcophagus, Warrior's
+ 		itemPrice   = 35000,
+		itemDate  = "2022-01-01",
+	},
+	[132150] = {        -- Orsinium Totem, Honor
+ 		itemPrice   = 20000,
+		itemDate  = "2022-01-01",
+	},
+	[132151] = {        -- Orsinium Totem, Obedience
+ 		itemPrice   = 20000,
+		itemDate  = "2022-01-01",
+	},
+	[132149] = {        -- Orsinium Totem, Strength
+ 		itemPrice   = 20000,
+		itemDate  = "2022-01-01",
+	},
+	[153692] = {    -- Orsinium Well, Covered
+		itemDate  = "2022-01-01",
+ 		itemPrice   = 20000,
+	},   
+   [182616] = { -- Orcish Banner, Iron,	
+		itemPrice	= 12000,
+		itemDate	= "2022-01-01",
+	},
+	
+	-- ====================================================================
+	
+	[167347] = {	-- Orcish Figurine, Mammoth
+		itemPrice   = 12000,
+		itemDate  	= "2021-12-25",
+	},
+	[153691] = {    -- Orsinium Sarcophagus, Honor's Rest
+ 		itemPrice   = 25000,
+		itemDate  	= "2021-12-25",
+	},
+	[141758] = {    -- Orcish Wagon, Merchant
+ 		itemPrice   = 15000,
+		itemDate  	= "2021-12-25",
+	},
+	[132145] = { 	-- Orsinium Tent, Chief’s
+ 		itemPrice   = 15000,
+		itemDate  	= "2021-12-25",
+	},
+	[132146] = { 	-- Orsinium Relief, Malacath
+ 		itemPrice   = 25000,
+		itemDate  	= "2021-12-25",
+	},
+	[132148] = { 	-- Orsinium Statue, Head
+ 		itemPrice   = 25000,
+		itemDate  	= "2021-12-25",
+	},
+	[132147] = { 	-- Orsinium Statue, Honor’s Rest
+ 		itemPrice   = 25000,
+		itemDate  	= "2021-12-25",
+	},
+	[182615] = {	-- Pedestal, Etched Stone
+		itemPrice	= 3000,
+		itemDate	= "2021-12-25",
+	},
+	
+	-- ====================================================================
+	[182614] = { -- Vine, Flowering Wyrdbloom Strand
+		itemPrice	= 700,
+		itemDate	= "2021-12-18",
+	},
+	[167346] = {		-- Vines, Flowering Wyrdbloom
+		itemPrice   = 4000,
+		itemDate  = "2021-12-18",
+	},
+	[153690] = {    -- Flower Cluster, Wyrdbloom
+ 		itemPrice   = 4000,
+		itemDate  = "2021-12-18",
+	},
+	[141756] = {        -- Mushrooms, Aether Cup Cluster
+		itemPrice   = 10000,
+		itemDate  = "2021-12-18",
+	},
+	[141755] = {        -- Mushrooms, Aether Cup Ring
+		itemPrice   = 10000,
+		itemDate  = "2021-12-18",
+	},
+	[141757] = {        -- Mushrooms, Climbing Aether Cup
+		itemPrice   = 5000,
+		itemDate  = "2021-12-18",
+	},	
+
+	-- ====================================================================
+	[182613] = {	-- Bush, Flowering Ivy
 		itemPrice	= 2000,
 		itemDate	= "2021-12-11",
 	},
-	[167345] = {		-- Fern, Cyan Cluster
+	[167345] = {	-- Fern, Cyan Cluster
 		itemPrice   = 4000,
-		itemDate  = "2021-12-11",
+		itemDate  	= "2021-12-11",
 	},
-
 	[153689] = {    -- Fern, Cyan
 		itemDate  = "2021-12-11",
  		itemPrice   = 2500,
 	},
-
-	[141752] = {        -- Plant, Cerulean Spadeleaf
+	[141752] = {    -- Plant, Cerulean Spadeleaf
  		itemPrice   = 1000,
-		itemDate  = "2021-12-11",
+		itemDate  	= "2021-12-11",
 	},
-	[141753] = {        -- Plants, Cerulean Spadeleaf Cluster
+	[141753] = {    -- Plants, Cerulean Spadeleaf Cluster
  		itemPrice   = 2500,
-		itemDate  = "2021-12-11",
+		itemDate  	= "2021-12-11",
 	},
-	[141754] = {        -- Skull Totem, Hircine Worship
+	[141754] = {    -- Skull Totem, Hircine Worship
  		itemPrice   = 7500,
-		itemDate  = "2021-12-11",
+		itemDate  	= "2021-12-11",
 	},
 	
 	-- ====================================================================
@@ -1472,36 +1652,36 @@ FurC.LuxuryFurnisher[FURC_MARKAT] = {
 
 	[156646] = {		-- Ra Gada Statue, Seated Lion Ibis
 		itemPrice   = 25000,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 	},
 	[171425] = {		-- Redguard Carpets, Rolled
 		itemPrice   = 4000,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 	},
 
 	[145468] = {    -- Wedding Lantern, Hanging
 		itemPrice   = 5000,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 		},
 	[117876] = {  -- Wedding Curtain, Wide
 		itemPrice   = 7500,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 	},
 	[120798] = {  -- Wedding Blossoms, Blue
 		itemPrice   = 2500,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 		},
 	[120800] = {  -- Wedding Curtain
 		itemPrice   = 7500,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 	},
 	[120801] = {  -- Wedding Lantern
 		itemPrice   = 5000,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 	},
 	[120797] = {  -- Wedding Flower Trellis
 		itemPrice   = 10000,
-		itemDate  = "2020-02-06",
+		itemDate  = "2022-02-05",
 	},
 
 
@@ -1632,214 +1812,66 @@ FurC.LuxuryFurnisher[FURC_MARKAT] = {
 	
 	[171412] = {		-- Clockwork Switch, Rotary
 		itemPrice   = 8000,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},	
 	[134424] = {  -- Clockwork Gear Display, Bell Jar
  		itemPrice   = 2500,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},
 	[134423] = {  -- Clockwork Gear Display, Tall Jar
  		itemPrice   = 3000,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},
 	[134426] = {  -- Clockwork Globe, Stand
  		itemPrice   = 4000,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},
 	[134425] = {  -- Clockwork Orrery, Compact
  		itemPrice   = 20000,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},
 	[134427] = {    -- Clockwork Orrery, Intricate
  		itemPrice   = 100000,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},
 	[153698] = {    -- Clockwork Orrery, Simple
  		itemPrice   = 35000,
-		itemDate  = "2020-01-02",
+		itemDate  = "2022-01-29",
 	},
 	
 	-- ====================================================================
 
 	[171411] = {		-- Clockwork Lens Assembly, Frozen
 		itemPrice   = 7000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
 	
 	[153697] = {    -- Clockwork Telescope, Stargazers
  		itemPrice   = 75000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
 
 	[134419] = {    -- Clockwork Calibration Guide, The Mage
  		itemPrice   = 50000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
 
 	[134418] = {    -- Clockwork Telescope, Surveyor's
  		itemPrice   = 15000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
 	[134422] = {    -- Clockwork Sextant, Surveyor's
  		itemPrice   = 75000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
 	[134421] = {    -- Clockwork Calibration Guide, The Warrior
  		itemPrice   = 50000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
 	[134420] = {    -- Clockwork Calibration Guide, The Thief
  		itemPrice   = 50000,
-		itemDate  = "2020-12-26",
+		itemDate  = "2022-01-22",
 	},
-	
-	-- ====================================================================
-
-
-	[167352] = {		-- Pelt, Fox
-		itemPrice   = 2500,
-		itemDate  = "2020-12-20",
-	},
-	[153696] = {    -- Taxidermy, Bird of Prey
- 		itemPrice   = 2500,
-		itemDate  = "2020-12-20",
-	},
-	[141762] = {        -- Animal Trap, Welded Open
- 		itemPrice   = 2500,
-		itemDate  = "2020-12-20",
-	},
-	-- Nov. 11th
-	[118285] = {  -- Carcass, Fresh Pheasant
- 		itemPrice = 7500,
-		itemDate  = "2020-12-20",
-	},
-	[118292] = {  -- Elk Head, Wall Mount
- 		itemPrice = 20000,
-		itemDate  = "2020-12-20",
-	},
-	[116506] = {  -- Orcish Grand Table with Skins
- 		itemPrice = 50000,
-		itemDate  = "2020-12-20",
-	},
-	[118243] = {  -- Tapestry, Echatere Pelt
- 		itemPrice = 25000,
-		itemDate  = "2020-12-20",
-	},
-	
-	-- ====================================================================
-	
-	[167351] = {		-- Crocodile Skeleton, Complete
-		itemPrice   = 9000,
-		itemDate    = "2020-12-12",
-	},
-	[118294] = {        -- Echatere Horns, Wall Mount
-		itemPrice   = 15000,
-		itemDate    = "2020-12-12",
-	},
-	[118286] = {  -- Carcass, Grey Hare
-		itemPrice = 5000,
-		itemDate  = "2020-12-12",
-	},
-	[118281] = {  -- Carcass, Hanging Geese
-		itemPrice = 7000,
-		itemDate  = "2020-12-12",
-	},
-	[118279] = {  -- Deer Head, Wall Mount
-		itemPrice = 15000,
-		itemDate  = "2020-12-12",
-	},
-	[118298] = {  -- Wolf Head, Wall Mount
-		itemPrice = 20000,
-		itemDate  = "2020-12-12",
-	},
-
-	-- ====================================================================
-	
-	[167348] = {		-- Orcish Figurine, Bear
-		itemPrice   = 12000,
-		itemDate  = "2020-12-06",
-	},
-	[141759] = {        -- Orcish Gazebo, Orsinium
- 		itemPrice   = 20000,
-		itemDate  = "2020-12-06",
-	},
-	[132152] = {        -- Orsinium Sarcophagus, Warrior's
- 		itemPrice   = 35000,
-		itemDate  = "2020-12-06",
-	},
-	[132150] = {        -- Orsinium Totem, Honor
- 		itemPrice   = 20000,
-		itemDate  = "2020-12-06",
-	},
-	[132151] = {        -- Orsinium Totem, Obedience
- 		itemPrice   = 20000,
-		itemDate  = "2020-12-06",
-	},
-	[132149] = {        -- Orsinium Totem, Strength
- 		itemPrice   = 20000,
-		itemDate  = "2020-12-06",
-	},
-
-	-- ====================================================================
-	
-	[167347] = {		-- Orcish Figurine, Mammoth
-		itemPrice   = 12000,
-		itemDate  = "2020-11-28",
-	},
-
-	[153691] = {    -- Orsinium Sarcophagus, Honor's Rest
- 		itemPrice   = 25000,
-		itemDate  = "2020-11-28",
-	},
-
-	[141758] = {        -- Orcish Wagon, Merchant
- 		itemPrice   = 15000,
-		itemDate  = "2020-11-28",
-	},
-	-- Oct. 7
-	[132145] = { -- Orsinium Tent, Chief’s
- 		itemPrice   = 15000,
-		itemDate  = "2020-11-28",
-	},
-	[132146] = { -- Orsinium Relief, Malacath
- 		itemPrice   = 25000,
-		itemDate  = "2020-11-28",
-	},
-	[132148] = { -- Orsinium Statue, Head
- 		itemPrice   = 25000,
-		itemDate  = "2020-11-28",
-	},
-	[132147] = { -- Orsinium Statue, Honor’s Rest
- 		itemPrice   = 25000,
-		itemDate  = "2020-11-28",
-	},
-
-	-- ====================================================================
-	
-	[167346] = {		-- Vines, Flowering Wyrdbloom
-		itemPrice   = 4000,
-		itemDate  = "2020-11-21",
-	},
-
-	[153690] = {    -- Flower Cluster, Wyrdbloom
- 		itemPrice   = 4000,
-		itemDate  = "2020-11-21",
-	},
-
-	[141756] = {        -- Mushrooms, Aether Cup Cluster
-		itemPrice   = 10000,
-		itemDate  = "2020-11-21",
-	},
-	[141755] = {        -- Mushrooms, Aether Cup Ring
-		itemPrice   = 10000,
-		itemDate  = "2020-11-21",
-	},
-	[141757] = {        -- Mushrooms, Climbing Aether Cup
-		itemPrice   = 5000,
-		itemDate  = "2020-11-21",
-	},
-
-
 }
 
 
@@ -1924,11 +1956,6 @@ FurC.LuxuryFurnisher[FURC_SCALES] = {
 
 	-- ====================================================================
 	
-
-	[153692] = {    -- Orsinium Well, Covered
-		itemDate  = "2020-12-06",
- 		itemPrice   = 20000,
-	},
 
 
 

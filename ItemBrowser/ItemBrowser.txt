@@ -7,11 +7,11 @@
 ## Title: Item Set Browser
 ## Description: List and browse the game's item sets with tracking of Item Set Collection progress
 ## Author: @code65536
-## Version: 4.2.1
-## APIVersion: 101031 101032
+## Version: 4.4.0
+## APIVersion: 101032 101033
 ## SavedVariables: ItemBrowserSavedVariables
-## DependsOn: LibExtendedJournal>=6
-## OptionalDependsOn: LibMultiAccountSets>=9 LibAddonMenu-2.0
+## DependsOn: LibExtendedJournal>=8
+## OptionalDependsOn: LibMultiAccountSets>=12 LibAddonMenu-2.0
 
 LibCodesCommonCode.lua
 
@@ -27,6 +27,31 @@ Tooltip.lua
 Bindings.xml
 
 ; Changelog:
+;
+; Version 4.4.0 (2022/02/23)
+; * For users of LibMultiAccountSets with data spanning multiple servers, it is
+;   now possible to view item set collection data for accounts on another server
+; * Increased the minimum version requirement of LibMultiAccountSets (optional
+;   dependency for multi-account features) to 3.0 or newer
+;
+; Version 4.3.1 (2022/02/19)
+; * Borrowing a feature from Character Knowledge, "+" or "-" can now be used as
+;   special search terms in the general search to filter for fully-completed and
+;   incomplete sets, respectively (crafted sets are considered to be completed)
+;   - This is separate from and can be used in conjunction with the "-" prefix
+;     introduced in the previous version; for example, "sunsp -perf -" will show
+;     all non-perfected Sunspire sets that have not been completed
+;   - This is not applicable for the set bonus search mode, as "+" and "-" have
+;     different, pre-existing meanings in that search mode
+;
+; Version 4.3.0 (2022/02/17)
+; * The "-" prefix can now be used in the general search to exclude a search
+;   term
+;   - For example, searching for "sunsp" will display all eight sets from
+;     Sunspire, searching for "sunsp perf" will display the four perfected sets,
+;     and now it will be possible to search for "sunsp -perf" to display the
+;     four non-perfected sets
+; * Added support for Update 33 (Ascending Tide)
 ;
 ; Version 4.2.1 (2021/09/29)
 ; * Fixed an issue with the display of antiquity fragment names in non-English

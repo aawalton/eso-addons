@@ -1,10 +1,10 @@
 ﻿## Title: WG |cB60000Ravalox'|r QuestTracker
-## APIVersion: 101031 101032
+## APIVersion: 101032 101033
 ## SavedVariables: QuestTrackerSavedVars
-## Version: 3.8.2.9
-## AddOnVersion: 3080209
+## Version: 3.8.2.10
+## AddOnVersion: 3080210
 ## Author: |cFF2222Ravalox Darkshire|r & |c4EFFF6Calia1120|r
-## DependsOn: LibAddonMenu-2.0>=32 LibCustomMenu>=711 LibQuestInfo>=3080208
+## DependsOn: LibAddonMenu-2.0>=32 LibCustomMenu>=712 LibQuestInfo>=3080210
 ## Description: Ravalox' QuestTracker (A reWrite of Wykkyd's QuestTracker)
 
 core\QuestTracker.lua

@@ -44,3 +44,23 @@ function ExtendedJournalSortFilterList:Row_OnMouseUp( control, button, upInside 
 		end
 	end
 end
+
+function ExtendedJournalSortFilterList:InitializeSearch( typeId )
+	local search = ZO_StringSearch:New()
+
+	search:AddProcessor(typeId, function( stringSearch, data, searchTerm, ... )
+		local invert = false
+
+		-- Invert the results if the "-" modifier prefix is specified
+		if (zo_strlen(searchTerm) > 1 and searchTerm:sub(1, 1) == "-") then
+			searchTerm = searchTerm:sub(2)
+			invert = true
+		end
+
+		local result = self:ProcessItemEntry(stringSearch, data, searchTerm, ...)
+		if (invert) then result = not result end
+		return result
+	end)
+
+	return search
+end

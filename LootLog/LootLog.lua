@@ -4,7 +4,7 @@ LootLog = {
 	name = "LootLog",
 
 	title = GetString(SI_LOOTLOG_TITLE),
-	version = "4.1.1",
+	version = "4.3.2",
 	url = "https://www.esoui.com/downloads/info1455.html",
 
 	-- Default settings
@@ -27,6 +27,12 @@ LootLog = {
 		tradeRequestMode = 1,
 		tradeRequestPrefix = "Requesting",
 		tradeIncludeBoE = false,
+		tradeCommandsCount = 0,
+
+		autoBind = {
+			stopTime = 0,
+			junk = false,
+		},
 
 		uncollectedColors = {
 			lootedPersonal = 0xCC0000,
@@ -862,6 +868,10 @@ function LootLog.OpenSettingsPanel( )
 	if (LootLog.settingsPanel) then
 		LibAddonMenu2:OpenToPanel(LootLog.settingsPanel)
 	end
+end
+
+function LootLog.ChatCommandsReference( )
+	RequestOpenUnsafeURL("http://eso.code65536.com/addons/lootlog/#chatcommands")
 end
 
 EVENT_MANAGER:RegisterForEvent(LootLog.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)

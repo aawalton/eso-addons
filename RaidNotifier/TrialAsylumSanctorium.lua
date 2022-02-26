@@ -11,8 +11,14 @@ local data = {}
 function RaidNotifier.AS.Initialize()
 	p = RaidNotifier.p
 	dbg = RaidNotifier.dbg
-	
+
 	data = {}
+end
+
+function RaidNotifier.AS.Shutdown()
+	-- In case of zoning out during the battle "OnCombatStateChanged" handler may be unregistered before it'll be called
+	-- outside the combat; so we have to manually unregister handler for interval check here
+	EVENT_MANAGER:UnregisterForUpdate(RaidNotifier.Name .. "_IntervalCheck")
 end
 
 local function OnIntervalCheck()
@@ -22,7 +28,12 @@ local function OnIntervalCheck()
 	local settings = self.Vars.asylum
 	
 	if (settings.olms_gusts_of_steam and settings.olms_gusts_of_steam_slider > 0) then
-		health, maxHealth = GetUnitPower("boss1", POWERTYPE_HEALTH) -- Llothi
+		local health, maxHealth = GetUnitPower("boss1", POWERTYPE_HEALTH) -- It's always Olms in AS
+		-- Precautious check in case of situation when the fight is finished already but the combat state check didn't fire yet
+		-- (as we have 3 seconds delay for that currently)
+		if (health == 0 or maxHealth == 0) then
+			return
+		end
 		local healthPercent = health * 100 / maxHealth
 		if (data.olmsHealthChecked == nil) then
 			data.olmsHealthChecked = healthPercent
@@ -40,6 +51,8 @@ end
 function RaidNotifier.AS.OnCombatStateChanged(inCombat)
 	local self = RaidNotifier
 	if (inCombat) then
+		-- At the start of the fight we want to clear all previous fight data collected
+		data = {}
 		EVENT_MANAGER:RegisterForUpdate(self.Name .. "_IntervalCheck", 1000, OnIntervalCheck);
 		dbg("start interval check")
 	else

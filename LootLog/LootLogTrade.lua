@@ -9,9 +9,11 @@ LootLogTrade.name = "LootLogTrade"
 ZO_CreateStringId("SI_BINDING_NAME_LOOTLOG_LINKTRADE", string.format("%s: %s", GetString(SI_LOOTLOG_TITLE), GetString(SI_LOOTLOG_LINKTRADE)))
 ZO_CreateStringId("SI_BINDING_NAME_LOOTLOG_BINDUNCOLLECTED", string.format("%s: %s", GetString(SI_LOOTLOG_TITLE), GetString(SI_LOOTLOG_BINDUNCOLLECTED)))
 
+local AutoBinder
+
 LCCC.RunAfterInitialLoadscreen(function( )
 	LCCC.RegisterSlashCommands(LootLogTrade.LinkTrade, "/linktrade", "/lt")
-	LCCC.RegisterSlashCommands(LootLogTrade.BindUncollected, "/binduncollected", "/bu", "/bunc")
+	LCCC.RegisterSlashCommands(LootLogTrade.BindUncollected, "/binduncollected", "/bu")
 
 	if (LootLog.vars.tradeFlagItemLists) then
 		LootLogTrade.HookLists()
@@ -20,6 +22,8 @@ LCCC.RunAfterInitialLoadscreen(function( )
 	if (LootLog.vars.tradeFlagChat) then
 		zo_callLater(LootLogTrade.HookIncomingChat, 750)
 	end
+
+	AutoBinder.Refresh()
 end)
 
 
@@ -337,6 +341,10 @@ function LootLogTrade.LinkTrade( ... )
 		LootLog.Msg(GetString(SI_LOOTLOG_TRADE_LINKRESET))
 	end
 
+	if (not isContinuation) then
+		LootLog.vars.tradeCommandsCount = LootLog.vars.tradeCommandsCount + 1
+	end
+
 	if (params.boe or params.e) then
 		filter = LinkTradeFilters.boe
 	elseif (params.bop or params.p) then
@@ -471,12 +479,11 @@ LinkTradeWatcher = {
 --------------------------------------------------------------------------------
 
 local MAX_BIND = 20 -- Limit of number of items to bind in a single batch, to avoid error 318
+local MAX_AUTOBIND_DURATION = 999999 -- Maximum autobind duration, in minutes
 local ItemsBound = { }
 local BindReports = { }
 
-function LootLogTrade.BindUncollected( ... )
-	local params = LCCC.TokenizeSlashCommandParameters(...)
-
+local function BindUncollectedItems( params, autoInvoked )
 	local selfPriority = LootLogMulti.GetCurrentAccountPriority()
 	local reservations = { }
 	local bound = { }
@@ -487,7 +494,7 @@ function LootLogTrade.BindUncollected( ... )
 	for _, item in pairs(bagCache) do
 		local itemLink = GetItemLink(item.bagId, item.slotIndex, LINK_STYLE_BRACKETS)
 
-		if (IsItemLinkSetCollectionPiece(itemLink) and not IsItemSetCollectionPieceUnlocked(GetItemLinkItemId(itemLink))) then
+		if (not IsItemPlayerLocked(item.bagId, item.slotIndex) and IsItemLinkSetCollectionPiece(itemLink) and not IsItemSetCollectionPieceUnlocked(GetItemLinkItemId(itemLink))) then
 			local key = LootLog.GetItemLinkItemSetCollectionKey(itemLink)
 
 			if (not ItemsBound[key]) then
@@ -523,10 +530,26 @@ function LootLogTrade.BindUncollected( ... )
 		LootLog.linkHandlers["llbind"] = LootLogTrade.BindReport
 	end
 
-	LootLog.Msg(string.format(GetString(SI_LOOTLOG_BIND_COMPLETED), #bound, reportLink))
+	if (#bound > 0 or not autoInvoked) then
+		LootLog.Msg(string.format(GetString(SI_LOOTLOG_BIND_COMPLETED), #bound, reportLink))
+	end
+
 	if (overflow > 0) then
 		LootLog.Msg(string.format(GetString(SI_LOOTLOG_BIND_OVERFLOW), overflow))
 	end
+end
+
+function LootLogTrade.BindUncollected( ... )
+	local params = LCCC.TokenizeSlashCommandParameters(...)
+	LootLog.vars.tradeCommandsCount = LootLog.vars.tradeCommandsCount + 1
+
+	for key in pairs(params) do
+		if (string.find(key, "^%d+$")) then
+			return AutoBinder.Setup(params, tonumber(key))
+		end
+	end
+
+	BindUncollectedItems(params)
 end
 
 function LootLogTrade.BindReport( key )
@@ -556,3 +579,63 @@ function LootLogTrade.BindReport( key )
 		CHAT_ROUTER:AddSystemMessage(table.concat(results, "\n"))
 	end
 end
+
+AutoBinder = {
+	name = "LootLogAutoBinder",
+	active = false,
+
+	Setup = function( params, duration )
+		if (duration == 0) then
+			LootLog.vars.autoBind.stopTime = 0
+		else
+			if (duration > MAX_AUTOBIND_DURATION) then duration = MAX_AUTOBIND_DURATION end
+			LootLog.vars.autoBind.stopTime = duration * 60 + GetTimeStamp() + 10
+			if (params.junk or params.j) then
+				LootLog.vars.autoBind.junk = true
+			else
+				LootLog.vars.autoBind.junk = false
+			end
+		end
+		AutoBinder.Refresh(duration > 0)
+	end,
+
+	Refresh = function( enablement )
+		local remaining = LootLog.vars.autoBind.stopTime - GetTimeStamp()
+		local printRemaining = function( )
+			LootLog.Msg(string.format(GetString(SI_LOOTLOG_AUTOBIND_ON), remaining / 60))
+		end
+
+		if (remaining > 0 and not AutoBinder.active) then
+			AutoBinder.active = true
+			EVENT_MANAGER:RegisterForEvent(AutoBinder.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, AutoBinder.Event)
+			EVENT_MANAGER:AddFilterForEvent(AutoBinder.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_BACKPACK)
+			EVENT_MANAGER:AddFilterForEvent(AutoBinder.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_IS_NEW_ITEM, true)
+			printRemaining()
+			AutoBinder.Event()
+		elseif (remaining <= 0 and AutoBinder.active) then
+			AutoBinder.active = false
+			EVENT_MANAGER:UnregisterForEvent(AutoBinder.name, EVENT_INVENTORY_SINGLE_SLOT_UPDATE)
+			LootLog.Msg(GetString(SI_LOOTLOG_AUTOBIND_OFF))
+		elseif (enablement) then
+			-- We were invoked from an enablement command, in which the user is updating the stop time
+			printRemaining()
+		end
+	end,
+
+	Event = function( eventCode, bagId, slotId, isNewItem, itemSoundCategory, inventoryUpdateReason, stackCountChange, triggeredByCharacterName, triggeredByDisplayName, isLastUpdateForMessage )
+		-- Multiple update events should be coalesced
+		EVENT_MANAGER:UnregisterForUpdate(AutoBinder.name)
+		EVENT_MANAGER:RegisterForUpdate(
+			AutoBinder.name,
+			1000,
+			function( )
+				EVENT_MANAGER:UnregisterForUpdate(AutoBinder.name)
+				-- Refresh ensures we have not exceeded our stop time
+				AutoBinder.Refresh()
+				if (AutoBinder.active) then
+					BindUncollectedItems(LootLog.vars.autoBind, true)
+				end
+			end
+		)
+	end,
+}

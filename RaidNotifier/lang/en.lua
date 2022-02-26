@@ -414,7 +414,7 @@ L.Alerts_Asylum_Teleport_Strike_Other            = "|cFF3366Teleport Strike|r on
 L.Alerts_Asylum_Exhaustive_Charges               = "Incoming |cFF0000Exhaustive Charges|r"
 L.Alerts_Asylum_Storm_The_Heavens                = "Incoming |cFF0000Storm The Heavens|r! Kite!"
 L.Alerts_Asylum_Gusts_Of_Steam                   = "Incoming |cFF9900Gusts Of Steam|r! Hide!"
-L.Alerts_Asylum_Pre_Gusts_Of_Steam               = "<<1>> to |cFF0000jump|r! Prepare to Hide!"
+L.Alerts_Asylum_Pre_Gusts_Of_Steam               = "|cFF0000<<1>>%|r to |cFF9900jump|r! Prepare to Hide!"
 L.Alerts_Asylum_Trial_By_Fire                    = "Incoming |cFF5500Fire|r!"
 L.Alerts_Asylum_Protector_Spawn                  = "|c0000FFProtector|r spawning!"
 L.Alerts_Asylum_Protector_Active                 = "|c0000FFProtector|r active!"
@@ -570,7 +570,7 @@ L.Settings_KynesAegis_Ichor_Eruption_CD_Time_TT     = "Time before Ichor Eruptio
 
 -- Alerts
 L.Alerts_KynesAegis_Crashing_Wall                   = "|cd2a100Crashing Wall|r in"
-L.Alerts_KynesAegis_Sanguine_Prison_Other           = "|cff0000<<!aC:1>>|r trapped in |cb00000Sanguine Prison|r. Free him!"
+L.Alerts_KynesAegis_Sanguine_Prison_Other           = "|cff0000<<!aC:1>>|r trapped in |cb00000Sanguine Prison|r. Free them!"
 L.Alerts_KynesAegis_Blood_Fountain                  = "|cb00000Blood Fountain|r in"
 L.Alerts_KynesAegis_Dragon_Totem                    = "Two |cffa500Dragon Totems|r spawned. Avoid the fire!"
 L.Alerts_KynesAegis_Harpy_Totem                     = "|c00bfffHarpy Totem|r spawned."
@@ -600,6 +600,8 @@ L.Settings_Rockgrove_Savage_Blitz                  = "Oaxiltso: Savage Blitz"
 L.Settings_Rockgrove_Savage_Blitz_TT               = "Alerts you when the Oaxiltso charges at the furthest player."
 L.Settings_Rockgrove_Noxious_Sludge                = "Oaxiltso: Noxious Sludge"
 L.Settings_Rockgrove_Noxious_Sludge_TT             = "Alerts you when someone is poisoned by Oaxiltso and has to go cleanse in the pool."
+L.Settings_Rockgrove_Cinder_Cleave                 = "Oaxiltso's mini-boss: Cinder Cleave"
+L.Settings_Rockgrove_Cinder_Cleave_TT              = "Alerts you when Havocrel Annihilator casts his Cinder Cleave ability on someone during the fight with Oaxiltso."
 L.Settings_Rockgrove_Embrace_Of_Death              = "Flame-Herald Bahsei: Embrace of Death"
 L.Settings_Rockgrove_Embrace_Of_Death_TT           = "Alerts you when someone got cursed by Flame-Herald Bahsei. That person will explode after 8 seconds, spreading the curse. It's important to keep cursed player separated from the group."
 L.Settings_Rockgrove_Embrace_Of_Death_TT_All       = "|cFF0000WARNING!|r If your group will get too much curses your screen may be fully covered in countdowns for a duration of those curses! We're working on ways to improve this notification."
@@ -615,8 +617,10 @@ L.Alerts_Rockgrove_Savage_Blitz                    = "Oaxiltso charges at |cFF00
 L.Alerts_Rockgrove_Noxious_Sludge_Self             = "You're poisoned by |c008C22Noxious Sludge|r! Cleanse in the pool!"
 L.Alerts_Rockgrove_Noxious_Sludge_Other1           = "|cFF0000<<!aC:1>>|r is poisoned by |c008C22Noxious Sludge|r."
 L.Alerts_Rockgrove_Noxious_Sludge_Other2           = "|cFF0000<<!aC:1>>|r and |cFF0000<<!aC:2>>|r are poisoned by |c008C22Noxious Sludge|r."
-L.Alerts_Rockgrove_Embrace_Of_Death                = "You're cursed by |c370073Embrace of Death|r! Stay away! Explosion in"
-L.Alerts_Rockgrove_Embrace_Of_Death_Other          = "|cFF0000<<!aC:1>>|r cursed by |c370073Embrace of Death|r! Explosion in"
+L.Alerts_Rockgrove_Cinder_Cleave                   = "|cD74700Cinder Cleave|r on you!"
+L.Alerts_Rockgrove_Cinder_Cleave_Other             = "|cD74700Cinder Cleave|r on |cFF0000<<!aC:1>>|r."
+L.Alerts_Rockgrove_Embrace_Of_Death                = "You're cursed by |c0A929BEmbrace of Death|r! Stay away! Explosion in"
+L.Alerts_Rockgrove_Embrace_Of_Death_Other          = "|cFF0000<<!aC:1>>|r cursed by |c0A929BEmbrace of Death|r! Explosion in"
 
 
 --------------------------------

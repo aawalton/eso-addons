@@ -90,7 +90,7 @@ function SearchTabWrapper:InitializeFilters(tradingHouseWrapper)
 
     AGS:RegisterFilter(AGS.class.UnitPriceFilter:New())
     AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.UNIT_PRICE_FILTER))
-
+    
     AGS:RegisterFilter(AGS.class.UnitValueFilter:New())
     AGS:RegisterFilterFragment(AGS.class.PriceRangeFilterFragment:New(FILTER_ID.UNIT_VALUE_FILTER))
 

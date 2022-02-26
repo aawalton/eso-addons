@@ -7,10 +7,10 @@
 ## Title: Loot Log
 ## Description: Searchable log of the items that you and your group members have looted
 ## Author: @code65536
-## Version: 4.1.1
-## APIVersion: 101031 101032
+## Version: 4.3.2
+## APIVersion: 101032 101033
 ## SavedVariables: LootLogSavedVariables LootLogHistory
-## DependsOn: LibExtendedJournal>=6
+## DependsOn: LibExtendedJournal>=8
 ## OptionalDependsOn: LibCharacterKnowledge>=6 LibMultiAccountSets>=9 LibAddonMenu-2.0
 
 LibCodesCommonCode.lua
@@ -27,6 +27,32 @@ LootLogTrade.lua
 Bindings.xml
 
 ; Changelog:
+;
+; Version 4.3.2 (2022/02/23)
+; * The more prominent link to the chat commands reference will now be hidden
+;   for players who have already discovered the features whose discoverability
+;   the link was intended to improve
+;
+; Versions 4.3.0 to 4.3.1 (2022/02/19)
+; * /binduncollected can now be used to automatically bind uncollected set items
+;   for a period of time by specifying a time parameter (in minutes); for
+;   example, "/bu 120" will cause Loot Log to automatically bind all uncollected
+;   set items for the next 120 minutes, and "/bu 0" will cancel automatic
+;   binding
+;   - This feature was added in response to item set curation; originally, there
+;     was no reason for players to bind items immediately, and most players
+;     would bind items in a single large batch at the end of their activities,
+;     but as curation encourages players to bind items frequently in order to
+;     avoid repeats, it has become necessary to support this new usage pattern
+; * /binduncollected will now ignore items that have been locked by the player
+; * The /bunc shorthand, which was deprecated a year ago, has been removed;
+;   users who wish to use a shorthand version of /binduncollected should use /bu
+; * Added a new link to the chat commands reference to the footer of the Loot
+;   History Browser, in an effort to improve the discoverability of the
+;   /binduncollected and /linktrade features
+;
+; Version 4.2.0 (2022/02/17)
+; * The "-" prefix can now be used in the search filter to exclude a search term
 ;
 ; Version 4.1.1 (2021/09/28)
 ; * Blue-quality companion items will no longer be considered notable

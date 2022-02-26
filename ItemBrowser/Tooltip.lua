@@ -3,6 +3,9 @@ local LMAS = LibMultiAccountSets
 local LEJ = LibExtendedJournal
 local ItemBrowser = ItemBrowser
 
+-- Ensure LMAS is 3.0 or newer
+if (LMAS and not LMAS.GetServerAndAccountList) then LMAS = nil end
+
 
 --------------------------------------------------------------------------------
 -- ItemBrowser.AddTooltipExtension
@@ -13,6 +16,7 @@ local FLAG_SHOW_PIECES   = 0x02
 local FLAG_SHOW_ACCOUNTS = 0x04
 local FLAG_FULL_PIECES   = 0x08
 local FLAG_BROWSER_ITEM  = 0x0B -- FLAG_SHOW_HEADER | FLAG_SHOW_PIECES | FLAG_FULL_PIECES
+local MASK_HIDE_ACCOUNTS = 0xFB -- ~FLAG_SHOW_ACCOUNTS
 
 local ItemCategories = {
 	GAMEPAD_ITEM_CATEGORY_LIGHT_ARMOR,
@@ -92,7 +96,10 @@ local function AddTooltipExtensionToUndauntedCoffer( tooltip, itemLink )
 	LEJ.TooltipExtensionFinalize(tooltip)
 end
 
-function ItemBrowser.AddTooltipExtension( tooltip, itemLink, account, flags, itemSource )
+function ItemBrowser.AddTooltipExtension( tooltip, itemLink, account, flags, itemSource, server )
+	-- Setting the server parameter should disable FLAG_SHOW_ACCOUNTS
+	if (server) then flags = BitAnd(flags, MASK_HIDE_ACCOUNTS) end
+
 	local valid, setId
 	local container = GetItemLinkNumContainerSetIds(itemLink)
 
@@ -118,9 +125,9 @@ function ItemBrowser.AddTooltipExtension( tooltip, itemLink, account, flags, ite
 	local CountUnlockedSlots = GetNumItemSetCollectionSlotsUnlocked
 	local GetCurrencyCost = GetItemReconstructionCurrencyOptionCost
 	if (LMAS) then
-		IsSlotUnlocked = function(...) return LMAS.IsItemSetCollectionSlotUnlockedForAccount(account, ...) end
-		CountUnlockedSlots = function(...) return LMAS.GetNumItemSetCollectionSlotsUnlockedForAccount(account, ...) end
-		GetCurrencyCost = function(...) return LMAS.GetItemReconstructionCurrencyOptionCostForAccount(account, ...) end
+		IsSlotUnlocked = function(...) return LMAS.IsItemSetCollectionSlotUnlockedForAccountEx(server, account, ...) end
+		CountUnlockedSlots = function(...) return LMAS.GetNumItemSetCollectionSlotsUnlockedForAccountEx(server, account, ...) end
+		GetCurrencyCost = function(...) return LMAS.GetItemReconstructionCurrencyOptionCostForAccountEx(server, account, ...) end
 	end
 
 	-- Component: status header

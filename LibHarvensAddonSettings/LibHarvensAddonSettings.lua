@@ -1,4 +1,4 @@
-local version = 10705
+local version = 10900
 
 if LibHarvensAddonSettings then return end
 
@@ -66,7 +66,7 @@ local changeControlStateFunctions = {
 		boxControl:SetAlpha(GetAlphaFromState(state))
 	end,
 	[LibHarvensAddonSettings.ST_DROPDOWN] = function(control, state)
-		local dropdown = GetControl(control, "Dropdown")
+		local dropdown = control.dropdown
 		if state == false then
 			ZO_ComboBox_Disable(dropdown)
 		else
@@ -147,12 +147,13 @@ local updateControlFunctions = {
 	[LibHarvensAddonSettings.ST_DROPDOWN] = function(self, lastControl)
 		self:SetAnchor(lastControl)
 		GetControl(self.control, "Name"):SetText(self:GetValueOrCallback(self.labelText))
-		local combobox = GetControl(self.control, "Dropdown").m_comboBox
+		local combobox = ZO_ComboBox_ObjectFromContainer(self.control.dropdown)
 		combobox:ClearItems()
 		local itemEntry
+		local callback = function(...) self:ValueChanged(...) end
 		local items = self:GetValueOrCallback(self.items)
 		for i = 1, #items do
-			itemEntry = combobox:CreateItemEntry(items[i].name, function(...) self:ValueChanged(...) end)
+			itemEntry = combobox:CreateItemEntry(items[i].name, callback)
 			itemEntry.data = items[i].data
 			combobox:AddItem(itemEntry)
 		end
@@ -226,7 +227,6 @@ local createControlFunctions = {
 		self.control.data = ZO_Object:New(self)
 		updateControlFunctions[LibHarvensAddonSettings.ST_EDIT](self, lastControl)
 		local editControl = self.control:GetNamedChild("EditBackdrop"):GetNamedChild("Edit")
-		editControl:SetAllowMarkupType(ALLOW_MARKUP_TYPE_NONE)
 		editControl:SetHandler("OnEnter", function(control)
 			self:ValueChanged(control:GetText())
 			control:LoseFocus()
@@ -235,11 +235,11 @@ local createControlFunctions = {
 			control:SetText(self.getFunction() or "")
 			control:LoseFocus()
 		end)
-		editControl:SetHandler("OnFocusLost", function(control)
-			self:ValueChanged(control:GetText())
+		editControl:SetHandler("OnFocusLost", function(editControl)
+			self:ValueChanged(editControl:GetText())
 			editControl:SetColor(ZO_NORMAL_TEXT:UnpackRGB())
-			control:SetText(self.getFunction() or "")
-			control:SetCursorPosition(0)
+			editControl:SetText(self.getFunction() or "")
+			editControl:SetCursorPosition(0)
 		end)
 		editControl:SetHandler("OnFocusGained", function(control)
 			control:SetColor(ZO_HIGHLIGHT_TEXT:UnpackRGB())
@@ -299,7 +299,7 @@ local cleanControlFunctions = {
 		LibHarvensAddonSettings.editPool:ReleaseObject(self.controlKey)
 	end,
 	[LibHarvensAddonSettings.ST_DROPDOWN] = function(self)
-		local combobox = GetControl(self.control, "Dropdown").m_comboBox
+		local combobox = ZO_ComboBox_ObjectFromContainer(self.control.dropdown)
 		combobox:ClearItems()
 		LibHarvensAddonSettings.dropdownPool:ReleaseObject(self.controlKey)
 	end,
@@ -569,7 +569,7 @@ function AddonSettingsControl:SetValue(...)
 		local value = ...
 		editControl:SetText(value)
 	elseif self.type == LibHarvensAddonSettings.ST_DROPDOWN then
-		local combobox = GetControl(self.control, "Dropdown").m_comboBox
+		local combobox = ZO_ComboBox_ObjectFromContainer(self.control.dropdown)
 		combobox:SetSelectedItem(...)
 	elseif self.type == LibHarvensAddonSettings.ST_COLOR then
 		self.control.texture:SetColor(...)
@@ -586,7 +586,7 @@ function AddonSettingsControl:ResetToDefaults()
 				break
 			end
 		end
-		local combobox = GetControl(self.control, "Dropdown").m_comboBox
+		local combobox = ZO_ComboBox_ObjectFromContainer(self.control.dropdown)
 		self.setFunction(combobox, self.default, self.items[itemIndex])
 	elseif self.type == LibHarvensAddonSettings.ST_COLOR then
 		self:SetValue(unpack(self.default))
@@ -829,7 +829,7 @@ local function PoolCreateControlBase(name, pool)
 	control:SetMouseEnabled(true)
 	control:SetDimensions(510, 26)
 
-	local label = WINDOW_MANAGER:CreateControl(controlNamespace .. "Name", control, CT_LABEL)
+	local label = WINDOW_MANAGER:CreateControl("$(parent)Name", control, CT_LABEL)
 	label:SetFont("ZoFontWinH4")
 	label:SetDimensions(300, 26)
 	label:SetAnchor(LEFT, control, LEFT, 0, 0)
@@ -839,7 +839,7 @@ end
 
 local function ButtonPoolCreateButton(pool)
 	local control, id = PoolCreateControlBase("HarvensAddonSettingsButton", pool)
-	local button = WINDOW_MANAGER:CreateControlFromVirtual("HarvensAddonSettingsButton" .. id .. "Button", control, "ZO_DefaultButton")
+	local button = WINDOW_MANAGER:CreateControlFromVirtual("$(parent)Button", control, "ZO_DefaultButton")
 	button:SetAnchor(RIGHT, control, RIGHT, 0, 0)
 	button:SetDimensions(200, 26)
 	return control
@@ -847,14 +847,14 @@ end
 
 local function EditPoolCreateEdit(pool)
 	local control, id = PoolCreateControlBase("HarvensAddonSettingsEdit", pool)
-	local controlNamespace = "HarvensAddonSettingsEdit" .. id
 
-	local editBackdrop = WINDOW_MANAGER:CreateControlFromVirtual(controlNamespace .. "EditBackdrop", control, "ZO_EditBackdrop")
+	local editBackdrop = WINDOW_MANAGER:CreateControlFromVirtual("$(parent)EditBackdrop", control, "ZO_EditBackdrop")
 	editBackdrop:SetDimensions(200, 26)
 	editBackdrop:SetAnchor(RIGHT, control, RIGHT, 0, 0)
 
-	local editBox = WINDOW_MANAGER:CreateControlFromVirtual(controlNamespace .. "EditBackdropEdit", editBackdrop, "ZO_DefaultEditForBackdrop")
+	local editBox = WINDOW_MANAGER:CreateControlFromVirtual("$(parent)Edit", editBackdrop, "ZO_DefaultEditForBackdrop")
 	editBox:SetFont("ZoFontWinH4")
+	editBox:SetAllowMarkupType(ALLOW_MARKUP_TYPE_NONE)
 	return control
 end
 
@@ -925,10 +925,27 @@ end
 function LibHarvensAddonSettings:CreateControlPools()
 	self.checkboxPool = ZO_ControlPool:New("ZO_Options_Checkbox", self.container, "Checkbox")
 	self.sliderPool = ZO_ControlPool:New("ZO_Options_Slider", self.container, "Slider")
-	self.buttonPool = ZO_ObjectPool:New(ButtonPoolCreateButton)
-	self.editPool = ZO_ObjectPool:New(EditPoolCreateEdit)
+	self.buttonPool = ZO_ObjectPool:New(ButtonPoolCreateButton, ZO_ObjectPool_DefaultResetControl)
+	self.editPool = ZO_ObjectPool:New(EditPoolCreateEdit, ZO_ObjectPool_DefaultResetControl)
 	self.dropdownPool = ZO_ControlPool:New("ZO_Options_Dropdown", self.container, "Dropdown")
-	self.labelPool = ZO_ObjectPool:New(LabelPoolCreateLabel)
+	local function comboboxSetup(control)
+		control.dropdown = control:GetNamedChild("Dropdown")
+		local combobox = ZO_ComboBox_ObjectFromContainer(control.dropdown)
+		local popup = combobox.m_dropdown
+		ZO_PreHook(combobox, "AddMenuItems", function(combobox)
+			local items = combobox.m_sortedItems
+			local width = control.dropdown:GetWidth()
+			for i = 1, #items do
+				width = math.max(width, ZO_LabelUtils_GetTextDimensions(items[i].name or "", "ZoFontGame") + 36)
+			end
+			popup:SetWidth(width)
+		end)
+		popup:ClearAnchors()
+		popup:SetAnchor(TOPRIGHT, nil, BOTTOMRIGHT)
+		popup:SetDrawTier(DT_HIGH)
+	end
+	self.dropdownPool:SetCustomFactoryBehavior(comboboxSetup)
+	self.labelPool = ZO_ObjectPool:New(LabelPoolCreateLabel, ZO_ObjectPool_DefaultResetControl)
 	self.sectionPool = ZO_ControlPool:New("ZO_Options_SectionTitle_WithDivider", self.container, "SectionLabel")
 	self.colorPool = ZO_ControlPool:New("ZO_Options_Color", self.container, "Color")
 end

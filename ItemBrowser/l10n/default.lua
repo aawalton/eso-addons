@@ -6,6 +6,7 @@ ZO_CreateStringId("SI_ITEMBROWSER_HEADER_SOURCE"   , "Source")
 
 ZO_CreateStringId("SI_ITEMBROWSER_COLLECTED_COUNT" , "%d / %d collected (%d%%)")
 ZO_CreateStringId("SI_ITEMBROWSER_ACCOUNT_LABEL"   , "Account:")
+ZO_CreateStringId("SI_ITEMBROWSER_SERVER_LABEL"    , "Server:")
 
 ZO_CreateStringId("SI_ITEMBROWSER_TYPE_CRAFTED"    , GetString(SI_ITEM_FORMAT_STR_CRAFTED))
 ZO_CreateStringId("SI_ITEMBROWSER_TYPE_MONSTER"    , "Monster")

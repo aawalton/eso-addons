@@ -3,6 +3,9 @@ local LMAS = LibMultiAccountSets
 local LEJ = LibExtendedJournal
 local ItemBrowser = ItemBrowser
 
+-- Ensure LMAS is 3.0 or newer
+if (LMAS and not LMAS.GetServerAndAccountList) then LMAS = nil end
+
 
 --------------------------------------------------------------------------------
 -- Extended Journal
@@ -13,7 +16,7 @@ local FRAME = ItemBrowserFrame
 local DATA_TYPE = 1
 local SORT_TYPE = 1
 
-local Initialized = false
+local Initialized = 0
 local Dirtiness = 0
 local ContextMenuItems = { }
 
@@ -34,8 +37,8 @@ function ItemBrowser.InitializeBrowser( )
 end
 
 function ItemBrowser.LazyInitializeBrowser( )
-	if (not Initialized) then
-		Initialized = true
+	if (Initialized == 0) then
+		Initialized = 1
 
 		-- For the current zone filter
 		ItemBrowser.zoneId = GetZoneId(GetUnitZoneIndex("player"))
@@ -90,11 +93,13 @@ function ItemBrowser.LazyInitializeBrowser( )
 			end
 			ItemBrowser.RefreshBrowser()
 		end)
+
+		Initialized = 2
 	end
 end
 
 function ItemBrowser.RefreshBrowser( noActiveCheck )
-	if (Initialized and Dirtiness > 0 and (noActiveCheck or LEJ.IsTabActive(TAB_NAME))) then
+	if (Initialized > 0 and Dirtiness > 0 and (noActiveCheck or LEJ.IsTabActive(TAB_NAME))) then
 		if (Dirtiness == 1) then
 			ItemBrowser.list:RefreshFilters()
 		else
@@ -138,13 +143,15 @@ end)
 -- LibMultiAccountSets Support
 --------------------------------------------------------------------------------
 
-local CurrentAccount = nil
+local CurrentServer = LCCC.GetServerName()
+local SelectedServer = CurrentServer
+local SelectedAccount = nil
 
 local CountUnlockedSlots = GetNumItemSetCollectionSlotsUnlocked
 local GetCurrencyCost = GetItemReconstructionCurrencyOptionCost
 if (LMAS) then
-	CountUnlockedSlots = function(...) return LMAS.GetNumItemSetCollectionSlotsUnlockedForAccount(CurrentAccount, ...) end
-	GetCurrencyCost = function(...) return LMAS.GetItemReconstructionCurrencyOptionCostForAccount(CurrentAccount, ...) end
+	CountUnlockedSlots = function(...) return LMAS.GetNumItemSetCollectionSlotsUnlockedForAccountEx(SelectedServer, SelectedAccount, ...) end
+	GetCurrencyCost = function(...) return LMAS.GetItemReconstructionCurrencyOptionCostForAccountEx(SelectedServer, SelectedAccount, ...) end
 end
 
 
@@ -335,20 +342,34 @@ function ItemBrowserList:Setup( )
 
 	if (LMAS) then
 		local accounts = LMAS.GetAccountList(true)
-		if (#accounts > 0) then
-			table.insert(accounts, 1, GetDisplayName())
+		local servers = LMAS.GetServerAndAccountList()
+
+		-- The current server should always exist in the list even if there is no data for it
+		if (servers[1] and servers[1].server ~= CurrentServer) then
+			table.insert(servers, 1, { server = CurrentServer, accounts = { } })
+		end
+
+		if (#accounts > 0 or #servers > 1) then
 			local control = self.frame:GetNamedChild("AccountDrop")
 			control:GetNamedChild("Caption"):SetText(GetString(SI_ITEMBROWSER_ACCOUNT_LABEL))
 			control:SetHidden(false)
 			self.accountDrop = ZO_ComboBox_ObjectFromContainer(control)
-			self:InitializeComboBox(self.accountDrop, accounts)
+
+			if (#servers > 1) then
+				local control = self.frame:GetNamedChild("ServerDrop")
+				control:GetNamedChild("Caption"):SetText(GetString(SI_ITEMBROWSER_SERVER_LABEL))
+				control:SetHidden(false)
+				self.serverDrop = ZO_ComboBox_ObjectFromContainer(control)
+				self:InitializeComboBox(self.serverDrop, servers)
+			else
+				self:RefreshAccountList()
+			end
 		end
 	end
 
 	self.searchBox = self.frame:GetNamedChild("SearchBox")
 	self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
-	self.search = ZO_StringSearch:New()
-	self.search:AddProcessor(SORT_TYPE, function(...) return self:ProcessItemEntry(...) end)
+	self.search = self:InitializeSearch(SORT_TYPE)
 
 	self:RefreshData()
 end
@@ -488,6 +509,8 @@ function ItemBrowserList:SetupItemRow( control, data )
 end
 
 function ItemBrowserList:RefreshCollectionCount( )
+	if (Initialized < 2) then return end
+
 	for _, data in ipairs(self.masterList) do
 		if (data.setSize > 0) then
 			data.setFound = CountUnlockedSlots(data.setId)
@@ -580,6 +603,12 @@ function ItemBrowserList:CheckForMatch( data, searchInput )
 end
 
 function ItemBrowserList:ProcessItemEntry( stringSearch, data, searchTerm, cache )
+	if (searchTerm == "+") then
+		return data.setSize == data.setFound
+	elseif (searchTerm == "-") then
+		return data.setSize > data.setFound
+	end
+
 	if ( zo_plainstrfind(data.name:lower(), searchTerm) or
 	     zo_plainstrfind(data.subname:lower(), searchTerm) or
 	     zo_plainstrfind(data.itemType:lower(), searchTerm) or
@@ -590,7 +619,34 @@ function ItemBrowserList:ProcessItemEntry( stringSearch, data, searchTerm, cache
 	return false
 end
 
+function ItemBrowserList:RefreshAccountList( )
+	-- For the current server, the current account should always be listed even
+	-- if its data is not tracked by LMAS, hence the different code paths here
+	local accounts = { }
+	if (SelectedServer == CurrentServer) then
+		accounts = LMAS.GetAccountList(true)
+		table.insert(accounts, 1, GetDisplayName())
+	else
+		for _, server in ipairs(LMAS.GetServerAndAccountList()) do
+			if (SelectedServer == server.server) then
+				accounts = server.accounts
+			end
+		end
+	end
+
+	-- Try to keep the same account selected when changing servers
+	local initialIndex
+	for i, account in ipairs(accounts) do
+		if (SelectedAccount == account) then
+			initialIndex = i
+		end
+	end
+	self:InitializeComboBox(self.accountDrop, accounts, nil, initialIndex)
+end
+
 function ItemBrowserList:InitializeComboBox( control, prefix, max, initialIndex )
+	local ignoreCallback = true
+
 	control:SetSortsItems(false)
 	control:ClearItems()
 
@@ -606,11 +662,12 @@ function ItemBrowserList:InitializeComboBox( control, prefix, max, initialIndex 
 			entry.id = i
 			control:AddItem(entry, ZO_COMBOBOX_SUPRESS_UPDATE)
 		end
-	elseif (type(prefix) == "table") then
+	elseif (type(prefix) == "table" and type(prefix[1]) == "string") then
 		-- Account drop-down
+		ignoreCallback = false
 
 		local callback = function( comboBox, entryText, entry, selectionChanged )
-			CurrentAccount = entryText
+			SelectedAccount = entryText
 			self:RefreshCollectionCount()
 		end
 
@@ -618,9 +675,22 @@ function ItemBrowserList:InitializeComboBox( control, prefix, max, initialIndex 
 			local entry = ZO_ComboBox:CreateItemEntry(label, callback)
 			control:AddItem(entry, ZO_COMBOBOX_SUPRESS_UPDATE)
 		end
+	elseif (type(prefix) == "table" and type(prefix[1]) == "table") then
+		-- Server drop-down
+		ignoreCallback = false
+
+		local callback = function( comboBox, entryText, entry, selectionChanged )
+			SelectedServer = entryText
+			self:RefreshAccountList()
+		end
+
+		for _, server in ipairs(prefix) do
+			local entry = ZO_ComboBox:CreateItemEntry(server.server, callback)
+			control:AddItem(entry, ZO_COMBOBOX_SUPRESS_UPDATE)
+		end
 	end
 
-	LEJ.SelectComboBoxItemByIndex(control, initialIndex, true)
+	LEJ.SelectComboBoxItemByIndex(control, initialIndex, ignoreCallback)
 end
 
 
@@ -636,7 +706,7 @@ function ItemBrowserListRow_OnMouseEnter( control )
 
 	local itemLink = data.itemLink
 	Tooltip = LEJ.ItemTooltip(itemLink)
-	ItemBrowser.AddTooltipExtension(Tooltip, itemLink, CurrentAccount, 0x0B) -- See FLAG_BROWSER_ITEM in Tooltip.lua
+	ItemBrowser.AddTooltipExtension(Tooltip, itemLink, SelectedAccount, 0x0B, nil, SelectedServer) -- See FLAG_BROWSER_ITEM in Tooltip.lua
 end
 
 function ItemBrowserListRow_OnMouseExit( control )

@@ -406,6 +406,15 @@ ItemBrowser.data = {
 		{ 179960, 0x00, { 1286 } }, -- Eye of the Grasp
 		{ 180132, 0x00, { 1286 } }, -- Hexos' Ward
 		{ 180297, 0x00, { 1286 } }, -- Kynmarcher's Cruelty
+		{ 180966, 0x00, { 1301 } }, -- Maligalig's Maelstrom
+		{ 181138, 0x00, { 1301 } }, -- Gryphon's Reprisal
+		{ 181303, 0x00, { 1301 } }, -- Glacial Guardian
+		{ 181739, 0x00, { 1302 } }, -- Turning Tide
+		{ 181905, 0x00, { 1302 } }, -- Storm-Cursed's Revenge
+		{ 182077, 0x00, { 1302 } }, -- Spriggan's Vigor
+		{ 183272, 0x20, { -4 } }, -- Rallying Cry
+		{ 183444, 0x20, { -4 } }, -- Hew and Sunder
+		{ 183609, 0x20, { -4 } }, -- Enervating Aura
 
 		-- Monster Sets --------------------------------------------------------
 		{ 59391, 0x18, { 934, { -101 } } }, -- Spawn of Mephala
@@ -457,6 +466,11 @@ ItemBrowser.data = {
 		{ 175309, 0x18, { 584 } }, -- Glorgoloch the Destroyer
 		{ 178582, 0x18, { 1267, { -103 } } }, -- Prior Thierric
 		{ 178644, 0x18, { 1268, { -103 } } }, -- Magma Incarnate
+		{ 183744, 0x18, { 1301, { -103 } } }, -- Kargaeda
+		{ 183800, 0x18, { 1302, { -103 } } }, -- Nazaray
+		{ 183908, 0x18, { 584 } }, -- Nunatak
+		{ 183976, 0x18, { 584 } }, -- Lady Malygda
+		{ 184032, 0x18, { 584 } }, -- Baron Thirsk
 
 		-- 3p Jewelry Sets -----------------------------------------------------
 		{ 69166, 0x22, { 584, -1 } }, -- Endurance
@@ -668,6 +682,8 @@ ItemBrowser.data = {
 		[1229] = 3, -- The Cauldron
 		[1267] = 3, -- Red Petal Bastion
 		[1268] = 3, -- The Dread Cellar
+		[1301] = 3, -- Coral Aerie
+		[1302] = 3, -- Shipwright's Regret
 
 		-- Trials --------------------------------------------------------------
 		[ 636] = 4, -- Hel Ra Citadel

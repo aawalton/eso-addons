@@ -312,6 +312,9 @@ l.onActionSlotAbilityUsed -- #(#number:eventCode,#number:slotNum)->()
       sameNameAction.startTime/1000,  action:getFlagsInfo(), action:getStartTime()/1000, action:getEndTime()/1000)
     sameNameAction.newAction = action
     action.effectList = sameNameAction.effectList
+    for key, var in ipairs(action.effectList) do
+    	var.ignored = false
+    end
     sameNameAction.effectList = {}
     action.lastEffectTime = sameNameAction.lastEffectTime
     action.stackCount = sameNameAction.stackCount
@@ -427,8 +430,13 @@ l.onEffectChanged -- #(#number:eventCode,#number:changeType,#number:effectSlot,#
 
   -- 0. prepare
   -- ignore expedition on others
-  if iconName:find('buff_major_expedition',1,true) and unitTag~='player' then return end
-
+  if unitTag~='player' and iconName:find('buff_major_expedition',1,true) then return end
+  -- ignore burning effect
+  if not l.ignoredIds['ability_mage_062'] and iconName:find('ability_mage_062',1,true) then
+    l.ignoredIds['ability_mage_062']=true
+    l.ignoredIds[abilityId]=true
+    return
+  end
 
   if unitTag and string.find(unitTag, 'group') then return end -- ignore effects on group members especially those same as player
   local startTime =  math.floor(beginTimeSec * 1000)
@@ -437,7 +445,7 @@ l.onEffectChanged -- #(#number:eventCode,#number:changeType,#number:effectSlot,#
   if duration > 150000 then return end -- ignore effects that last longer than 150 seconds
   if l.lastAction and not l.lastAction.flags.forGround and startTime and
     startTime - (l.lastAction.startTime + l.lastAction.castTime)>2000 then
-    l.debug(DS_ACTION,1)('[w] wipe lastAction by time')
+    l.debug(DS_ACTION,1)('[u] unref lastAction by time')
     l.lastAction = nil
   end
   if l.lastEffectAction and startTime and startTime- l.lastEffectAction.lastEffectTime>50 then
@@ -458,7 +466,7 @@ l.onEffectChanged -- #(#number:eventCode,#number:changeType,#number:effectSlot,#
       local oldEffect = action:purgeEffect(effect)
       l.timeActionMap[oldEffect.startTime] = nil
       if stackInfoUpdated then
-        l.debug(DS_ACTION,1)('[cs] purged stack info %s (%s)', action.ability:toLogString(), action:hasEffect() and 'other effect exists' or 'no other effect')
+        l.debug(DS_ACTION,1)('[cs] purged stack info %s (%s)%s', action.ability:toLogString(), action:hasEffect() and 'other effect exists' or 'no other effect',action:getEffectsInfo())
         if action:getEndTime() <= now+20 and action:getStartTime()>now-500 then  -- action trigger effect's end i.e. Crystal Fragment/Molten Whip
           l.debug(DS_ACTION,1)('[P]%s@%.2f~%.2f', action.ability:toLogString(), action.startTime/1000, action:getEndTime())
           l.removeAction(action)
@@ -805,6 +813,14 @@ m.clearAreaActions -- #()->()
   l.timeActionMap = newMap
 end
 addon.clearAreaActions = m.clearAreaActions
+
+m.debug
+= function() --#()->()
+  for key, var in pairs(l.idActionMap) do
+    df('%s(%d)@%d:%s',var.ability.name,var.ability.id,var.startTime,var:getEffectsInfo())
+  end
+end
+addon.debug = m.debug
 
 m.getIdActionMap -- #()->(#map<#number,Models#Action>)
 = function()

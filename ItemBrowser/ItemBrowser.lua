@@ -4,7 +4,7 @@ ItemBrowser = {
 	name = "ItemBrowser",
 
 	title = GetString(SI_ITEMBROWSER_TITLE),
-	version = "4.2.1",
+	version = "4.4.0",
 	url = "https://www.esoui.com/downloads/info1480.html",
 
 	-- Default settings

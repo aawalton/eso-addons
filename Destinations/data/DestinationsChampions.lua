@@ -1228,8 +1228,8 @@ Destinations.ChampionTableStore = {
   ["trollstoothpick_base_0"] = {
     { 0.5781766176, 0.5203699470, 539, 1 },
   },
-  ["ui_map_tsofeercavern01_0"] = {
-    { 0.7699, 0.3632, 2286, 1 },
+  ["tsofeercavern01_0"] = {
+    { 0.7708830833, 0.3618138432, 2286, 1 },
   },
 
   ["underpallcave_base_0"] = {

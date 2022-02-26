@@ -83,9 +83,11 @@ function LostTreasure:OnEventShowTreasureMap(treasureMapIndex)
 	if pin then
 		self:SetLastOpenedItemId(pin.itemId)
 		local pinType = utilities:GetPinTypeFromString(name)
-		local markOption = settings:GetSettingsFromPinType(pinType, "markOption")
-		if markOption == LOST_TREASURE_MARK_OPTIONS_USING then
-			self:AddMarkOnUsingPin(pinType, pin.itemId)
+		if pinType ~= LOST_TREASURE_NO_PIN_TYPE then
+			local markOption = settings:GetSettingsFromPinType(pinType, "markOption")
+			if markOption == LOST_TREASURE_MARK_OPTIONS_USING then
+				self:AddMarkOnUsingPin(pinType, pin.itemId)
+			end
 		end
 	end
 end
@@ -96,9 +98,11 @@ function LostTreasure:OnEventShowBook(title, body, medium, showTitle, bookId)
 	local itemId = LibTreasure_GetBookIdItemId(bookId)
 	if itemId then
 		local pinType = utilities:GetPinTypeFromString(title)
-		local markOption = settings:GetSettingsFromPinType(pinType, "markOption")
-		if markOption == LOST_TREASURE_MARK_OPTIONS_USING then
-			self:AddMarkOnUsingPin(pinType, itemId)
+		if pinType ~= LOST_TREASURE_NO_PIN_TYPE then
+			local markOption = settings:GetSettingsFromPinType(pinType, "markOption")
+			if markOption == LOST_TREASURE_MARK_OPTIONS_USING then
+				self:AddMarkOnUsingPin(pinType, itemId)
+			end
 		end
 	end
 	logger:Info("Book opened. bookId: %s, title: %s, isCollected: %s", bookId, title, tostring(itemId ~= nil))
@@ -113,7 +117,7 @@ end
 
 function LostTreasure:UpdateVisibility(hidden, fadeTime)
 	local isHidden = tostring(LOST_TREASURE_FRAGMENT:IsHidden())
-	logger:Debug("set hidden: %s, isHidden: %s, fadeTime: %d", tostring(hidden), isHidden, fadeTime)
+	logger:Debug("set hidden: %s, isHidden: %s, fadeTime: %s", tostring(hidden), isHidden, fadeTime or "nil")
 	LOST_TREASURE_FRAGMENT:SetHiddenForReason("hasMapOpened", hidden, fadeTime, fadeTime)
 end
 
@@ -142,13 +146,13 @@ do
 	--[[
 
 	This has to pass without action:
-	/script LOST_TREASURE:RequestReport("treasure", INTERACTION_NONE, 57764, "itemName", "itemLink", "hud")
+	/script LOST_TREASURE:RequestReport("treasure", INTERACTION_NONE, 57764, "itemName", "itemLink", "hud", true)
 	
 	This has to pop a request:
-	/script LOST_TREASURE:RequestReport("treasure", INTERACTION_NONE, 99999, "itemName", "itemLink", "hud")
+	/script LOST_TREASURE:RequestReport("treasure", INTERACTION_NONE, 99999, "itemName", "itemLink", "hud", true)
 
 	]]
-	function LostTreasure:RequestReport(pinType, interactionType, itemId, itemName, itemLink, sceneName)
+	function LostTreasure:RequestReport(pinType, interactionType, itemId, itemName, itemLink, sceneName, overwriteMiningState)
 		if IsValidInteractionType(pinType, interactionType, sceneName) then
 			-- Check for exisiting items in LostTreasure_Data.
 			if LibTreasure_GetItemIdData(itemId) then
@@ -161,8 +165,9 @@ do
 
 			local x, y, zone, subZone, mapId = utilities:GetPlayerPositionInfo()
 			local zoneName = zo_strformat(SI_ITEM_FORMAT_STR_TEXT1_TEXT2, zone, subZone)
+			local texture = settings:GetSettingsFromPinType(pinType, "texture")
 
-			logger:Info("new pin location at %.4f x %.4f, zone: %s, mapId: %d, itemId: %d, itemName: %s, treasureMapTexture: %s, interactionType: %d, sceneName: %s, itemLink: %s, bookId: %d", x, y, zoneName, mapId, itemId, itemName, self.lastOpenedTreasureMap, interactionType, sceneName, itemLink, self.lastOpenedBookId)
+			logger:Info("new pin location at %.4f x %.4f, zone: %s, mapId: %d, itemId: %d, itemName: %s, treasureMapTexture: %s, interactionType: %d, sceneName: %s, itemLink: %s, bookId: %d, texture: %s", x, y, zoneName, mapId, itemId, itemName, self.lastOpenedTreasureMap, interactionType, sceneName, itemLink, self.lastOpenedBookId, texture)
 
 			-- Pop up a new notification by handing over pinData.
 			local pinData =
@@ -172,13 +177,13 @@ do
 				pinType = pinType,
 				x = x,
 				y = y,
-				texture = settings:GetSettingsFromPinType(pinType, "texture"),
+				texture = texture,
 				zone = zoneName,
 				itemName = itemName,
 				lastOpenedTreasureMap = self.lastOpenedTreasureMap,
 				lastOpenedBookId = self.lastOpenedBookId,
 			}
-			mining:Add(pinData)
+			mining:Add(pinData, overwriteMiningState)
 		else
 			logger:Info("Invalid interaction. pinType %s, interactionType %d, sceneName %s", pinType, interactionType, sceneName)
 		end

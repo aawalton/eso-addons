@@ -5,7 +5,7 @@ local RaidNotifier = RaidNotifier
 
 RaidNotifier.Name           = "RaidNotifier"
 RaidNotifier.DisplayName    = "Raid Notifier"
-RaidNotifier.Version        = "2.19.1"
+RaidNotifier.Version        = "2.20"
 RaidNotifier.Author         = "|c009ad6Kyoma, Memus, Woeler, silentgecko|r"
 RaidNotifier.SV_Name        = "RNVars"
 RaidNotifier.SV_Version     = 4
@@ -630,12 +630,14 @@ do ----------------------
 			dbg("Register for %s (%s)", GetRaidZoneName(self.raidId), GetString("SI_DUNGEONDIFFICULTY", self.raidDifficulty))
 
 			local trial = self.Trial[self.raidId]
+			local combatStateChangedCallback
+
 			if (trial) then
 				trial.Initialize()
 				local combatEventCallback = trial.OnCombatEvent
 				local bossesChangedCallback = trial.OnBossesChanged
 				local effectChangedCallback = trial.OnEffectChanged
-				local combatStateChangedCallback = trial.OnCombatStateChanged
+				combatStateChangedCallback = trial.OnCombatStateChanged
 
 				local abilityList = {}
 				local function RegisterForAbility(abId)
@@ -744,6 +746,13 @@ do ----------------------
 		EVENT_MANAGER:UnregisterForEvent(self.Name, EVENT_EFFECT_CHANGED)
 		EVENT_MANAGER:UnregisterForEvent(self.Name, EVENT_BOSSES_CHANGED)
 		EVENT_MANAGER:UnregisterForEvent(self.Name, EVENT_PLAYER_COMBAT_STATE)
+
+		local trial = self.Trial[self.raidId]
+
+		-- Remove custom handlers which may have been assigned inside the trial "class"
+		if type(trial.Shutdown) == "function" then
+			trial.Shutdown()
+		end
 
 		--self:RemoveFragment()
 		self:HideAllElements()

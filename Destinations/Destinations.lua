@@ -121,7 +121,7 @@ end
 -------------------------------------------------
 
 local ADDON_AUTHOR                              = "Sharlikran |c990000Snowman|r|cFFFFFFDK|r & MasterLenman & Ayantir"
-local ADDON_VERSION                             = "29.1"
+local ADDON_VERSION                             = "29.4"
 local ADDON_WEBSITE                             = "http://www.esoui.com/downloads/info667-Destinations.html"
 
 local LMP                                       = LibMapPins
@@ -1597,37 +1597,6 @@ function on_zone_changed(eventCode, zoneName, subZoneName, newSubzone, zoneId, s
 end
 EVENT_MANAGER:RegisterForEvent(ADDON_NAME .. "_zone_changed", EVENT_ZONE_CHANGED, on_zone_changed)
 
--- Slash commands -------------------------------------------------------------
-local function ShowMyPosition()
-  if SetMapToPlayerLocation() == SET_MAP_RESULT_MAP_CHANGED then
-    CALLBACK_MANAGER:FireCallbacks("OnWorldMapChanged")
-  end
-
-  local x, y    = GetMapPlayerPosition("player")
-
-  local locX    = ("%0.09f"):format(zo_round(x * 10000) / 10000)
-  local locY    = ("%0.09f"):format(zo_round(y * 10000) / 10000)
-
-  local mapname = LMP:GetZoneAndSubzone(true, true, true)
-
-  Dest:dm("Info", zo_strformat('["<<1>>"] = <<2>>, <<3>>', mapname, locX, locY))
-
-end
-
-SLASH_COMMANDS["/fishloc"] = ShowMyPosition
-
-local function GetPoiTypeName(poiTypeId)
-  return poiTypes[poiTypeId] or poiTypes[99]
-end
-
-local function GetICPoiTypeName(poiTypeId)
-  return poiTypesIC[poiTypeId] or poiTypesIC[99]
-end
-
-local function GetAchTypeName(TYPE)
-  return achTypes[TYPE] or achTypes[55]
-end
-
 --[[ Various map names
     Reference https://wiki.esoui.com/Texture_List/ESO/art/maps
 
@@ -1648,6 +1617,37 @@ local function GetMapTextureName()
   end
 
   return mapTextureName, zoneTextureName
+end
+
+-- Slash commands -------------------------------------------------------------
+local function ShowMyPosition()
+  if SetMapToPlayerLocation() == SET_MAP_RESULT_MAP_CHANGED then
+    CALLBACK_MANAGER:FireCallbacks("OnWorldMapChanged")
+  end
+
+  local x, y    = GetMapPlayerPosition("player")
+
+  local locX    = ("%0.09f"):format(zo_round(x * 10000) / 10000)
+  local locY    = ("%0.09f"):format(zo_round(y * 10000) / 10000)
+
+  local mapname = LMP:GetZoneAndSubzone(false, true, true)
+  GetMapTextureName()
+
+  Dest:dm("Info", zo_strformat('["<<1>>/<<2>>"] = <<3>>, <<4>>', mapname, zoneTextureName, locX, locY))
+end
+
+SLASH_COMMANDS["/fishloc"] = ShowMyPosition
+
+local function GetPoiTypeName(poiTypeId)
+  return poiTypes[poiTypeId] or poiTypes[99]
+end
+
+local function GetICPoiTypeName(poiTypeId)
+  return poiTypesIC[poiTypeId] or poiTypesIC[99]
+end
+
+local function GetAchTypeName(TYPE)
+  return achTypes[TYPE] or achTypes[55]
 end
 
 ------------------- MAP PINS -------------------
@@ -3185,6 +3185,7 @@ local function QuestPinFilters(QuestID, dataName, questLine, questSeries)
   end
   return
 end
+--[[
 local function sharedQuestPinData()
   mapData, mapTextureName, zoneTextureName = nil, nil, nil
   if LMP:IsEnabled(drtv.pinName) and DestinationsCSSV.filters[drtv.pinName] then
@@ -3192,6 +3193,7 @@ local function sharedQuestPinData()
     mapData = LQD:get_quest_list(LMP:GetZoneAndSubzone(true, false, true))
   end
 end
+]]--
 local function AvailableQuestPinTint(pin)
   if pin ~= nil then
     if pin.m_PinTag ~= nil then
@@ -6430,7 +6432,11 @@ end
 
 local function ShowLanguageWarning()
   EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, EVENT_PLAYER_ACTIVATED)
-  CHAT_ROUTER:AddSystemMessage("Destinations is not properly localized for " .. Destinations.client_lang .. ".  English terms will be used and not all POIs may be properly classified.")
+  if Destinations.client_lang == "it" then
+    CHAT_ROUTER:AddSystemMessage("Destinations non è localizzato correttamente dalla lingua italiana. Verranno utilizzati termini inglesi e non tutti i punti di interesse potrebbero essere classificati correttamente.")
+  else
+    CHAT_ROUTER:AddSystemMessage("Destinations is not properly localized for " .. Destinations.client_lang .. ".  English terms will be used and not all POIs may be properly classified.")
+  end
 end
 
 local function DisableEnglishFunctionnalities()

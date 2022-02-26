@@ -67,6 +67,7 @@ local skyshardsAchievementIDs = {
 	[2687] = true,  -- Western Skyrim Skyshard Hunter
 	[2857] = true,  -- The Reach Skyshard Hunter
 	[2982] = true,  -- Blackwood Skyshard Hunter
+  [3140] = true,  -- Deadlands Skyshard Hunter
 }
 
 local skyshardsExplorationIDs = {
@@ -1197,10 +1198,7 @@ skyshardsData["stonefalls"] = {
 	["bleakrock_base"] = {  --Bleakrock Isle
 		{ 0.7744, 0.4388, 398, 1 },
 		{ 0.4985, 0.2252, 398, 2 },
-		{ 0.2547, 0.3964, 398, 3, 4 }, --Hozzin's Folly entrance
-		},
-	["hozzinsfolley_base"] = {
-		{ 0.3296, 0.8098, 398, 3 },
+		{ 0.2780946493, 0.4022813737, 398, 3 }, --Hozzin's Folly entrance
 		},
 }
 
@@ -1714,13 +1712,17 @@ skyshardsData["reach"] = {
         { 0.738115906715, 0.330711334943, 2857, 6, 2 },
     },
     ["gloomreach3_base"] = {
-        { 0.646440267562, 0.407346159219, 2857, 6 },
+        { 0.6464774012, 0.4073275923, 2857, 6 },
     },
     ["briarrockruins_ext_base"] = {
         { 0.341515928506, 0.621803820133, 2857, 5 },
     },
 }
+skyshardsData["reach"]["gloomreach_base"]=skyshardsData["reach"]["gloomreach3_base"]
 skyshardsData["reach"]["gloomreach2_base"]=skyshardsData["reach"]["gloomreach3_base"]
+skyshardsData["reach"]["gloomreach2b_base"]=skyshardsData["reach"]["gloomreach3_base"]
+skyshardsData["reach"]["gloomreach2c_base"]=skyshardsData["reach"]["gloomreach3_base"]
+skyshardsData["reach"]["gloomreach5_base"]=skyshardsData["reach"]["gloomreach3_base"]
 
 skyshardsData["blackwood"] = {
 	--Blackwood
